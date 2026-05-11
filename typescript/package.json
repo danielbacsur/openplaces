@@ -1,0 +1,12 @@
+{
+  "name": "openplaces",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "playwright": "1.60.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25",
+    "typescript": "^6"
+  }
+}
