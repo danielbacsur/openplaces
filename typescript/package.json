@@ -2,11 +2,15 @@
   "name": "openplaces",
   "version": "0.0.0",
   "private": true,
+  "scripts": {
+    "test": "vitest run"
+  },
   "dependencies": {
     "playwright": "1.60.0"
   },
   "devDependencies": {
     "@types/node": "^25",
-    "typescript": "^6"
+    "typescript": "^6",
+    "vitest": "^4"
   }
 }
