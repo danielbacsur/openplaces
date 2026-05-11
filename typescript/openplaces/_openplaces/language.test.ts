@@ -1,0 +1,102 @@
+import { describe, expect, it } from "vitest";
+
+import { parse } from "./language";
+
+describe("parse", () => {
+  describe("bare queries", () => {
+    it("parses a single bare word as one query result", () => {
+      expect(parse("a")).toEqual([{ query: "a" }]);
+    });
+
+    it("joins consecutive words into a single query", () => {
+      expect(parse("a b")).toEqual([{ query: "a b" }]);
+    });
+  });
+
+  describe("and / or", () => {
+    it("splits queries with the 'and' or 'or' keywords", () => {
+      expect(parse("a and b")).toEqual([{ query: "a" }, { query: "b" }]);
+      expect(parse("a or b")).toEqual([{ query: "a" }, { query: "b" }]);
+    });
+
+    it("chains many 'and' or 'or' separators in a row", () => {
+      expect(parse("a and b and c")).toEqual([
+        { query: "a" },
+        { query: "b" },
+        { query: "c" },
+      ]);
+
+      expect(parse("a or b or c")).toEqual([
+        { query: "a" },
+        { query: "b" },
+        { query: "c" },
+      ]);
+    });
+
+    it("interleaves the 'and' and 'or' keywords freely", () => {
+      expect(parse("a and b or c")).toEqual([
+        { query: "a" },
+        { query: "b" },
+        { query: "c" },
+      ]);
+    });
+  });
+
+  describe("in", () => {
+    it("attaches one location with the 'in' keyword", () => {
+      expect(parse("a in x")).toEqual([{ query: "a", location: "x" }]);
+    });
+
+    it("shares a single location across many queries", () => {
+      expect(parse("a and b in x")).toEqual([
+        { query: "a", location: "x" },
+        { query: "b", location: "x" },
+      ]);
+    });
+
+    it("shares a single query across many locations", () => {
+      expect(parse("a in x and y")).toEqual([
+        { query: "a", location: "x" },
+        { query: "a", location: "y" },
+      ]);
+    });
+
+    it("cross-products many queries with many locations", () => {
+      expect(parse("a and b in x and y")).toEqual([
+        { query: "a", location: "x" },
+        { query: "a", location: "y" },
+        { query: "b", location: "x" },
+        { query: "b", location: "y" },
+      ]);
+    });
+  });
+
+  describe("parentheses", () => {
+    it("ignores parentheses around a single bare query", () => {
+      expect(parse("(a)")).toEqual([{ query: "a" }]);
+    });
+
+    it("scopes the 'in' keyword inside parentheses", () => {
+      expect(parse("a and (b in x)")).toEqual([
+        { query: "a" },
+        { query: "b", location: "x" },
+      ]);
+    });
+
+    it("groups many queries inside parentheses with in", () => {
+      expect(parse("(a and b) in x")).toEqual([
+        { query: "a", location: "x" },
+        { query: "b", location: "x" },
+      ]);
+    });
+
+    it("handles arbitrarily deep nested expressions", () => {
+      expect(parse("a and (((b and c) in x) or (d in y))")).toEqual([
+        { query: "a" },
+        { query: "b", location: "x" },
+        { query: "c", location: "x" },
+        { query: "d", location: "y" },
+      ]);
+    });
+  });
+});
