@@ -11,6 +11,11 @@ describe("parse", () => {
     it("joins consecutive words into a single query", () => {
       expect(parse("a b")).toEqual([{ query: "a b" }]);
     });
+
+    it("preserves keywords embedded in hyphenated words", () => {
+      expect(parse("in-n-out")).toEqual([{ query: "in-n-out" }]);
+      expect(parse("rock-and-roll")).toEqual([{ query: "rock-and-roll" }]);
+    });
   });
 
   describe("and / or", () => {

@@ -3,7 +3,7 @@ type Prototype = { query: string; location?: string };
 const KEYWORDS = new Set(["(", ")", "and", "or", "in"]);
 
 export function parse(input: string): Prototype[] {
-  const tokens = input.match(/\(|\)|\band\b|\bor\b|\bin\b|[^\s()]+/gi) ?? [];
+  const tokens = input.match(/\(|\)|(?<![^\s()])(?:and|or|in)(?![^\s()])|[^\s()]+/gi) ?? [];
 
   if (tokens.length === 0) return [];
 
