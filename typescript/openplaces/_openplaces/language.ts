@@ -5,6 +5,8 @@ const KEYWORDS = new Set(["(", ")", "and", "or", "in"]);
 export function parse(input: string): Prototype[] {
   const tokens = input.match(/\(|\)|\band\b|\bor\b|\bin\b|[^\s()]+/gi) ?? [];
 
+  if (tokens.length === 0) return [];
+
   const peek = () => tokens[index]?.toLowerCase();
 
   let index = 0;
@@ -45,6 +47,7 @@ export function parse(input: string): Prototype[] {
     if (peek() === "(") {
       index++;
       const results = IN();
+      if (peek() !== ")") throw new Error("expected ')'");
       index++;
       return results;
     }
@@ -52,8 +55,18 @@ export function parse(input: string): Prototype[] {
     while (index < tokens.length && !KEYWORDS.has(peek()!)) {
       query.push(tokens[index++]);
     }
+    if (query.length === 0) {
+      const tok = peek();
+      throw new Error(tok ? `unexpected '${tok}'` : "unexpected end of input");
+    }
     return [{ query: query.join(" ") }];
   };
 
-  return IN();
+  const results = IN();
+
+  if (index < tokens.length) {
+    throw new Error(`unexpected '${peek()}'`);
+  }
+
+  return results;
 }

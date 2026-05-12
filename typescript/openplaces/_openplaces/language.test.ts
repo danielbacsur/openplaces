@@ -99,4 +99,36 @@ describe("parse", () => {
       ]);
     });
   });
+
+  describe("malformed input", () => {
+    it("returns an empty result for blank or empty input", () => {
+      expect(parse("")).toEqual([]);
+      expect(parse("   ")).toEqual([]);
+    });
+
+    it("throws when a query is missing before a keyword", () => {
+      expect(() => parse("and a")).toThrow(/unexpected 'and'/);
+      expect(() => parse("or a")).toThrow(/unexpected 'or'/);
+      expect(() => parse("in x")).toThrow(/unexpected 'in'/);
+    });
+
+    it("throws when a query is missing after a keyword", () => {
+      expect(() => parse("a and")).toThrow(/unexpected end of input/);
+      expect(() => parse("a or")).toThrow(/unexpected end of input/);
+      expect(() => parse("a in")).toThrow(/unexpected end of input/);
+    });
+
+    it("throws for unbalanced parentheses in the input", () => {
+      expect(() => parse("(a")).toThrow(/expected '\)'/);
+      expect(() => parse("a)")).toThrow(/unexpected '\)'/);
+    });
+
+    it("throws on empty parentheses with no inner query", () => {
+      expect(() => parse("()")).toThrow(/unexpected '\)'/);
+    });
+
+    it("throws when there are unconsumed trailing tokens", () => {
+      expect(() => parse("a in x in y")).toThrow(/unexpected 'in'/);
+    });
+  });
 });
