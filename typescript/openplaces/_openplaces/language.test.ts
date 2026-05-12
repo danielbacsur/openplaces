@@ -76,6 +76,22 @@ describe("parse", () => {
     });
   });
 
+  describe("quoted strings", () => {
+    it("treats a quoted string as a single bare query", () => {
+      expect(parse('"new york"')).toEqual([{ query: "new york" }]);
+    });
+
+    it("preserves keyword words inside quoted strings", () => {
+      expect(parse('"and or in"')).toEqual([{ query: "and or in" }]);
+    });
+
+    it("uses quoted strings as queries and locations", () => {
+      expect(parse('"fancy food" in "new york"')).toEqual([
+        { query: "fancy food", location: "new york" },
+      ]);
+    });
+  });
+
   describe("parentheses", () => {
     it("ignores parentheses around a single bare query", () => {
       expect(parse("(a)")).toEqual([{ query: "a" }]);

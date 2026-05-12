@@ -3,7 +3,10 @@ type Prototype = { query: string; location?: string };
 const KEYWORDS = new Set(["(", ")", "and", "or", "in"]);
 
 export function parse(input: string): Prototype[] {
-  const tokens = input.match(/\(|\)|(?<![^\s()])(?:and|or|in)(?![^\s()])|[^\s()]+/gi) ?? [];
+  const tokens =
+    input.match(
+      /"[^"]*"|\(|\)|(?<![^\s()])(?:and|or|in)(?![^\s()])|[^\s()]+/gi,
+    ) ?? [];
 
   if (tokens.length === 0) return [];
 
@@ -53,11 +56,14 @@ export function parse(input: string): Prototype[] {
     }
     const query: string[] = [];
     while (index < tokens.length && !KEYWORDS.has(peek()!)) {
-      query.push(tokens[index++]);
+      const token = tokens[index++];
+      query.push(/^".*"$/.test(token) ? token.slice(1, -1) : token);
     }
     if (query.length === 0) {
-      const tok = peek();
-      throw new Error(tok ? `unexpected '${tok}'` : "unexpected end of input");
+      const token = peek();
+      throw new Error(
+        token ? `unexpected '${token}'` : "unexpected end of input",
+      );
     }
     return [{ query: query.join(" ") }];
   };
