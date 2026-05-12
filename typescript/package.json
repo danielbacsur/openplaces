@@ -5,6 +5,9 @@
   "scripts": {
     "test": "vitest run"
   },
+  "dependencies": {
+    "zod": "4.4.3"
+  },
   "devDependencies": {
     "@types/node": "^25",
     "typescript": "^6",
