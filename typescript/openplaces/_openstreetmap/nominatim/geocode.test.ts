@@ -8,7 +8,7 @@ describe("geocode", () => {
 
     beforeAll(async () => {
       area = await geocode("budapest");
-    });
+    }, 5000);
 
     it("returns a center near the expected coordinates", () => {
       expect(area.center.latitude).toBeCloseTo(47.5, 0);
@@ -33,6 +33,6 @@ describe("geocode", () => {
       await expect(geocode("no such place")).rejects.toThrow(
         /nominatim returned no result for "no such place"/,
       );
-    });
+    }, 5000);
   });
 });

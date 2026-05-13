@@ -27,7 +27,7 @@ describe("search", () => {
 
     beforeAll(async () => {
       results = await search({ query: "eiffel tower" });
-    });
+    }, 5000);
 
     it("returns exactly one place", () => {
       expect(results).toHaveLength(1);
@@ -62,7 +62,7 @@ describe("search", () => {
         query: "restaurants",
         viewport: BUDAPEST_VIEWPORT,
       });
-    });
+    }, 5000);
 
     it("returns the full page of results", () => {
       expect(results).toHaveLength(20);
@@ -137,7 +137,7 @@ describe("search", () => {
         viewport: BUDAPEST_VIEWPORT,
         offset: 20,
       });
-    });
+    }, 10000);
 
     it("returns places on page 1", () => {
       expect(page1.length).toBeGreaterThan(0);
@@ -167,7 +167,7 @@ describe("search", () => {
         query: "coffee",
         viewport: NEW_YORK_VIEWPORT,
       });
-    });
+    }, 10_000);
 
     it("returns paris-area latitudes for the paris viewport", () => {
       for (const place of parisResults) {
@@ -205,7 +205,7 @@ describe("search", () => {
 
     beforeAll(async () => {
       results = await search({ query: "asdfqwerlkjhpoiu98765zxcvbnm" });
-    });
+    }, 5000);
 
     it("returns no places", () => {
       expect(results).toHaveLength(0);

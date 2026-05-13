@@ -11,7 +11,7 @@ describe("stream", () => {
 
     beforeAll(async () => {
       results = await places.search("eiffel tower");
-    });
+    }, 5000);
 
     it("returns exactly one place", () => {
       expect(results).toHaveLength(1);
@@ -32,7 +32,7 @@ describe("stream", () => {
 
     beforeAll(async () => {
       results = await places.search("restaurants in budapest", { limit: 200 });
-    });
+    }, 200000);
 
     it("returns exactly the requested number of places", () => {
       expect(results).toHaveLength(200);
