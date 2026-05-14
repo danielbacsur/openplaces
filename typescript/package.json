@@ -18,6 +18,10 @@
     "url": "https://github.com/danielbacsur/openplaces/issues"
   },
 
+  "engines": {
+    "node": ">=22.0.0"
+  },
+
   "scripts": {
     "test": "vitest run"
   },
