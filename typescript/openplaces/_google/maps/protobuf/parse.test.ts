@@ -4,13 +4,13 @@ import { parse } from "./parse";
 
 describe("parse", () => {
   describe("flat token streams", () => {
-    it("parses a single scalar token as one flat node", () => {
+    it("parses a single scalar token as one flat tree node", () => {
       expect(parse("!1shello")).toEqual([
         { tag: 1, type: "s", value: "hello" },
       ]);
     });
 
-    it("parses a sequence of scalar tokens in order", () => {
+    it("parses a sequence of scalar tokens in source order", () => {
       expect(parse("!1shi!2i7")).toEqual([
         { tag: 1, type: "s", value: "hi" },
         { tag: 2, type: "i", value: 7 },

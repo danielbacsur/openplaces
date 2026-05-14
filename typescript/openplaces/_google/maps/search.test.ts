@@ -29,27 +29,27 @@ describe("search", () => {
       results = await search({ query: "eiffel tower" });
     }, 5000);
 
-    it("returns exactly one place", () => {
+    it("returns exactly one place for a unique landmark", () => {
       expect(results).toHaveLength(1);
     });
 
-    it("returns a name matching the query", () => {
+    it("returns a name that matches the eiffel tower query", () => {
       expect(results[0].name).toMatch(/eiffel tower/i);
     });
 
-    it("returns the latitude of the eiffel tower", () => {
+    it("returns the published latitude of the eiffel tower", () => {
       expect(results[0].latitude).toBeCloseTo(48.858, 2);
     });
 
-    it("returns the longitude of the eiffel tower", () => {
+    it("returns the published longitude of the eiffel tower", () => {
       expect(results[0].longitude).toBeCloseTo(2.294, 2);
     });
 
-    it("returns a ChIJ-prefixed id", () => {
+    it("returns a ChIJ-prefixed id for the eiffel tower", () => {
       expect(results[0].id).toMatch(/^ChIJ[\w-]+$/);
     });
 
-    it("returns a website domain", () => {
+    it("returns a website domain string for the landmark", () => {
       expect(results[0].website).toMatch(/toureiffel\.paris/);
     });
   });
@@ -64,17 +64,17 @@ describe("search", () => {
       });
     }, 5000);
 
-    it("returns the full page of results", () => {
+    it("returns exactly twenty places on a single page query", () => {
       expect(results).toHaveLength(20);
     });
 
-    it("returns ChIJ-prefixed ids for every place", () => {
+    it("returns a ChIJ-prefixed id on every returned place", () => {
       for (const place of results) {
         expect(place.id).toMatch(/^ChIJ[\w-]+$/);
       }
     });
 
-    it("returns a non-empty string name for every place", () => {
+    it("returns a non-empty string name on every result place", () => {
       for (const place of results) {
         expect(typeof place.name).toBe("string");
         expect(place.name.length).toBeGreaterThan(0);
@@ -88,19 +88,19 @@ describe("search", () => {
       }
     });
 
-    it("returns latitudes near the viewport center", () => {
+    it("returns latitudes clustered near the viewport center", () => {
       for (const place of results) {
         expect(place.latitude).toBeCloseTo(BUDAPEST_VIEWPORT.latitude, 0);
       }
     });
 
-    it("returns longitudes near the viewport center", () => {
+    it("returns longitudes clustered near the viewport center", () => {
       for (const place of results) {
         expect(place.longitude).toBeCloseTo(BUDAPEST_VIEWPORT.longitude, 0);
       }
     });
 
-    it("returns unique ids on a single page", () => {
+    it("returns a unique id across every place on the page", () => {
       const ids = new Set(results.map((p) => p.id));
       expect(ids.size).toBe(results.length);
     });
@@ -109,7 +109,7 @@ describe("search", () => {
       expect(results.some((p) => p.phone !== undefined)).toBe(true);
     });
 
-    it("populates a website for at least one place", () => {
+    it("populates a website domain for at least one place", () => {
       expect(results.some((p) => p.website !== undefined)).toBe(true);
     });
 
@@ -139,15 +139,15 @@ describe("search", () => {
       });
     }, 10000);
 
-    it("returns places on page 1", () => {
+    it("returns at least one place on the first offset page", () => {
       expect(page1.length).toBeGreaterThan(0);
     });
 
-    it("returns places on page 2", () => {
+    it("returns at least one place on the second offset page", () => {
       expect(page2.length).toBeGreaterThan(0);
     });
 
-    it("returns disjoint id sets across pages", () => {
+    it("returns disjoint id sets across the two page calls", () => {
       const ids1 = new Set(page1.map((p) => p.id));
       const overlap = page2.filter((p) => ids1.has(p.id));
       expect(overlap).toHaveLength(0);
@@ -181,13 +181,13 @@ describe("search", () => {
       }
     });
 
-    it("returns new-york-area latitudes for the new york viewport", () => {
+    it("returns nyc-area latitudes for the new york viewport", () => {
       for (const place of newYorkResults) {
         expect(place.latitude).toBeCloseTo(NEW_YORK_VIEWPORT.latitude, 0);
       }
     });
 
-    it("returns new-york-area longitudes for the new york viewport", () => {
+    it("returns nyc-area longitudes for the new york viewport", () => {
       for (const place of newYorkResults) {
         expect(place.longitude).toBeCloseTo(NEW_YORK_VIEWPORT.longitude, 0);
       }
@@ -207,7 +207,7 @@ describe("search", () => {
       results = await search({ query: "asdfqwerlkjhpoiu98765zxcvbnm" });
     }, 5000);
 
-    it("returns no places", () => {
+    it("returns no places for an unmatchable query string", () => {
       expect(results).toHaveLength(0);
     });
   });

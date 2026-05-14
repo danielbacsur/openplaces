@@ -10,7 +10,7 @@ describe("geocode", () => {
       area = await geocode("budapest");
     }, 5000);
 
-    it("returns a center near the expected coordinates", () => {
+    it("returns a center near the expected geographic point", () => {
       expect(area.center.latitude).toBeCloseTo(47.5, 0);
       expect(area.center.longitude).toBeCloseTo(19.0, 0);
     });

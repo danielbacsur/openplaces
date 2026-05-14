@@ -4,7 +4,7 @@ import { tokenize } from "./tokenize";
 
 describe("tokenize", () => {
   describe("scalar tokens", () => {
-    it("captures a string token with its tag and value", () => {
+    it("captures a string token alongside its tag and value", () => {
       expect(tokenize("!1shello")).toEqual([
         { tag: 1, type: "s", value: "hello" },
       ]);

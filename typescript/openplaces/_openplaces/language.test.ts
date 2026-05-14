@@ -4,11 +4,11 @@ import { parse } from "./language";
 
 describe("parse", () => {
   describe("bare queries", () => {
-    it("parses a single bare word as one query result", () => {
+    it("parses a single bare word as a single query result", () => {
       expect(parse("a")).toEqual([{ query: "a" }]);
     });
 
-    it("joins consecutive words into a single query", () => {
+    it("joins many consecutive words into a single query", () => {
       expect(parse("a b")).toEqual([{ query: "a b" }]);
     });
 
@@ -19,12 +19,12 @@ describe("parse", () => {
   });
 
   describe("and / or", () => {
-    it("splits queries with the 'and' or 'or' keywords", () => {
+    it("splits a query by the 'and' or 'or' separator words", () => {
       expect(parse("a and b")).toEqual([{ query: "a" }, { query: "b" }]);
       expect(parse("a or b")).toEqual([{ query: "a" }, { query: "b" }]);
     });
 
-    it("chains many 'and' or 'or' separators in a row", () => {
+    it("chains many 'and' or 'or' separators in a single row", () => {
       expect(parse("a and b and c")).toEqual([
         { query: "a" },
         { query: "b" },
@@ -38,7 +38,7 @@ describe("parse", () => {
       ]);
     });
 
-    it("interleaves the 'and' and 'or' keywords freely", () => {
+    it("interleaves the 'and' and 'or' keywords arbitrarily", () => {
       expect(parse("a and b or c")).toEqual([
         { query: "a" },
         { query: "b" },
@@ -48,18 +48,18 @@ describe("parse", () => {
   });
 
   describe("in", () => {
-    it("attaches one location with the 'in' keyword", () => {
+    it("attaches a single location with the 'in' keyword", () => {
       expect(parse("a in x")).toEqual([{ query: "a", location: "x" }]);
     });
 
-    it("shares a single location across many queries", () => {
+    it("shares a single location across many query terms", () => {
       expect(parse("a and b in x")).toEqual([
         { query: "a", location: "x" },
         { query: "b", location: "x" },
       ]);
     });
 
-    it("shares a single query across many locations", () => {
+    it("shares a single query across many target locations", () => {
       expect(parse("a in x and y")).toEqual([
         { query: "a", location: "x" },
         { query: "a", location: "y" },
@@ -77,15 +77,15 @@ describe("parse", () => {
   });
 
   describe("quoted strings", () => {
-    it("treats a quoted string as a single bare query", () => {
+    it("treats a quoted string as a single bare query value", () => {
       expect(parse('"new york"')).toEqual([{ query: "new york" }]);
     });
 
-    it("preserves keyword words inside quoted strings", () => {
+    it("preserves the keyword words inside quoted strings", () => {
       expect(parse('"and or in"')).toEqual([{ query: "and or in" }]);
     });
 
-    it("uses quoted strings as queries and locations", () => {
+    it("uses quoted strings as both queries and locations", () => {
       expect(parse('"fancy food" in "new york"')).toEqual([
         { query: "fancy food", location: "new york" },
       ]);
@@ -93,25 +93,25 @@ describe("parse", () => {
   });
 
   describe("parentheses", () => {
-    it("ignores parentheses around a single bare query", () => {
+    it("ignores parentheses placed around a single bare query", () => {
       expect(parse("(a)")).toEqual([{ query: "a" }]);
     });
 
-    it("scopes the 'in' keyword inside parentheses", () => {
+    it("scopes the 'in' keyword inside parenthesized groups", () => {
       expect(parse("a and (b in x)")).toEqual([
         { query: "a" },
         { query: "b", location: "x" },
       ]);
     });
 
-    it("groups many queries inside parentheses with in", () => {
+    it("groups many queries inside a parenthesized in clause", () => {
       expect(parse("(a and b) in x")).toEqual([
         { query: "a", location: "x" },
         { query: "b", location: "x" },
       ]);
     });
 
-    it("handles arbitrarily deep nested expressions", () => {
+    it("handles arbitrarily deeply nested expression trees", () => {
       expect(parse("a and (((b and c) in x) or (d in y))")).toEqual([
         { query: "a" },
         { query: "b", location: "x" },
@@ -133,13 +133,13 @@ describe("parse", () => {
       expect(() => parse("in x")).toThrow(/unexpected 'in'/);
     });
 
-    it("throws when a query is missing after a keyword", () => {
+    it("throws when a query is missing after the keyword", () => {
       expect(() => parse("a and")).toThrow(/unexpected end of input/);
       expect(() => parse("a or")).toThrow(/unexpected end of input/);
       expect(() => parse("a in")).toThrow(/unexpected end of input/);
     });
 
-    it("throws for unbalanced parentheses in the input", () => {
+    it("throws for unbalanced parentheses anywhere in input", () => {
       expect(() => parse("(a")).toThrow(/expected '\)'/);
       expect(() => parse("a)")).toThrow(/unexpected '\)'/);
     });

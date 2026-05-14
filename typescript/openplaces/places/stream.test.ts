@@ -11,17 +11,17 @@ describe("stream", () => {
 
     beforeAll(async () => {
       results = await places.search("eiffel tower");
-    }, 5000);
+    }, 5_000);
 
-    it("returns exactly one place", () => {
+    it("returns exactly one place for a unique landmark", () => {
       expect(results).toHaveLength(1);
     });
 
-    it("returns a name matching the query", () => {
+    it("returns a name that matches the eiffel tower query", () => {
       expect(results[0].name).toMatch(/eiffel tower/i);
     });
 
-    it("returns the eiffel tower coordinates", () => {
+    it("returns latitude and longitude of the eiffel tower", () => {
       expect(results[0].latitude).toBeCloseTo(48.858, 1);
       expect(results[0].longitude).toBeCloseTo(2.294, 1);
     });
@@ -32,24 +32,24 @@ describe("stream", () => {
 
     beforeAll(async () => {
       results = await places.search("restaurants in budapest", { limit: 200 });
-    }, 200000);
+    }, 200_000);
 
-    it("returns exactly the requested number of places", () => {
+    it("returns exactly the requested limit of two hundred", () => {
       expect(results).toHaveLength(200);
     });
 
-    it("returns all unique ids", () => {
+    it("returns a unique id for every place in the stream", () => {
       const ids = new Set(results.map((r) => r.id));
       expect(ids.size).toBe(200);
     });
 
-    it("returns ChIJ-prefixed ids", () => {
+    it("returns a ChIJ-prefixed id on every yielded place", () => {
       for (const r of results) {
         expect(r.id).toMatch(/^ChIJ[\w-]+$/);
       }
     });
 
-    it("returns string names", () => {
+    it("returns a non-empty string name on every result", () => {
       for (const r of results) {
         expect(typeof r.name).toBe("string");
       }

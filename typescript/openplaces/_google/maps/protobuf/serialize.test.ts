@@ -4,13 +4,13 @@ import { serialize } from "./serialize";
 
 describe("serialize", () => {
   describe("flat node lists", () => {
-    it("serializes a single scalar node to one token", () => {
+    it("serializes a single scalar node to a single token", () => {
       expect(serialize([{ tag: 1, type: "s", value: "hello" }])).toBe(
         "!1shello",
       );
     });
 
-    it("serializes a sequence of scalar nodes in order", () => {
+    it("serializes a sequence of scalar nodes in source order", () => {
       expect(
         serialize([
           { tag: 1, type: "s", value: "hi" },
