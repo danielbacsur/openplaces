@@ -34,11 +34,12 @@
   "files": [
     "dist"
   ],
-
+  
   "scripts": {
     "build": "tsdown",
-    "test": "vitest run",
-    "prepack": "npm run build"
+    "prepack": "npm run typecheck && npm run build",
+    "test": "vitest --run",
+    "typecheck": "tsc"
   },
 
   "dependencies": {
