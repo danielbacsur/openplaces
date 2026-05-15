@@ -20,7 +20,11 @@ export async function geocode(query: string): Promise<Area> {
     throw new Error(`nominatim failed to geocode "${query}"`);
   }
 
-  const [result] = await response.json();
+  const [result] = (await response.json()) as Array<{
+    lat: string;
+    lon: string;
+    boundingbox: [string, string, string, string];
+  }>;
 
   if (!result) {
     throw new Error(`nominatim returned no result for "${query}"`);
