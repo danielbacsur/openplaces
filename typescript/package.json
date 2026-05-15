@@ -38,6 +38,7 @@
   "scripts": {
     "build": "tsdown",
     "prepack": "npm run typecheck && npm run build",
+    "release": "bumpp",
     "test": "vitest --run",
     "typecheck": "tsc"
   },
@@ -48,6 +49,7 @@
 
   "devDependencies": {
     "@types/node": "^25",
+    "bumpp": "^11",
     "tsdown": "^0.22.0",
     "typescript": "^6",
     "vitest": "^4"
