@@ -1,60 +1,7 @@
 {
   "name": "openplaces",
   "version": "0.0.0",
-
   "description": "Look up places, businesses, addresses, and location metadata without a proprietary places API.",
-  "author": "Daniel Bacsur <contact@danielbacsur.com>",
-  "license": "MIT",
-
-  "homepage": "https://github.com/danielbacsur/openplaces",
-
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/danielbacsur/openplaces.git",
-    "directory": "typescript"
-  },
-
-  "bugs": {
-    "url": "https://github.com/danielbacsur/openplaces/issues"
-  },
-
-  "engines": {
-    "node": ">=22.0.0"
-  },
-
-  "type": "module",
-  "main": "./dist/index.mjs",
-  "types": "./dist/index.d.mts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.mts",
-      "default": "./dist/index.mjs"
-    }
-  },
-  "files": [
-    "dist"
-  ],
-  
-  "scripts": {
-    "build": "tsdown",
-    "prepack": "npm run typecheck && npm run build",
-    "release": "bumpp",
-    "test": "vitest --run",
-    "typecheck": "tsc"
-  },
-
-  "dependencies": {
-    "zod": "^4.4.3"
-  },
-
-  "devDependencies": {
-    "@types/node": "^25",
-    "bumpp": "^11",
-    "tsdown": "^0.22.0",
-    "typescript": "^6",
-    "vitest": "^4"
-  },
-
   "keywords": [
     "addresses",
     "geocoding",
@@ -65,5 +12,48 @@
     "openplaces",
     "openstreetmap",
     "places"
-  ]
+  ],
+  "homepage": "https://github.com/danielbacsur/openplaces",
+  "bugs": {
+    "url": "https://github.com/danielbacsur/openplaces/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielbacsur/openplaces.git",
+    "directory": "typescript"
+  },
+  "license": "MIT",
+  "author": "Daniel Bacsur <contact@danielbacsur.com>",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "prepack": "npm run typecheck && npm run build",
+    "release": "bumpp",
+    "test": "vitest --run",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25",
+    "bumpp": "^11",
+    "tsdown": "^0.22.0",
+    "typescript": "^6",
+    "vitest": "^4"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
 }
