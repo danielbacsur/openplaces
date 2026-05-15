@@ -22,8 +22,23 @@
     "node": ">=22.0.0"
   },
 
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+
   "scripts": {
-    "test": "vitest run"
+    "build": "tsdown",
+    "test": "vitest run",
+    "prepack": "npm run build"
   },
 
   "dependencies": {
@@ -32,6 +47,7 @@
 
   "devDependencies": {
     "@types/node": "^25",
+    "tsdown": "^0.22.0",
     "typescript": "^6",
     "vitest": "^4"
   },
