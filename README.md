@@ -16,7 +16,7 @@ npm install openplaces
 
 <div align="justify">
   <p>
-    OpenPlaces works with or without a Google Maps API key. With a key, it calls the official Google Places API on your behalf &mdash; fully compliant with <a href="https://cloud.google.com/maps-platform/terms">Google Maps Platform Terms</a> and billed to your Google Cloud project.
+    <b>OpenPlaces works with or without a Google Maps API key.</b> With a key, it calls the official Google Places API on your behalf &mdash; fully compliant with <a href="https://cloud.google.com/maps-platform/terms">Google Maps Platform Terms</a> and billed to your Google Cloud project.
   </p>
 
   <p>
@@ -30,7 +30,7 @@ npm install openplaces
 
 <div align="justify">
   <p>
-    Search queries can express more than a single lookup. Use <code>AND</code> or <code>OR</code> to search for multiple things at once, and <code>IN</code> to pin a query to a location. When combined, they expand into every combination automatically &mdash; searching for coffee and tea in paris or london runs four queries, not one. Wrap multi-word phrases in quotes to treat them as a single term, and use parentheses when you need finer control over which queries belong to which location.
+    Search queries can express more than a single lookup. Use <code>AND</code> or <code>OR</code> to search for multiple things at once, and <code>IN</code> to pin a query to a location. When combined, they expand into every combination automatically &mdash; searching for <code>coffee and tea in paris or london</code> runs four queries, not one. Wrap multi-word phrases in quotes to treat them as a single term, and use parentheses when you need finer control over which queries belong to which location.
   </p>
 
   <p align="center">
@@ -46,7 +46,7 @@ npm install openplaces
 
 <h2>Usage</h2>
 
-```ts
+```typescript
 import { OpenPlaces } from "openplaces";
 
 const client = new OpenPlaces();
@@ -60,7 +60,7 @@ const client = new OpenPlaces();
 
 <h3><code>places.search</code></h3>
 
-```ts
+```typescript
 await client.places.search("eiffel tower");
 
 await client.places.search("restaurants in tokyo", { limit: 10 });
@@ -78,7 +78,7 @@ await client.places.search("coffee and tea in paris or london", { limit: 40 });
 
 <h3><code>places.stream</code></h3>
 
-```ts
+```typescript
 const stream = client.places.stream("restaurants in tokyo", { limit: 200 });
 
 for await (const place of stream) {
