@@ -12,15 +12,6 @@ import { parse } from "../_openplaces/language";
 import { geocode } from "../_openstreetmap/nominatim/geocode";
 import { EARTH_CIRCUMFERENCE, HALF_FIELD_OF_VIEW_TANGENT } from "./config";
 
-declare module "." {
-  interface Places {
-    stream(
-      query: string,
-      options?: OpenPlaces.Places.Stream.Options,
-    ): AsyncGenerator<Place>;
-  }
-}
-
 export async function* stream(
   this: Places,
   query: string,
@@ -130,7 +121,7 @@ export async function* stream(
   }
 }
 
-declare module ".." {
+declare module "openplaces" {
   namespace OpenPlaces.Places.Stream {
     interface Options {
       limit?: number;

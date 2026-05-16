@@ -3,15 +3,6 @@ import { type OpenPlaces } from "..";
 
 import { Place } from "../_google/maps/place";
 
-declare module "." {
-  interface Places {
-    search(
-      query: string,
-      options?: OpenPlaces.Places.Search.Options,
-    ): Promise<Place[]>;
-  }
-}
-
 export async function search(
   this: Places,
   query: string,
@@ -22,7 +13,7 @@ export async function search(
   return places;
 }
 
-declare module ".." {
+declare module "openplaces" {
   namespace OpenPlaces.Places.Search {
     type Options = OpenPlaces.Places.Stream.Options;
   }
