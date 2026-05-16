@@ -29,7 +29,9 @@
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "files": [
-    "dist"
+    "dist",
+    "license",
+    "readme.md"
   ],
   "scripts": {
     "build": "tsdown",
