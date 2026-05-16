@@ -3,15 +3,10 @@
   "version": "0.0.0",
   "description": "Look up places, businesses, addresses, and location metadata without a proprietary places API.",
   "keywords": [
-    "addresses",
-    "geocoding",
-    "google-places",
-    "location",
-    "maps",
-    "nominatim",
-    "openplaces",
+    "google-maps",
+    "google-places-api",
     "openstreetmap",
-    "places"
+    "nominatim"
   ],
   "homepage": "https://github.com/danielbacsur/openplaces",
   "bugs": {
