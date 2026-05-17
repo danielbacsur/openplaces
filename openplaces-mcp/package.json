@@ -35,7 +35,9 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0"
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "openplaces": "*",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "tsdown": "^0.22.0",
