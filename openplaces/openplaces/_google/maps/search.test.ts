@@ -1,6 +1,7 @@
+  import { Place } from "openplaces";
+
   import { beforeAll, describe, expect, it } from "vitest";
 
-  import { Place } from "./place";
   import { search } from "./search";
 
   const BUDAPEST_VIEWPORT = {

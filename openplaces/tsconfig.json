@@ -3,7 +3,6 @@
 
   "compilerOptions": {
     "paths": {
-      "@/*": ["./openplaces/*"],
       "openplaces": ["./openplaces/index.ts"]
     }
   },

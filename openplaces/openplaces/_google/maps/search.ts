@@ -1,3 +1,5 @@
+import { Place } from "openplaces";
+
 import {
   FIELD_OF_VIEW,
   PAGE_SIZE,
@@ -5,7 +7,6 @@ import {
   VIEWPORT_HEIGHT,
   VIEWPORT_WIDTH,
 } from "./config";
-import { Place } from "./place";
 
 interface Options {
   query: string;

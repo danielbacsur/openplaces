@@ -1,12 +1,11 @@
-import { type Places } from ".";
-import { type OpenPlaces } from "..";
+import { type OpenPlaces, Place } from "openplaces";
 
+import { type Places } from ".";
 import {
   PAGE_SIZE,
   VIEWPORT_HEIGHT,
   VIEWPORT_WIDTH,
 } from "../_google/maps/config";
-import { Place } from "../_google/maps/place";
 import { search } from "../_google/maps/search";
 import { parse } from "../_openplaces/language";
 import { geocode } from "../_openstreetmap/nominatim/geocode";

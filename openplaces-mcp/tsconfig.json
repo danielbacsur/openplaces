@@ -1,11 +1,5 @@
 {
   "extends": "../tsconfig.json",
 
-  "compilerOptions": {
-    "paths": {
-      "@/*": ["./openplaces-mcp/*"]
-    }
-  },
-
   "include": ["openplaces-mcp/**/*.ts", "tsdown.config.ts"]
 }

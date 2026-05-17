@@ -1,7 +1,6 @@
-import { type Places } from ".";
-import { type OpenPlaces } from "..";
+import { type OpenPlaces, Place } from "openplaces";
 
-import { Place } from "../_google/maps/place";
+import { type Places } from ".";
 
 export async function search(
   this: Places,

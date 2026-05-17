@@ -1,7 +1,6 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { OpenPlaces, Place } from "openplaces";
 
-import { Place } from "../_google/maps/place";
-import { OpenPlaces } from "..";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const places = new OpenPlaces().places;
 

@@ -1,5 +1,4 @@
-import { type OpenPlaces } from "..";
-import { type Place } from "../_google/maps/place";
+import { type OpenPlaces, type Place } from "openplaces";
 
 import { search } from "./search";
 import { stream } from "./stream";
