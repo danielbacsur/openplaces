@@ -7,7 +7,7 @@
       "outputs": ["dist/**"]
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": []
     }
