@@ -1,11 +1,38 @@
 {
   "name": "@openplaces/mcp",
   "version": "0.0.0",
-  "private": true,
+  "description": "Look up places, businesses, addresses, and location metadata without a proprietary places API.",
+  "keywords": [
+    "google-maps",
+    "google-places-api",
+    "openstreetmap",
+    "nominatim"
+  ],
+  "homepage": "https://github.com/danielbacsur/openplaces",
+  "bugs": {
+    "url": "https://github.com/danielbacsur/openplaces/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielbacsur/openplaces.git",
+    "directory": "openplaces-mcp"
+  },
+  "license": "MIT",
+  "author": "Daniel Bacsur <contact@danielbacsur.com>",
   "type": "module",
-  "bin": "./dist/index.mjs",
+  "bin": {
+    "openplaces-mcp": "./dist/index.mjs"
+  },
+  "files": [
+    "dist",
+    "license",
+    "readme.md"
+  ],
   "scripts": {
-    "build": "tsdown"
+    "build": "tsdown",
+    "prepack": "npm run typecheck && npm run build && rm -f readme.md license && cp ../readme.md ./readme.md && cp ../license ./license",
+    "postpack": "git checkout -- readme.md license",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0"
@@ -13,5 +40,11 @@
   "devDependencies": {
     "tsdown": "^0.22.0",
     "typescript": "^6"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

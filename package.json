@@ -1,13 +1,13 @@
 {
+  "workspaces": [
+    "openplaces",
+    "openplaces-mcp"
+  ],
   "scripts": {
     "build": "turbo build"
   },
   "devDependencies": {
     "turbo": "^2.9.14"
   },
-  "packageManager": "npm@11.14.1",
-  "workspaces": [
-    "openplaces",
-    "openplaces-mcp"
-  ]
+  "packageManager": "npm@11.14.1"
 }

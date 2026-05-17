@@ -5,7 +5,8 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "noEmit": true
   },
   "include": ["openplaces-mcp/**/*.ts", "tsdown.config.ts"]
 }
