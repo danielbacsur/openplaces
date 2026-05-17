@@ -4,10 +4,12 @@
     "openplaces-mcp"
   ],
   "scripts": {
-    "build": "turbo build"
+    "build": "turbo run build",
+    "release": "bumpp"
   },
   "devDependencies": {
-    "turbo": "^2.9.14"
+    "bumpp": "^11",
+    "turbo": "^2"
   },
   "packageManager": "npm@11.14.1"
 }

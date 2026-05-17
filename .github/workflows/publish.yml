@@ -13,10 +13,6 @@ jobs:
   publish:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: typescript
-
     steps:
       - uses: actions/checkout@v6
 
@@ -28,6 +24,8 @@ jobs:
 
       - run: npm ci
 
-      - run: npm test
+      - run: npm run test --workspace openplaces
 
-      - run: npm publish
+      - run: npm publish --workspace openplaces
+
+      - run: npm publish --workspace @openplaces/mcp
