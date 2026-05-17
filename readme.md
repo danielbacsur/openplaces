@@ -14,6 +14,10 @@
 npm install openplaces
 ```
 
+```bash
+claude mcp add openplaces -- npx -y @openplaces/mcp
+```
+
 <div align="justify">
   <p>
     <b>OpenPlaces works with or without a Google Maps API key.</b> With a key, it calls the official Google Places API on your behalf &mdash; fully compliant with <a href="https://cloud.google.com/maps-platform/terms">Google Maps Platform Terms</a> and billed to your Google Cloud project.
