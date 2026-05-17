@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "openplaces": { "command": "npx", "args": ["-y", "@openplaces/mcp"] }
+  }
+}
