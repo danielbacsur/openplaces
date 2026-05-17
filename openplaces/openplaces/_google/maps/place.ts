@@ -7,7 +7,7 @@ export const Place = z.preprocess(
     latitude: raw?.[14]?.[9]?.[2],
     longitude: raw?.[14]?.[9]?.[3],
     phone: raw?.[14]?.[178]?.[0]?.[0] ?? undefined,
-    website: raw?.[14]?.[7]?.[1] ?? undefined,
+    website: raw?.[14]?.[7]?.[0] ?? undefined,
   }),
   z.object({
     id: z.string(),
