@@ -8,6 +8,8 @@ export async function search(
   query: string,
   options: OpenPlaces.Places.Search.Options = {},
 ): Promise<Place[]> {
+  options.limit = options.limit ?? 100;
+
   const places: Place[] = [];
   for await (const p of this.stream(query, options)) places.push(p);
   return places;
