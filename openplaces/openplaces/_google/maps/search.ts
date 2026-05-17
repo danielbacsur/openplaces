@@ -48,8 +48,15 @@ export async function search(options: Options): Promise<Place[]> {
 
   const data = JSON.parse((await response.text()).replace(/^\)\]\}'/, ""));
 
-  return ((data?.[0]?.[1] ?? []) as unknown[]).flatMap((raw) => {
-    const result = Place.safeParse(raw);
+  return ((data?.[0]?.[1] ?? []) as any[]).flatMap((raw) => {
+    const result = Place.safeParse({
+      id: raw?.[14]?.[78],
+      name: raw?.[14]?.[11],
+      latitude: raw?.[14]?.[9]?.[2],
+      longitude: raw?.[14]?.[9]?.[3],
+      phone: raw?.[14]?.[178]?.[0]?.[0] ?? undefined,
+      website: raw?.[14]?.[7]?.[0] ?? undefined,
+    });
     return result.success ? [result.data] : [];
   });
 }
