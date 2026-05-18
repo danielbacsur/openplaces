@@ -3,6 +3,7 @@ import { Place } from "openplaces";
 import {
   FIELD_OF_VIEW,
   PAGE_SIZE,
+  TIMEOUT,
   USER_AGENT,
   VIEWPORT_HEIGHT,
   VIEWPORT_WIDTH,
@@ -42,6 +43,7 @@ export async function search(options: Options): Promise<Place[]> {
 
   const response = await fetch(url, {
     headers: { "user-agent": USER_AGENT, "accept-language": "en" },
+    signal: AbortSignal.timeout(TIMEOUT),
   });
 
   if (!response.ok) throw new Error(`maps search failed: ${response.status}`);

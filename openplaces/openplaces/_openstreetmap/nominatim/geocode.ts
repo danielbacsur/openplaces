@@ -1,4 +1,4 @@
-import { USER_AGENT } from "./config";
+import { TIMEOUT, USER_AGENT } from "./config";
 
 export interface Area {
   center: { latitude: number; longitude: number };
@@ -14,7 +14,10 @@ export async function geocode(query: string): Promise<Area> {
     })}`,
   );
 
-  const response = await fetch(url, { headers: { "user-agent": USER_AGENT } });
+  const response = await fetch(url, {
+    headers: { "user-agent": USER_AGENT },
+    signal: AbortSignal.timeout(TIMEOUT),
+  });
 
   if (!response.ok) {
     throw new Error(`nominatim failed to geocode "${query}"`);
