@@ -1,5 +1,8 @@
 {
   "mcpServers": {
-    "openplaces": { "command": "npx", "args": ["-y", "@openplaces/mcp"] }
+    "openplaces": {
+      "command": "npx",
+      "args": ["-y", "@openplaces/mcp@latest"]
+    }
   }
 }

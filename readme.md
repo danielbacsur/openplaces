@@ -15,7 +15,7 @@ npm install openplaces
 ```
 
 ```bash
-claude mcp add openplaces -- npx -y @openplaces/mcp
+claude mcp add openplaces -- npx -y @openplaces/mcp@latest
 ```
 
 <div align="justify">
