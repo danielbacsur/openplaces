@@ -1,2 +1,3 @@
-export const USER_AGENT =
-  "openplaces/0.0.0 (https://github.com/danielbacsur/openplaces)";
+import { homepage, name, version } from "../../../package.json";
+
+export const USER_AGENT = `${name}/${version} (${homepage})`;
