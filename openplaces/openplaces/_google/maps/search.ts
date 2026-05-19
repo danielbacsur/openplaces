@@ -8,6 +8,8 @@ import {
   VIEWPORT_HEIGHT,
   VIEWPORT_WIDTH,
 } from "./config";
+import { type Node } from "./protobuf/schema";
+import { serialize } from "./protobuf/serialize";
 
 interface Options {
   query: string;
@@ -22,14 +24,46 @@ interface Options {
 export async function search(options: Options): Promise<Place[]> {
   const { query, viewport, offset } = options;
 
-  // prettier-ignore
-  const protobuf = [
-    `!1s${query}`,
-    viewport && `!4m8!1m3!1d${viewport.altitude}!2d${viewport.longitude}!3d${viewport.latitude}!3m2!1i${VIEWPORT_WIDTH}!2i${VIEWPORT_HEIGHT}!4f${FIELD_OF_VIEW}`,
-    `!7i${PAGE_SIZE}`,
-    offset && `!8i${offset}`,
-    `!10b1`,
-  ].filter(Boolean).join("");
+  const nodes: Node[] = [];
+
+  nodes.push({ tag: 1, type: "s", value: query });
+
+  if (viewport) {
+    nodes.push({
+      tag: 4,
+      type: "m",
+      children: [
+        {
+          tag: 1,
+          type: "m",
+          children: [
+            { tag: 1, type: "d", value: viewport.altitude },
+            { tag: 2, type: "d", value: viewport.longitude },
+            { tag: 3, type: "d", value: viewport.latitude },
+          ],
+        },
+        {
+          tag: 3,
+          type: "m",
+          children: [
+            { tag: 1, type: "i", value: VIEWPORT_WIDTH },
+            { tag: 2, type: "i", value: VIEWPORT_HEIGHT },
+          ],
+        },
+        { tag: 4, type: "f", value: FIELD_OF_VIEW },
+      ],
+    });
+  }
+
+  nodes.push({ tag: 7, type: "i", value: PAGE_SIZE });
+
+  if (offset) {
+    nodes.push({ tag: 8, type: "i", value: offset });
+  }
+
+  nodes.push({ tag: 10, type: "b", value: 1 });
+
+  const protobuf = serialize(nodes);
 
   const url = new URL(
     `https://www.google.com/search?${new URLSearchParams({
