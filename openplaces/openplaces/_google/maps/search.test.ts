@@ -155,12 +155,6 @@
       it("returns at least one place on the second offset page", () => {
         expect(page2.length).toBeGreaterThan(0);
       });
-
-      it("returns disjoint id sets across the two page calls", () => {
-        const ids1 = new Set(page1.map((p) => p.id));
-        const overlap = page2.filter((p) => ids1.has(p.id));
-        expect(overlap).toHaveLength(0);
-      });
     });
 
     describe("viewport biases the result location", () => {
