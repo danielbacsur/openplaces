@@ -2,6 +2,7 @@ import { type OpenPlaces, Place } from "openplaces";
 
 import { type Places } from ".";
 import {
+  MAX_OFFSET,
   PAGE_SIZE,
   VIEWPORT_HEIGHT,
   VIEWPORT_WIDTH,
@@ -61,7 +62,7 @@ export async function* stream(
 
       let saturated = false;
 
-      for (let offset = 0; ; offset += PAGE_SIZE) {
+      for (let offset = 0; offset < MAX_OFFSET; offset += PAGE_SIZE) {
         const places = await search({
           query: prototype.query,
           viewport,

@@ -3,6 +3,8 @@ export const USER_AGENT =
 
 export const PAGE_SIZE = 20;
 
+export const MAX_OFFSET = 200;
+
 export const VIEWPORT_WIDTH = 1024;
 
 export const VIEWPORT_HEIGHT = 768;
