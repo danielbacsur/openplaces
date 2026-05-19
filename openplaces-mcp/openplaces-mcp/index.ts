@@ -47,15 +47,28 @@ server.registerTool(
         ),
     },
 
-    outputSchema: { places: z.array(Place) },
+    outputSchema: {
+      places: z.array(Place).optional(),
+      error: z.string().optional(),
+    },
   },
   async ({ query, ...options }) => {
-    const places = await client.places.search(query, options);
+    try {
+      const places = await client.places.search(query, options);
 
-    return {
-      content: [{ type: "text", text: JSON.stringify(places, null, 2) }],
-      structuredContent: { places },
-    };
+      return {
+        content: [{ type: "text", text: JSON.stringify(places, null, 2) }],
+        structuredContent: { places },
+      };
+    } catch (e) {
+      const error = e instanceof Error ? e.message : String(e);
+
+      return {
+        content: [{ type: "text", text: JSON.stringify({ error }, null, 2) }],
+        structuredContent: { error },
+        isError: true,
+      };
+    }
   },
 );
 
