@@ -7,6 +7,8 @@ export const Place = z.object({
   longitude: z.number(),
   phone: z.string().optional(),
   website: z.string().optional(),
+  rating: z.number().optional(),
+  reviews: z.string().optional(),
 });
 
 export type Place = z.infer<typeof Place>;

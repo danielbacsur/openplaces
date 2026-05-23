@@ -43,6 +43,11 @@ export async function search(options: Options): Promise<Place[]> {
       longitude: place.coordinates?.longitude,
       phone: place.phones?.[0]?.number ?? undefined,
       website: place.website?.url ?? undefined,
+      rating: place.ratings?.rating ?? undefined,
+      reviews:
+        place.ratings?.reviewCount != null
+          ? String(place.ratings.reviewCount)
+          : undefined,
     });
 
     return result.success ? [result.data] : [];

@@ -15,12 +15,23 @@ export const Phone = z.positional([
   /* 0 */ z.mapped("number", z.string()), /* "06 30 603 2480" */
 ]);
 
-export const PlaceNode = z.positional([
+export const Ratings = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.unused(),
   /* 2 */ z.unused(),
   /* 3 */ z.unused(),
   /* 4 */ z.unused(),
+  /* 5 */ z.unused(),
+  /* 6 */ z.mapped("reviewCount", z.number().nullish()), /* 5203 */
+  /* 7 */ z.mapped("rating", z.number().nullish()), /* 4.7 */
+]);
+
+export const PlaceNode = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.unused(),
+  /* 2 */ z.unused(),
+  /* 3 */ z.unused(),
+  /* 4 */ z.mapped("ratings", Ratings.nullish()),
   /* 5 */ z.unused(),
   /* 6 */ z.unused(),
   /* 7 */ z.mapped("website", Website.nullish()),
