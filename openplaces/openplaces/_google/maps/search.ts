@@ -2,6 +2,7 @@ import { Place } from "openplaces";
 
 import * as browser from "./browser";
 import { pb } from "./features";
+import { Response } from "./schema";
 
 interface Options {
   query: string;
@@ -28,15 +29,22 @@ export async function search(options: Options): Promise<Place[]> {
 
   const data = JSON.parse((await browser.get(url)).replace(/^\)\]\}'/, ""));
 
-  return ((data?.[0]?.[1] ?? []) as any[]).flatMap((raw) => {
+  const parsed = Response.safeParse(data);
+  if (!parsed.success) return [];
+
+  return (parsed.data.results?.rows ?? []).flatMap((row) => {
+    const place = row?.place;
+    if (!place) return [];
+
     const result = Place.safeParse({
-      id: raw?.[14]?.[78],
-      name: raw?.[14]?.[11],
-      latitude: raw?.[14]?.[9]?.[2],
-      longitude: raw?.[14]?.[9]?.[3],
-      phone: raw?.[14]?.[178]?.[0]?.[0] ?? undefined,
-      website: raw?.[14]?.[7]?.[0] ?? undefined,
+      id: place.placeId,
+      name: place.name,
+      latitude: place.coordinates?.latitude,
+      longitude: place.coordinates?.longitude,
+      phone: place.phones?.[0]?.number ?? undefined,
+      website: place.website?.url ?? undefined,
     });
+
     return result.success ? [result.data] : [];
   });
 }
