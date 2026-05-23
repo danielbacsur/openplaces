@@ -1,14 +1,7 @@
 import { Place } from "openplaces";
 
 import * as browser from "./browser";
-import {
-  FIELD_OF_VIEW,
-  PAGE_SIZE,
-  VIEWPORT_HEIGHT,
-  VIEWPORT_WIDTH,
-} from "./config";
-import { type Node } from "./protobuf/schema";
-import { serialize } from "./protobuf/serialize";
+import { pb } from "./features";
 
 interface Options {
   query: string;
@@ -23,54 +16,13 @@ interface Options {
 export async function search(options: Options): Promise<Place[]> {
   const { query, viewport, offset } = options;
 
-  const nodes: Node[] = [];
-
-  nodes.push({ tag: 1, type: "s", value: query });
-
-  if (viewport) {
-    nodes.push({
-      tag: 4,
-      type: "m",
-      children: [
-        {
-          tag: 1,
-          type: "m",
-          children: [
-            { tag: 1, type: "d", value: viewport.altitude },
-            { tag: 2, type: "d", value: viewport.longitude },
-            { tag: 3, type: "d", value: viewport.latitude },
-          ],
-        },
-        {
-          tag: 3,
-          type: "m",
-          children: [
-            { tag: 1, type: "i", value: VIEWPORT_WIDTH },
-            { tag: 2, type: "i", value: VIEWPORT_HEIGHT },
-          ],
-        },
-        { tag: 4, type: "f", value: FIELD_OF_VIEW },
-      ],
-    });
-  }
-
-  nodes.push({ tag: 7, type: "i", value: PAGE_SIZE });
-
-  if (offset) {
-    nodes.push({ tag: 8, type: "i", value: offset });
-  }
-
-  nodes.push({ tag: 10, type: "b", value: 1 });
-
-  const protobuf = serialize(nodes);
-
   const url = new URL(
     `https://www.google.com/search?${new URLSearchParams({
       tbm: "map",
       hl: "en",
       gl: "us",
       q: query,
-      pb: protobuf,
+      pb: pb({ query, viewport, offset }),
     })}`,
   );
 
