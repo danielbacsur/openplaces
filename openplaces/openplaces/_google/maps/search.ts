@@ -1,10 +1,9 @@
 import { Place } from "openplaces";
 
+import * as browser from "./browser";
 import {
   FIELD_OF_VIEW,
   PAGE_SIZE,
-  TIMEOUT,
-  USER_AGENT,
   VIEWPORT_HEIGHT,
   VIEWPORT_WIDTH,
 } from "./config";
@@ -75,14 +74,7 @@ export async function search(options: Options): Promise<Place[]> {
     })}`,
   );
 
-  const response = await fetch(url, {
-    headers: { "user-agent": USER_AGENT, "accept-language": "en" },
-    signal: AbortSignal.timeout(TIMEOUT),
-  });
-
-  if (!response.ok) throw new Error(`maps search failed: ${response.status}`);
-
-  const data = JSON.parse((await response.text()).replace(/^\)\]\}'/, ""));
+  const data = JSON.parse((await browser.get(url)).replace(/^\)\]\}'/, ""));
 
   return ((data?.[0]?.[1] ?? []) as any[]).flatMap((raw) => {
     const result = Place.safeParse({

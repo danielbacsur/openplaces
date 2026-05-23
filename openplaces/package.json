@@ -41,6 +41,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "playwright": "^1.52.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
