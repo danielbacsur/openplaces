@@ -18,9 +18,9 @@ export const Phone = z.positional([
 export const Ratings = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.unused(),
-  /* 2 */ z.unused(),
+  /* 2 */ z.mapped("priceLevel", z.string().nullish()), /* "20 000 Ft+" */
   /* 3 */ z.unused(),
-  /* 4 */ z.unused(),
+  /* 4 */ z.mapped("priceSymbol", z.string().nullish()), /* "$$" */
   /* 5 */ z.unused(),
   /* 6 */ z.unused(),
   /* 7 */ z.mapped("rating", z.number().nullish()), /* 4.7 */

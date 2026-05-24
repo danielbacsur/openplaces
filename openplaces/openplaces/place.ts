@@ -9,6 +9,7 @@ export const Place = z.object({
   website: z.string().optional(),
   rating: z.number().optional(),
   reviews: z.string().optional(),
+  price: z.string().optional(),
 });
 
 export type Place = z.infer<typeof Place>;

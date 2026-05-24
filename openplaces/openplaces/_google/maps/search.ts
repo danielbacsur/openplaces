@@ -48,6 +48,7 @@ export async function search(options: Options): Promise<Place[]> {
         place.ratings?.reviewCount != null
           ? String(place.ratings.reviewCount)
           : undefined,
+      price: place.ratings?.priceLevel ?? undefined,
     });
 
     return result.success ? [result.data] : [];
