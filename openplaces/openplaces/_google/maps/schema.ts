@@ -15,6 +15,32 @@ export const Phone = z.positional([
   /* 0 */ z.mapped("number", z.string()), /* "06 30 603 2480" */
 ]);
 
+export const RatingsPriceBucketLabel = z.positional([
+  /* 0 */ z.mapped("id", z.string().nullish()), /* "E:HUF_12000_TO_14000" */
+  /* 1 */ z.mapped("short", z.string().nullish()), /* "12 000–14 000 Ft" */
+  /* 2 */ z.mapped("long", z.string().nullish()), /* "12 000 Ft to 14 000 Ft" */
+]);
+
+export const RatingsPriceBucketStats = z.positional([
+  /* 0 */ z.mapped("count", z.number().nullish()), /* 110 */
+  /* 1 */ z.mapped("fraction", z.number().nullish()), /* 0.061 */
+  /* 2 */ z.mapped("selected", z.number().nullish()), /* 0 */
+]);
+
+export const RatingsPriceBucket = z.positional([
+  /* 0 */ z.mapped("label", RatingsPriceBucketLabel.nullish()),
+  /* 1 */ z.mapped("statistics", RatingsPriceBucketStats.nullish()),
+  /* 2 */ z.unused(),
+  /* 3 */ z.unused(),
+  /* 4 */ z.opaque(/* feature/ui token */),
+]);
+
+export const RatingsPriceRange = z.positional([
+  /* 0 */ z.mapped("buckets", z.array(RatingsPriceBucket.nullish()).nullish()),
+  /* 1 */ z.mapped("short", z.string().nullish()), /* "20 000 Ft+" */
+  /* 2 */ z.mapped("long", z.string().nullish()), /* "20 000 Ft or above" */
+]);
+
 export const Ratings = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.unused(),
@@ -25,6 +51,7 @@ export const Ratings = z.positional([
   /* 6 */ z.unused(),
   /* 7 */ z.mapped("rating", z.number().nullish()), /* 4.7 */
   /* 8 */ z.mapped("reviewCount", z.number().nullish()), /* 5203 */
+  /* 9 */ z.mapped("priceRange", RatingsPriceRange.nullish()),
 ]);
 
 export const PlaceNode = z.positional([
