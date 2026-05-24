@@ -22,8 +22,9 @@ export const Ratings = z.positional([
   /* 3 */ z.unused(),
   /* 4 */ z.unused(),
   /* 5 */ z.unused(),
-  /* 6 */ z.mapped("reviewCount", z.number().nullish()), /* 5203 */
+  /* 6 */ z.unused(),
   /* 7 */ z.mapped("rating", z.number().nullish()), /* 4.7 */
+  /* 8 */ z.mapped("reviewCount", z.number().nullish()), /* 5203 */
 ]);
 
 export const PlaceNode = z.positional([
