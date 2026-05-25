@@ -9,6 +9,10 @@ export const Coordinates = z.positional([
 
 export const Website = z.positional([
   /* 0 */ z.mapped("url", z.string()), /* "https://www.gundel.hu/" */
+  /* 1 */ z.mapped("domain", z.string().nullish()), /* "gundel.hu" */
+  /* 2 */ z.unused(),
+  /* 3 */ z.opaque(/* ved / tracking token */),
+  /* 4 */ z.opaque(/* ved / click-tracking token */),
 ]);
 
 export const Phone = z.positional([
