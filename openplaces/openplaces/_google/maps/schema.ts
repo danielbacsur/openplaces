@@ -41,11 +41,18 @@ export const RatingsPriceRange = z.positional([
   /* 2 */ z.mapped("long", z.string().nullish()), /* "20 000 Ft or above" */
 ]);
 
+export const RatingsReviewsLink = z.positional([
+  /* 0 */ z.mapped("url", z.string().nullish()),
+  /* 1 */ z.mapped("text", z.string().nullish()), /* "5 203 reviews" */
+  /* 2 */ z.unused(),
+  /* 3 */ z.opaque(/* feature/ui token */),
+]);
+
 export const Ratings = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.unused(),
   /* 2 */ z.mapped("priceLevel", z.string().nullish()), /* "20 000 Ft+" */
-  /* 3 */ z.unused(),
+  /* 3 */ z.mapped("reviewsLink", RatingsReviewsLink.nullish()),
   /* 4 */ z.mapped("priceSymbol", z.string().nullish()), /* "$$" */
   /* 5 */ z.unused(),
   /* 6 */ z.unused(),

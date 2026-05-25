@@ -44,10 +44,7 @@ export async function search(options: Options): Promise<Place[]> {
       phone: place.phones?.[0]?.number ?? undefined,
       website: place.website?.url ?? undefined,
       rating: place.ratings?.rating ?? undefined,
-      reviews:
-        place.ratings?.reviewCount != null
-          ? String(place.ratings.reviewCount)
-          : undefined,
+      reviews: count(place.ratings?.reviewCount),
       price:
         place.ratings?.priceRange?.short ??
         place.ratings?.priceLevel ??
@@ -56,4 +53,8 @@ export async function search(options: Options): Promise<Place[]> {
 
     return result.success ? [result.data] : [];
   });
+}
+
+function count(reviews: number | null | undefined): string | undefined {
+  return typeof reviews === "number" ? reviews.toLocaleString("en") : undefined;
 }
