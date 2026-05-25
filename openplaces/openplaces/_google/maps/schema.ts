@@ -96,7 +96,7 @@ export const PlaceNode = z.positional([
   /* 10 */ z.unused(),
   /* 11 */ z.mapped("name", z.string()), /* "Gundel Cafe Patisserie Restaurant" */
   /* 12 */ z.unused(),
-  /* 13 */ z.unused(),
+  /* 13 */ z.mapped("categories", z.array(z.string().nullish()).nullish()), /* ["Hungarian restaurant"] */
   /* 14 */ z.unused(),
   /* 15 */ z.unused(),
   /* 16 */ z.unused(),

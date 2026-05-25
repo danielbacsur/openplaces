@@ -3,6 +3,8 @@ import { z } from "zod";
 export const Place = z.object({
   id: z.string(),
   name: z.string(),
+  category: z.string().optional(),
+  categories: z.array(z.string()).optional(),
   latitude: z.number(),
   longitude: z.number(),
   phone: z.string().optional(),

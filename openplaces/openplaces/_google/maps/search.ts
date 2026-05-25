@@ -39,6 +39,8 @@ export async function search(options: Options): Promise<Place[]> {
     const result = Place.safeParse({
       id: place.placeId,
       name: place.name,
+      category: place.categories?.[0] ?? undefined,
+      categories: strings(place.categories),
       latitude: place.coordinates?.latitude,
       longitude: place.coordinates?.longitude,
       phone: place.phones?.[0]?.number ?? undefined,
@@ -53,6 +55,11 @@ export async function search(options: Options): Promise<Place[]> {
 
     return result.success ? [result.data] : [];
   });
+}
+
+function strings(values: (string | null | undefined)[] | null | undefined) {
+  const list = (values ?? []).filter((v): v is string => typeof v === "string");
+  return list.length ? list : undefined;
 }
 
 function count(reviews: number | null | undefined): string | undefined {
