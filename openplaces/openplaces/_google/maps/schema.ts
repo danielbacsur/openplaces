@@ -15,8 +15,25 @@ export const Website = z.positional([
   /* 4 */ z.opaque(/* ved / click-tracking token */),
 ]);
 
-export const Phone = z.positional([
+export const PhoneLink = z.positional([
+  /* 0 */ z.mapped("uri", z.string()), /* "tel:06306032480" */
+  /* 1 */ z.unused(),
+  /* 2 */ z.unused(),
+  /* 3 */ z.opaque(/* action / click-tracking id */),
+]);
+
+export const PhoneVariant = z.positional([
+  /* 0 */ z.mapped("formatted", z.string()), /* "06 30 603 2480" */
+  /* 1 */ z.mapped("type", z.number().nullish()), /* 1 */
+]);
+
+export const PhoneEntry = z.positional([
   /* 0 */ z.mapped("number", z.string()), /* "06 30 603 2480" */
+  /* 1 */ z.mapped("variants", z.array(PhoneVariant.nullish()).nullish()),
+  /* 2 */ z.unused(),
+  /* 3 */ z.mapped("normalized", z.string().nullish()), /* "06306032480" */
+  /* 4 */ z.unused(),
+  /* 5 */ z.mapped("link", PhoneLink.nullish()),
 ]);
 
 export const RatingsPriceBucketLabel = z.positional([
@@ -244,7 +261,7 @@ export const PlaceNode = z.positional([
   /* 175 */ z.unused(),
   /* 176 */ z.unused(),
   /* 177 */ z.unused(),
-  /* 178 */ z.mapped("phones", z.array(Phone.nullish()).nullish()),
+  /* 178 */ z.mapped("phones", z.array(PhoneEntry.nullish()).nullish()),
 ]);
 
 export type PlaceNode = z.infer<typeof PlaceNode>;
