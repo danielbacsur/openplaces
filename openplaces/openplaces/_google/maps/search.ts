@@ -43,7 +43,16 @@ export async function search(options: Options): Promise<Place[]> {
       categories: strings(place.categories),
       latitude: place.coordinates?.latitude,
       longitude: place.coordinates?.longitude,
-      address: join(place.addressLines),
+      address: place.address ?? join(place.addressLines),
+      street:
+        place.structuredAddress?.flat?.streetDisplay ??
+        place.addressComponents?.street ??
+        undefined,
+      district:
+        place.structuredAddress?.flat?.district ?? place.district ?? undefined,
+      city: place.structuredAddress?.flat?.city ?? place.city ?? undefined,
+      postalCode: place.structuredAddress?.flat?.postalCode ?? undefined,
+      country: place.structuredAddress?.flat?.country ?? undefined,
       phone: place.phones?.[0]?.number ?? undefined,
       website: place.website?.url ?? undefined,
       rating: place.ratings?.rating ?? undefined,

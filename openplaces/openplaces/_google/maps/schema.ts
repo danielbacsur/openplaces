@@ -82,6 +82,33 @@ export const Ratings = z.positional([
   /* 9 */ z.mapped("priceRange", RatingsPriceRange.nullish()),
 ]);
 
+export const AddressComponents = z.positional([
+  /* 0 */ z.mapped("district", z.string().nullish()), /* "District XIV." */
+  /* 1 */ z.mapped("street", z.string().nullish()), /* "Gundel Károly út 4" */
+  /* 2 */ z.mapped("streetDisplay", z.string().nullish()), /* "Gundel Károly út 4" */
+  /* 3 */ z.mapped("city", z.string().nullish()), /* "Budapest" */
+]);
+
+export const StructuredAddressPart = z.positional([
+  /* 0 */ z.mapped("type", z.number().nullish()), /* 7 */
+  /* 1 */ z.mapped("values", z.array(z.array(z.string().nullish()).nullish()).nullish()), /* [["Budapest"], ["Gundel Károly út 4"]] */
+]);
+
+export const StructuredAddressFlat = z.positional([
+  /* 0 */ z.mapped("district", z.string().nullish()), /* "District XIV." */
+  /* 1 */ z.mapped("street", z.string().nullish()), /* "Gundel Károly út 4" */
+  /* 2 */ z.mapped("streetDisplay", z.string().nullish()), /* "Gundel Károly út 4" */
+  /* 3 */ z.mapped("city", z.string().nullish()), /* "Budapest" */
+  /* 4 */ z.mapped("postalCode", z.string().nullish()), /* "1146" */
+  /* 5 */ z.mapped("region", z.string().nullish()), /* "Tokyo" */
+  /* 6 */ z.mapped("country", z.string().nullish()), /* "HU" */
+]);
+
+export const StructuredAddress = z.positional([
+  /* 0 */ z.mapped("parts", z.array(StructuredAddressPart.nullish()).nullish()),
+  /* 1 */ z.mapped("flat", StructuredAddressFlat.nullish()),
+]);
+
 export const PlaceNode = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.unused(),
@@ -97,7 +124,7 @@ export const PlaceNode = z.positional([
   /* 11 */ z.mapped("name", z.string()), /* "Gundel Cafe Patisserie Restaurant" */
   /* 12 */ z.unused(),
   /* 13 */ z.mapped("categories", z.array(z.string().nullish()).nullish()), /* ["Hungarian restaurant"] */
-  /* 14 */ z.unused(),
+  /* 14 */ z.mapped("district", z.string().nullish()), /* "District XIV." */
   /* 15 */ z.unused(),
   /* 16 */ z.unused(),
   /* 17 */ z.unused(),
@@ -122,7 +149,7 @@ export const PlaceNode = z.positional([
   /* 36 */ z.unused(),
   /* 37 */ z.unused(),
   /* 38 */ z.unused(),
-  /* 39 */ z.unused(),
+  /* 39 */ z.mapped("address", z.string().nullish()), /* "Budapest, Gundel Károly út 4, 1146" */
   /* 40 */ z.unused(),
   /* 41 */ z.unused(),
   /* 42 */ z.unused(),
@@ -165,7 +192,7 @@ export const PlaceNode = z.positional([
   /* 79 */ z.unused(),
   /* 80 */ z.unused(),
   /* 81 */ z.unused(),
-  /* 82 */ z.unused(),
+  /* 82 */ z.mapped("addressComponents", AddressComponents.nullish()),
   /* 83 */ z.unused(),
   /* 84 */ z.unused(),
   /* 85 */ z.unused(),
@@ -249,7 +276,7 @@ export const PlaceNode = z.positional([
   /* 163 */ z.unused(),
   /* 164 */ z.unused(),
   /* 165 */ z.unused(),
-  /* 166 */ z.unused(),
+  /* 166 */ z.mapped("city", z.string().nullish()), /* "Budapest" */
   /* 167 */ z.unused(),
   /* 168 */ z.unused(),
   /* 169 */ z.unused(),
@@ -262,6 +289,11 @@ export const PlaceNode = z.positional([
   /* 176 */ z.unused(),
   /* 177 */ z.unused(),
   /* 178 */ z.mapped("phones", z.array(PhoneEntry.nullish()).nullish()),
+  /* 179 */ z.unused(),
+  /* 180 */ z.unused(),
+  /* 181 */ z.unused(),
+  /* 182 */ z.unused(),
+  /* 183 */ z.mapped("structuredAddress", StructuredAddress.nullish()),
 ]);
 
 export type PlaceNode = z.infer<typeof PlaceNode>;
