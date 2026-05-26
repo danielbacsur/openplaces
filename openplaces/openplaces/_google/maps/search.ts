@@ -43,7 +43,7 @@ export async function search(options: Options): Promise<Place[]> {
       categories: strings(place.categories),
       latitude: place.coordinates?.latitude,
       longitude: place.coordinates?.longitude,
-      address: place.addressLines?.[0] ?? undefined,
+      address: join(place.addressLines),
       phone: place.phones?.[0]?.number ?? undefined,
       website: place.website?.url ?? undefined,
       rating: place.ratings?.rating ?? undefined,
@@ -61,6 +61,10 @@ export async function search(options: Options): Promise<Place[]> {
 function strings(values: (string | null | undefined)[] | null | undefined) {
   const list = (values ?? []).filter((v): v is string => typeof v === "string");
   return list.length ? list : undefined;
+}
+
+function join(lines: (string | null | undefined)[] | null | undefined) {
+  return lines?.filter(Boolean).join(", ") || undefined;
 }
 
 function count(reviews: number | null | undefined): string | undefined {
