@@ -43,6 +43,7 @@ export async function search(options: Options): Promise<Place[]> {
       categories: strings(place.categories),
       latitude: place.coordinates?.latitude,
       longitude: place.coordinates?.longitude,
+      address: place.addressLines?.[0] ?? undefined,
       phone: place.phones?.[0]?.number ?? undefined,
       website: place.website?.url ?? undefined,
       rating: place.ratings?.rating ?? undefined,

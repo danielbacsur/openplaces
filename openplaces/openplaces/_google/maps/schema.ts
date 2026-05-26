@@ -85,7 +85,7 @@ export const Ratings = z.positional([
 export const PlaceNode = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.unused(),
-  /* 2 */ z.unused(),
+  /* 2 */ z.mapped("addressLines", z.array(z.string().nullish()).nullish()), /* ["Budapest", "Gundel Károly út 4", "1146"] */
   /* 3 */ z.unused(),
   /* 4 */ z.mapped("ratings", Ratings.nullish()),
   /* 5 */ z.unused(),
