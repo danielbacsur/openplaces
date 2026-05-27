@@ -82,6 +82,19 @@ export const Ratings = z.positional([
   /* 9 */ z.mapped("priceRange", RatingsPriceRange.nullish()),
 ]);
 
+export const DescriptionLine = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.mapped("text", z.string().nullish()), /* "Chic hangout for global eats & cocktails" */
+]);
+
+export const Description = z.positional([
+  /* 0 */ z.mapped("summary", DescriptionLine.nullish()),
+  /* 1 */ z.mapped("blurb", DescriptionLine.nullish()),
+  /* 2 */ z.mapped("extended", z.unknown().nullish()),
+  /* 3 */ z.opaque(/* report url */),
+  /* 4 */ z.opaque(/* learn-more url */),
+]);
+
 export const AddressComponents = z.positional([
   /* 0 */ z.mapped("district", z.string().nullish()), /* "District XIV." */
   /* 1 */ z.mapped("street", z.string().nullish()), /* "Gundel Károly út 4" */
@@ -142,7 +155,7 @@ export const PlaceNode = z.positional([
   /* 29 */ z.unused(),
   /* 30 */ z.mapped("timezone", z.string().nullish()), /* "Europe/Budapest" */
   /* 31 */ z.unused(),
-  /* 32 */ z.unused(),
+  /* 32 */ z.mapped("description", Description.nullish()),
   /* 33 */ z.unused(),
   /* 34 */ z.unused(),
   /* 35 */ z.unused(),

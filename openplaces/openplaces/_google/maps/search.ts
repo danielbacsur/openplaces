@@ -41,6 +41,10 @@ export async function search(options: Options): Promise<Place[]> {
       name: place.name,
       category: place.categories?.[0] ?? undefined,
       categories: strings(place.categories),
+      description:
+        place.description?.summary?.text ??
+        place.description?.blurb?.text ??
+        undefined,
       latitude: place.coordinates?.latitude,
       longitude: place.coordinates?.longitude,
       timezone: place.timezone ?? undefined,

@@ -5,6 +5,7 @@ export const Place = z.object({
   name: z.string(),
   category: z.string().optional(),
   categories: z.array(z.string()).optional(),
+  description: z.string().optional(),
   latitude: z.number(),
   longitude: z.number(),
   timezone: z.string().optional(),
