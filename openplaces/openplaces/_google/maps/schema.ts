@@ -140,7 +140,7 @@ export const PlaceNode = z.positional([
   /* 27 */ z.unused(),
   /* 28 */ z.unused(),
   /* 29 */ z.unused(),
-  /* 30 */ z.unused(),
+  /* 30 */ z.mapped("timezone", z.string().nullish()), /* "Europe/Budapest" */
   /* 31 */ z.unused(),
   /* 32 */ z.unused(),
   /* 33 */ z.unused(),

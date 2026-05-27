@@ -7,6 +7,7 @@ export const Place = z.object({
   categories: z.array(z.string()).optional(),
   latitude: z.number(),
   longitude: z.number(),
+  timezone: z.string().optional(),
   address: z.string().optional(),
   street: z.string().optional(),
   district: z.string().optional(),
