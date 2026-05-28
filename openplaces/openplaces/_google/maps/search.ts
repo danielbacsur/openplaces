@@ -82,14 +82,18 @@ function join(lines: (string | null | undefined)[] | null | undefined) {
   return lines?.filter(Boolean).join(", ") || undefined;
 }
 
+function argb(value: number | null | undefined): string {
+  if (typeof value !== "number") return "#5e5e5e";
+  return "#" + (value & 0xffffff).toString(16).padStart(6, "0");
+}
+
 function hours(opening: PlaceNode["openingHours"]) {
   const current = opening?.current;
   if (!current) return undefined;
 
   const detail = current.status?.text ?? undefined;
   const status = current.shortStatus?.text ?? detail?.split("·")[0]?.trim();
-  const argb = current.status?.colorRuns?.[0]?.style?.colors?.[0];
-  const color = typeof argb === "number" ? String(argb) : undefined;
+  const color = argb(current.status?.colorRuns?.[0]?.style?.colors?.[0]);
 
   if (!status && !detail) return undefined;
   return { status, detail, color };
