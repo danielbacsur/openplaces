@@ -67,7 +67,10 @@ export async function search(options: Options): Promise<Place[]> {
         place.ratings?.priceLevel ??
         undefined,
       hours: hours(place.openingHours),
-      image: place.photos?.photos?.[0]?.image?.url ?? undefined,
+      image:
+        place.photos?.photos?.[0]?.image?.url ??
+        place.legacyPhotos?.photos?.[0]?.image?.url ??
+        undefined,
     });
 
     return result.success ? [result.data] : [];

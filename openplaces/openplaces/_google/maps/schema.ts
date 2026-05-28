@@ -132,6 +132,23 @@ export const Photos = z.positional([
   /* 0 */ z.mapped("photos", z.array(Photo.nullish()).nullish()),
 ]);
 
+export const LegacyPhoto = z.positional([
+  /* 0 */ z.mapped("id", z.string().nullish()), /* "CIHM0ogKEICAgID5vvCh7wE" */
+  /* 1 */ z.mapped("mediaSource", z.number().nullish()), /* 10 */
+  /* 2 */ z.mapped("mediaFormat", z.number().nullish()), /* 12 */
+  /* 3 */ z.mapped("caption", z.string().nullish()), /* "" */
+  /* 4 */ z.unused(),
+  /* 5 */ z.unused(),
+  /* 6 */ z.mapped("image", PhotoImage.nullish()),
+  /* 7 */ z.unused(),
+  /* 8 */ z.mapped("camera", PhotoCamera.nullish()),
+]);
+
+export const LegacyPhotos = z.positional([
+  /* 0 */ z.mapped("photos", z.array(LegacyPhoto.nullish()).nullish()),
+  /* 1 */ z.mapped("totalCount", z.number().nullish()), /* 9653 */
+]);
+
 export const HoursPeriodTime = z.positional([
   /* 0 */ z.mapped("open", z.array(z.number().nullish()).nullish()), /* [11, 30] */
   /* 1 */ z.mapped("close", z.array(z.number().nullish()).nullish()), /* [22] */
@@ -274,7 +291,7 @@ export const PlaceNode = z.positional([
   /* 34 */ z.unused(),
   /* 35 */ z.unused(),
   /* 36 */ z.unused(),
-  /* 37 */ z.unused(),
+  /* 37 */ z.mapped("legacyPhotos", LegacyPhotos.nullish()),
   /* 38 */ z.unused(),
   /* 39 */ z.mapped("address", z.string().nullish()), /* "Budapest, Gundel Károly út 4, 1146" */
   /* 40 */ z.unused(),
