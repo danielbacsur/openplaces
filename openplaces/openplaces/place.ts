@@ -28,6 +28,7 @@ export const Place = z.object({
       color: z.string().optional(),
     })
     .optional(),
+  image: z.string().optional(),
 });
 
 export type Place = z.infer<typeof Place>;

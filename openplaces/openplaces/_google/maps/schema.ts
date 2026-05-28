@@ -82,6 +82,56 @@ export const Ratings = z.positional([
   /* 9 */ z.mapped("priceRange", RatingsPriceRange.nullish()),
 ]);
 
+export const PhotoSize = z.positional([
+  /* 0 */ z.mapped("width", z.number().nullish()), /* 4032 */
+  /* 1 */ z.mapped("height", z.number().nullish()), /* 3024 */
+]);
+
+export const PhotoImage = z.positional([
+  /* 0 */ z.mapped("url", z.string().nullish()), /* "https://lh3.googleusercontent.com/gps-cs-s/...=w122-h92-k-no" */
+  /* 1 */ z.mapped("attribution", z.string().nullish()), /* "9653+ Photos" */
+  /* 2 */ z.mapped("native", PhotoSize.nullish()),
+  /* 3 */ z.mapped("thumbnail", PhotoSize.nullish()),
+]);
+
+export const PhotoVideoVariant = z.positional([
+  /* 0 */ z.mapped("itag", z.number().nullish()), /* 18 */
+  /* 1 */ z.mapped("width", z.number().nullish()), /* 360 */
+  /* 2 */ z.mapped("height", z.number().nullish()), /* 640 */
+  /* 3 */ z.mapped("url", z.string().nullish()), /* "https://lh3.googleusercontent.com/gps-cs-s/...=m18" */
+  /* 4 */ z.mapped("streamType", z.number().nullish()), /* 1 */
+]);
+
+export const PhotoVideo = z.positional([
+  /* 0 */ z.mapped("durationMs", z.number().nullish()), /* 29999 */
+  /* 1 */ z.mapped("variants", z.array(PhotoVideoVariant.nullish()).nullish()),
+]);
+
+export const PhotoCamera = z.positional([
+  /* 0 */ z.mapped("position", z.array(z.number().nullish()).nullish()), /* [3, 19.07, 47.51] */
+  /* 1 */ z.mapped("orientation", z.array(z.number().nullish()).nullish()), /* [0, 90] */
+  /* 2 */ z.mapped("size", PhotoSize.nullish()),
+  /* 3 */ z.mapped("quality", z.number().nullish()), /* 75 */
+]);
+
+export const Photo = z.positional([
+  /* 0 */ z.mapped("id", z.string().nullish()), /* "CIHM0ogKEICAgID5vvCh7wE" */
+  /* 1 */ z.mapped("mediaSource", z.number().nullish()), /* 10 */
+  /* 2 */ z.mapped("mediaFormat", z.number().nullish()), /* 12 */
+  /* 3 */ z.mapped("caption", z.string().nullish()), /* "" */
+  /* 4 */ z.unused(),
+  /* 5 */ z.unused(),
+  /* 6 */ z.mapped("image", PhotoImage.nullish()),
+  /* 7 */ z.unused(),
+  /* 8 */ z.mapped("camera", PhotoCamera.nullish()),
+  /* 9 */ z.opaque(/* session token */),
+  /* 10 */ z.opaque(/* ved / request token */),
+]);
+
+export const Photos = z.positional([
+  /* 0 */ z.mapped("photos", z.array(Photo.nullish()).nullish()),
+]);
+
 export const HoursPeriodTime = z.positional([
   /* 0 */ z.mapped("open", z.array(z.number().nullish()).nullish()), /* [11, 30] */
   /* 1 */ z.mapped("close", z.array(z.number().nullish()).nullish()), /* [22] */
@@ -259,7 +309,7 @@ export const PlaceNode = z.positional([
   /* 69 */ z.unused(),
   /* 70 */ z.unused(),
   /* 71 */ z.unused(),
-  /* 72 */ z.unused(),
+  /* 72 */ z.mapped("photos", Photos.nullish()),
   /* 73 */ z.unused(),
   /* 74 */ z.unused(),
   /* 75 */ z.unused(),
