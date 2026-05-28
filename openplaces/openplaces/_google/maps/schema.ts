@@ -82,6 +82,70 @@ export const Ratings = z.positional([
   /* 9 */ z.mapped("priceRange", RatingsPriceRange.nullish()),
 ]);
 
+export const HoursPeriodTime = z.positional([
+  /* 0 */ z.mapped("open", z.array(z.number().nullish()).nullish()), /* [11, 30] */
+  /* 1 */ z.mapped("close", z.array(z.number().nullish()).nullish()), /* [22] */
+]);
+
+export const HoursPeriod = z.positional([
+  /* 0 */ z.mapped("label", z.string().nullish()), /* "11:30 am–10 pm" */
+  /* 1 */ z.mapped("time", HoursPeriodTime.nullish()),
+]);
+
+export const HoursDate = z.positional([
+  /* 0 */ z.mapped("year", z.number().nullish()), /* 2026 */
+  /* 1 */ z.mapped("month", z.number().nullish()), /* 6 */
+  /* 2 */ z.mapped("day", z.number().nullish()), /* 28 */
+]);
+
+export const HoursDay = z.positional([
+  /* 0 */ z.mapped("weekday", z.string().nullish()), /* "Sunday" */
+  /* 1 */ z.mapped("weekdayNumber", z.number().nullish()), /* 7 */
+  /* 2 */ z.mapped("date", HoursDate.nullish()),
+  /* 3 */ z.mapped("periods", z.array(HoursPeriod.nullish()).nullish()),
+  /* 4 */ z.opaque(/* flag */),
+  /* 5 */ z.mapped("openFlag", z.number().nullish()), /* 1 */
+  /* 6 */ z.opaque(/* holiday note */),
+]);
+
+export const HoursColorStyle = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.mapped("colors", z.array(z.number().nullish()).nullish()), /* [4279862841] */
+]);
+
+export const HoursColorRun = z.positional([
+  /* 0 */ z.mapped("start", z.number().nullish()), /* 0 */
+  /* 1 */ z.mapped("length", z.number().nullish()), /* 4 */
+  /* 2 */ z.mapped("style", HoursColorStyle.nullish()),
+]);
+
+export const HoursStatus = z.positional([
+  /* 0 */ z.mapped("text", z.string().nullish()), /* "Open · Closes 10 pm" */
+  /* 1 */ z.mapped("colorRuns", z.array(HoursColorRun.nullish()).nullish()),
+]);
+
+export const HoursCurrent = z.positional([
+  /* 0 */ z.mapped("day", HoursDay.nullish()),
+  /* 1 */ z.mapped("activePeriodIndex", z.number().nullish()), /* 0 */
+  /* 2 */ z.mapped("openStateCode", z.number().nullish()), /* 1 */
+  /* 3 */ z.opaque(/* flag */),
+  /* 4 */ z.mapped("status", HoursStatus.nullish()),
+  /* 5 */ z.mapped("statusAlt", HoursStatus.nullish()),
+  /* 6 */ z.unused(),
+  /* 7 */ z.mapped("closingHour", z.array(z.number().nullish()).nullish()), /* [21] */
+  /* 8 */ z.mapped("shortStatus", HoursStatus.nullish()),
+]);
+
+export const OpeningHours = z.positional([
+  /* 0 */ z.mapped("weekly", z.array(HoursDay.nullish()).nullish()),
+  /* 1 */ z.mapped("current", HoursCurrent.nullish()),
+  /* 2 */ z.mapped("todayWeekdayNumber", z.number().nullish()), /* 7 */
+  /* 3 */ z.unused(),
+  /* 4 */ z.unused(),
+  /* 5 */ z.unused(),
+  /* 6 */ z.opaque(/* flag */),
+]);
+
 export const DescriptionLine = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.mapped("text", z.string().nullish()), /* "Chic hangout for global eats & cocktails" */
@@ -307,6 +371,26 @@ export const PlaceNode = z.positional([
   /* 181 */ z.unused(),
   /* 182 */ z.unused(),
   /* 183 */ z.mapped("structuredAddress", StructuredAddress.nullish()),
+  /* 184 */ z.unused(),
+  /* 185 */ z.unused(),
+  /* 186 */ z.unused(),
+  /* 187 */ z.unused(),
+  /* 188 */ z.unused(),
+  /* 189 */ z.unused(),
+  /* 190 */ z.unused(),
+  /* 191 */ z.unused(),
+  /* 192 */ z.unused(),
+  /* 193 */ z.unused(),
+  /* 194 */ z.unused(),
+  /* 195 */ z.unused(),
+  /* 196 */ z.unused(),
+  /* 197 */ z.unused(),
+  /* 198 */ z.unused(),
+  /* 199 */ z.unused(),
+  /* 200 */ z.unused(),
+  /* 201 */ z.unused(),
+  /* 202 */ z.unused(),
+  /* 203 */ z.mapped("openingHours", OpeningHours.nullish()),
 ]);
 
 export type PlaceNode = z.infer<typeof PlaceNode>;

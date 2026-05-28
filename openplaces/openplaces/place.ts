@@ -20,6 +20,14 @@ export const Place = z.object({
   rating: z.number().optional(),
   reviews: z.string().optional(),
   price: z.string().optional(),
+
+  hours: z
+    .object({
+      status: z.string().optional(),
+      detail: z.string().optional(),
+      color: z.string().optional(),
+    })
+    .optional(),
 });
 
 export type Place = z.infer<typeof Place>;

@@ -2,7 +2,7 @@ import { Place } from "openplaces";
 
 import * as browser from "./browser";
 import { pb } from "./features";
-import { Response } from "./schema";
+import { type PlaceNode, Response } from "./schema";
 
 interface Options {
   query: string;
@@ -66,6 +66,7 @@ export async function search(options: Options): Promise<Place[]> {
         place.ratings?.priceRange?.short ??
         place.ratings?.priceLevel ??
         undefined,
+      hours: hours(place.openingHours),
     });
 
     return result.success ? [result.data] : [];
@@ -79,6 +80,19 @@ function strings(values: (string | null | undefined)[] | null | undefined) {
 
 function join(lines: (string | null | undefined)[] | null | undefined) {
   return lines?.filter(Boolean).join(", ") || undefined;
+}
+
+function hours(opening: PlaceNode["openingHours"]) {
+  const current = opening?.current;
+  if (!current) return undefined;
+
+  const detail = current.status?.text ?? undefined;
+  const status = current.shortStatus?.text ?? detail?.split("·")[0]?.trim();
+  const argb = current.status?.colorRuns?.[0]?.style?.colors?.[0];
+  const color = typeof argb === "number" ? String(argb) : undefined;
+
+  if (!status && !detail) return undefined;
+  return { status, detail, color };
 }
 
 function count(reviews: number | null | undefined): string | undefined {
