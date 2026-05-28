@@ -3,6 +3,7 @@ import { z } from "zod";
 export const Place = z.object({
   id: z.string(),
   name: z.string(),
+  localName: z.string().optional(),
   category: z.string().optional(),
   categories: z.array(z.string()).optional(),
   description: z.string().optional(),
@@ -17,6 +18,7 @@ export const Place = z.object({
   country: z.string().optional(),
   phone: z.string().optional(),
   website: z.string().optional(),
+  logo: z.string().optional(),
   rating: z.number().optional(),
   reviews: z.string().optional(),
   price: z.string().optional(),

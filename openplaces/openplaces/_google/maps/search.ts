@@ -39,6 +39,7 @@ export async function search(options: Options): Promise<Place[]> {
     const result = Place.safeParse({
       id: place.placeId,
       name: place.name,
+      localName: place.localName ?? undefined,
       category: place.categories?.[0] ?? undefined,
       categories: strings(place.categories),
       description:
@@ -60,6 +61,7 @@ export async function search(options: Options): Promise<Place[]> {
       country: place.structuredAddress?.flat?.country ?? undefined,
       phone: place.phones?.[0]?.number ?? undefined,
       website: place.website?.url ?? undefined,
+      logo: place.logo ?? undefined,
       rating: place.ratings?.rating ?? undefined,
       reviews: count(place.ratings?.reviewCount),
       price:

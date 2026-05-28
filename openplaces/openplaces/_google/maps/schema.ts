@@ -355,7 +355,7 @@ export const PlaceNode = z.positional([
   /* 98 */ z.unused(),
   /* 99 */ z.unused(),
   /* 100 */ z.unused(),
-  /* 101 */ z.unused(),
+  /* 101 */ z.mapped("localName", z.string().nullish()), /* "Gundel Étterem" */
   /* 102 */ z.unused(),
   /* 103 */ z.unused(),
   /* 104 */ z.unused(),
@@ -411,7 +411,7 @@ export const PlaceNode = z.positional([
   /* 154 */ z.unused(),
   /* 155 */ z.unused(),
   /* 156 */ z.unused(),
-  /* 157 */ z.unused(),
+  /* 157 */ z.mapped("logo", z.string().nullish()), /* "https://lh3.googleusercontent.com/-LzNCOr0ygq4/.../photo.jpg" */
   /* 158 */ z.unused(),
   /* 159 */ z.unused(),
   /* 160 */ z.unused(),
