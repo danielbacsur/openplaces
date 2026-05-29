@@ -32,54 +32,64 @@ export async function search(options: Options): Promise<Place[]> {
   const parsed = Response.safeParse(data);
   if (!parsed.success) return [];
 
-  return (parsed.data.results?.rows ?? []).flatMap((row) => {
-    const place = row?.place;
-    if (!place) return [];
+  const organic = (parsed.data.results?.rows ?? []).map((row) => row?.place);
+  const sponsored = (parsed.data.ads?.ads ?? [])
+    .flat()
+    .map((ad) => ad?.place);
 
-    const result = Place.safeParse({
-      id: place.placeId,
-      name: place.name,
-      localName: place.localName ?? undefined,
-      category: place.categories?.[0] ?? undefined,
-      categories: strings(place.categories),
-      description:
-        place.description?.summary?.text ??
-        place.description?.blurb?.text ??
-        undefined,
-      latitude: place.coordinates?.latitude,
-      longitude: place.coordinates?.longitude,
-      timezone: place.timezone ?? undefined,
-      address: place.address ?? join(place.addressLines),
-      street:
-        place.structuredAddress?.flat?.streetDisplay ??
-        place.addressComponents?.street ??
-        undefined,
-      district:
-        place.structuredAddress?.flat?.district ?? place.district ?? undefined,
-      city: place.structuredAddress?.flat?.city ?? place.city ?? undefined,
-      postalCode: place.structuredAddress?.flat?.postalCode ?? undefined,
-      country: place.structuredAddress?.flat?.country ?? undefined,
-      phone: place.phones?.[0]?.number ?? undefined,
-      website: place.website?.url ?? undefined,
-      logo: place.logo ?? undefined,
-      rating: place.ratings?.rating ?? undefined,
-      reviews: count(place.ratings?.reviewCount),
-      price:
-        place.ratings?.priceRange?.short ??
-        place.ratings?.priceLevel ??
-        undefined,
-      hours: hours(place.openingHours),
-      services: services(place.attributes),
-      accessible: accessible(place.attributes),
-      reserve: place.reserve?.[0]?.url ?? undefined,
-      image:
-        place.photos?.photos?.[0]?.image?.url ??
-        place.legacyPhotos?.photos?.[0]?.image?.url ??
-        undefined,
-    });
+  return [
+    ...organic.flatMap((node) => place(node, false)),
+    ...sponsored.flatMap((node) => place(node, true)),
+  ];
+}
 
-    return result.success ? [result.data] : [];
+function place(node: PlaceNode | null | undefined, sponsored: boolean): Place[] {
+  if (!node) return [];
+
+  const address = node.structuredAddress?.flat;
+
+  const result = Place.safeParse({
+    id: node.placeId,
+    name: node.name,
+    localName: node.localName ?? undefined,
+
+    category: node.categories?.[0] ?? undefined,
+    categories: strings(node.categories),
+    description: node.description?.summary?.text ?? node.description?.blurb?.text,
+
+    latitude: node.coordinates?.latitude,
+    longitude: node.coordinates?.longitude,
+    timezone: node.timezone ?? undefined,
+
+    address: node.address ?? join(node.addressLines),
+    street: address?.streetDisplay ?? node.addressComponents?.street ?? undefined,
+    district: address?.district ?? node.district ?? undefined,
+    city: address?.city ?? node.city ?? undefined,
+    postalCode: address?.postalCode ?? undefined,
+    country: address?.country ?? undefined,
+
+    phone: node.phones?.[0]?.number ?? undefined,
+    website: node.website?.url ?? undefined,
+    logo: node.logo ?? undefined,
+
+    rating: node.ratings?.rating ?? undefined,
+    reviews: count(node.ratings?.reviewCount),
+    price: node.ratings?.priceRange?.short ?? node.ratings?.priceLevel ?? undefined,
+
+    hours: hours(node.openingHours),
+
+    services: services(node.attributes),
+    accessible: accessible(node.attributes),
+
+    reserve: node.reserve?.[0]?.url ?? undefined,
+    sponsored: sponsored || undefined,
+    image:
+      node.photos?.photos?.[0]?.image?.url ??
+      node.legacyPhotos?.photos?.[0]?.image?.url ??
+      undefined,
   });
+
+  return result.success ? [result.data] : [];
 }
 
 function strings(values: (string | null | undefined)[] | null | undefined) {
@@ -89,6 +99,10 @@ function strings(values: (string | null | undefined)[] | null | undefined) {
 
 function join(lines: (string | null | undefined)[] | null | undefined) {
   return lines?.filter(Boolean).join(", ") || undefined;
+}
+
+function count(reviews: number | null | undefined): string | undefined {
+  return typeof reviews === "number" ? reviews.toLocaleString("en") : undefined;
 }
 
 function argb(value: number | null | undefined): string {
@@ -108,10 +122,6 @@ function hours(opening: PlaceNode["openingHours"]) {
   return { status, detail, color };
 }
 
-function count(reviews: number | null | undefined): string | undefined {
-  return typeof reviews === "number" ? reviews.toLocaleString("en") : undefined;
-}
-
 function services(attributes: PlaceNode["attributes"]) {
   const group = attributes?.groups?.find((g) => g?.key === "service_options");
 
@@ -127,10 +137,7 @@ function services(attributes: PlaceNode["attributes"]) {
 function accessible(attributes: PlaceNode["attributes"]) {
   for (const group of attributes?.groups ?? []) {
     for (const attribute of group?.attributes ?? []) {
-      if (
-        typeof attribute?.id === "string" &&
-        attribute.id.includes("wheelchair")
-      ) {
+      if (typeof attribute?.id === "string" && attribute.id.includes("wheelchair")) {
         return attribute.availability?.state === 1;
       }
     }

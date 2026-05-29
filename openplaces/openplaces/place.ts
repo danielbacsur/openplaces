@@ -37,6 +37,7 @@ export const Place = z.object({
   accessible: z.boolean().optional(),
 
   reserve: z.string().optional(),
+  sponsored: z.boolean().optional(),
   image: z.string().optional(),
 });
 

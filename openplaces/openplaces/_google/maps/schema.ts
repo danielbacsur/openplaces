@@ -519,13 +519,39 @@ export const ResultRow = z.positional([
   /* 14 */ z.mapped("place", PlaceNode.nullish()),
 ]);
 
+export const AdEntry = z.positional([
+  /* 0 */ z.mapped("tagline", z.string().nullish()), /* "Budapest's award-winning Neapolitan pizzas." */
+  /* 1 */ z.opaque(/* flag */),
+  /* 2 */ z.opaque(/* cta label */),
+  /* 3 */ z.opaque(/* display domain */),
+  /* 4 */ z.opaque(/* click url */),
+  /* 5 */ z.opaque(/* flag */),
+  /* 6 */ z.opaque(/* flag */),
+  /* 7 */ z.opaque(/* flag */),
+  /* 8 */ z.opaque(/* flag */),
+  /* 9 */ z.opaque(/* request id */),
+  /* 10 */ z.opaque(/* ved token */),
+  /* 11 */ z.opaque(/* flag */),
+  /* 12 */ z.opaque(/* flag */),
+  /* 13 */ z.opaque(/* flag */),
+  /* 14 */ z.opaque(/* flag */),
+  /* 15 */ z.mapped("place", PlaceNode.nullish()),
+]);
+
+export const AdsSection = z.positional([
+  /* 0 */ z.opaque(/* ad request id */),
+  /* 1 */ z.mapped("ads", z.array(z.array(AdEntry.nullish().catch(null)).nullish()).nullish()),
+]);
+
 export const ResultContainer = z.positional([
-  /* 0 */ z.unused(),
+  /* 0 */ z.mapped("query", z.string().nullish()), /* "restaurants" */
   /* 1 */ z.mapped("rows", z.array(ResultRow.nullish().catch(null)).nullish()),
 ]);
 
 export const Response = z.positional([
   /* 0 */ z.mapped("results", ResultContainer.nullish()),
+  /* 1 */ z.unused(),
+  /* 2 */ z.mapped("ads", AdsSection.nullish()),
 ]);
 
 export type Response = z.infer<typeof Response>;
