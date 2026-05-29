@@ -82,6 +82,45 @@ export const Ratings = z.positional([
   /* 9 */ z.mapped("priceRange", RatingsPriceRange.nullish()),
 ]);
 
+export const AttributesShortLabel = z.positional([
+  /* 0 */ z.mapped("state", z.number().nullish()), /* 1 */
+  /* 1 */ z.mapped("label", z.string().nullish()), /* "Outdoor seating" */
+]);
+
+export const AttributesLongLabel = z.positional([
+  /* 0 */ z.mapped("state", z.number().nullish()), /* 1 */
+  /* 1 */ z.mapped("short", z.string().nullish()), /* "Outdoor seating" */
+  /* 2 */ z.mapped("canonical", z.string().nullish()), /* "Outdoor seating" */
+  /* 3 */ z.mapped("sentence", z.string().nullish()), /* "Has outdoor seating" */
+]);
+
+export const AttributesAvailability = z.positional([
+  /* 0 */ z.mapped("state", z.number().nullish()), /* 1 */
+  /* 1 */ z.mapped("shortLabels", z.array(AttributesShortLabel.nullish()).nullish()),
+  /* 2 */ z.mapped("longLabel", AttributesLongLabel.nullish()),
+]);
+
+export const AttributesAttribute = z.positional([
+  /* 0 */ z.mapped("id", z.string().nullish()), /* "/geo/type/establishment_poi/has_seating_outdoors" */
+  /* 1 */ z.mapped("label", z.string().nullish()), /* "Outdoor seating" */
+  /* 2 */ z.mapped("availability", AttributesAvailability.nullish()),
+  /* 3 */ z.mapped("negated", z.number().nullish()), /* 1 */
+  /* 4 */ z.mapped("iconGlyph", z.array(z.number().nullish()).nullish()), /* [32] */
+]);
+
+export const AttributesGroup = z.positional([
+  /* 0 */ z.mapped("key", z.string().nullish()), /* "service_options" */
+  /* 1 */ z.mapped("name", z.string().nullish()), /* "Service options" */
+  /* 2 */ z.mapped("attributes", z.array(AttributesAttribute.nullish()).nullish()),
+]);
+
+export const Attributes = z.positional([
+  /* 0 */ z.mapped("featured", z.array(AttributesAttribute.nullish()).nullish()),
+  /* 1 */ z.mapped("groups", z.array(AttributesGroup.nullish()).nullish()),
+  /* 2 */ z.unused(),
+  /* 3 */ z.mapped("summary", z.array(AttributesAttribute.nullish()).nullish()),
+]);
+
 export const PhotoSize = z.positional([
   /* 0 */ z.mapped("width", z.number().nullish()), /* 4032 */
   /* 1 */ z.mapped("height", z.number().nullish()), /* 3024 */
@@ -354,7 +393,7 @@ export const PlaceNode = z.positional([
   /* 97 */ z.unused(),
   /* 98 */ z.unused(),
   /* 99 */ z.unused(),
-  /* 100 */ z.unused(),
+  /* 100 */ z.mapped("attributes", Attributes.nullish()),
   /* 101 */ z.mapped("localName", z.string().nullish()), /* "Gundel Étterem" */
   /* 102 */ z.unused(),
   /* 103 */ z.unused(),
