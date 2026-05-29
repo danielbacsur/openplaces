@@ -30,6 +30,12 @@ export const Place = z.object({
       color: z.string().optional(),
     })
     .optional(),
+
+  services: z
+    .array(z.object({ label: z.string(), available: z.boolean() }))
+    .optional(),
+  accessible: z.boolean().optional(),
+
   image: z.string().optional(),
 });
 

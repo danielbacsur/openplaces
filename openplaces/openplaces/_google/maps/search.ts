@@ -69,6 +69,8 @@ export async function search(options: Options): Promise<Place[]> {
         place.ratings?.priceLevel ??
         undefined,
       hours: hours(place.openingHours),
+      services: services(place.attributes),
+      accessible: accessible(place.attributes),
       image:
         place.photos?.photos?.[0]?.image?.url ??
         place.legacyPhotos?.photos?.[0]?.image?.url ??
@@ -107,4 +109,31 @@ function hours(opening: PlaceNode["openingHours"]) {
 
 function count(reviews: number | null | undefined): string | undefined {
   return typeof reviews === "number" ? reviews.toLocaleString("en") : undefined;
+}
+
+function services(attributes: PlaceNode["attributes"]) {
+  const group = attributes?.groups?.find((g) => g?.key === "service_options");
+
+  const list = (group?.attributes ?? []).flatMap((attribute) => {
+    const label = attribute?.label;
+    if (!label) return [];
+    return [{ label, available: attribute?.availability?.state === 1 }];
+  });
+
+  return list.length ? list : undefined;
+}
+
+function accessible(attributes: PlaceNode["attributes"]) {
+  for (const group of attributes?.groups ?? []) {
+    for (const attribute of group?.attributes ?? []) {
+      if (
+        typeof attribute?.id === "string" &&
+        attribute.id.includes("wheelchair")
+      ) {
+        return attribute.availability?.state === 1;
+      }
+    }
+  }
+
+  return undefined;
 }
