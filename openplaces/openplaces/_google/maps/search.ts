@@ -71,6 +71,7 @@ export async function search(options: Options): Promise<Place[]> {
       hours: hours(place.openingHours),
       services: services(place.attributes),
       accessible: accessible(place.attributes),
+      reserve: place.reserve?.[0]?.url ?? undefined,
       image:
         place.photos?.photos?.[0]?.image?.url ??
         place.legacyPhotos?.photos?.[0]?.image?.url ??

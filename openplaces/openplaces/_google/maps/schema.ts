@@ -339,7 +339,7 @@ export const PlaceNode = z.positional([
   /* 43 */ z.unused(),
   /* 44 */ z.unused(),
   /* 45 */ z.unused(),
-  /* 46 */ z.unused(),
+  /* 46 */ z.mapped("reserve", z.array(Website.nullish()).nullish()),
   /* 47 */ z.unused(),
   /* 48 */ z.unused(),
   /* 49 */ z.unused(),
