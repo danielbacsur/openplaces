@@ -1,6 +1,6 @@
 {
   "name": "@openplaces/mcp",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Look up places, businesses, addresses, and location metadata without a proprietary places API.",
   "keywords": [
     "google-maps",
