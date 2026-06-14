@@ -13,5 +13,10 @@
     "bumpp": "^11",
     "turbo": "^2"
   },
+  "overrides": {
+    "next": {
+      "postcss": "8.5.15"
+    }
+  },
   "packageManager": "npm@11.16.0"
 }
