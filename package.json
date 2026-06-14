@@ -1,12 +1,13 @@
 {
   "workspaces": [
     "openplaces",
-    "openplaces-mcp"
+    "openplaces-mcp",
+    "openplaces-atlas"
   ],
   "scripts": {
-    "build": "turbo run build",
+    "dev": "turbo run dev",
     "test": "turbo run test",
-    "release": "bumpp"
+    "build": "turbo run build"
   },
   "devDependencies": {
     "bumpp": "^11",
