@@ -12,5 +12,5 @@
     "bumpp": "^11",
     "turbo": "^2"
   },
-  "packageManager": "npm@11.14.1"
+  "packageManager": "npm@11.16.0"
 }
