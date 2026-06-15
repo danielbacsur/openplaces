@@ -18,5 +18,10 @@
       "postcss": "8.5.15"
     }
   },
-  "packageManager": "npm@11.16.0"
+  "packageManager": "npm@11.16.0",
+  "allowScripts": {
+    "fsevents@2.3.3": true,
+    "fsevents@2.3.2": true,
+    "sharp@0.34.5": true
+  }
 }
