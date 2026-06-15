@@ -8,6 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --font-sans: var(--font-google-sans);
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -20,4 +21,11 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+.material-symbols-outlined {
+  font-family: var(--font-material-symbols);
+  font-size: 24px;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
 }
