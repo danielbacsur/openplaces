@@ -1,5 +1,6 @@
 import { Aside } from "./_components/aside";
 import { Checkbox } from "./_components/checkbox";
+import { NoResults } from "./_components/no-results";
 import { Search } from "./_components/search";
 import { Separator } from "./_components/separator";
 
@@ -10,6 +11,8 @@ export default function Page() {
 
       <div className="flex w-[408px] flex-col bg-white">
         <Search />
+
+        <NoResults />
 
         <div className="flex-1"></div>
 
