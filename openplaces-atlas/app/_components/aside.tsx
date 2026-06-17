@@ -1,6 +1,6 @@
 export function Aside() {
   return (
-    <aside className="flex w-[72px] flex-col bg-[#f4fbfc] font-sans text-[#5e5e5e]">
+    <aside className="relative z-20 flex w-[72px] flex-col bg-[#f4fbfc] font-sans text-[#5e5e5e]">
       <button className="mt-4 flex h-9 w-full flex-col items-center justify-center">
         <span className="material-symbols-outlined -mb-1 flex h-10 w-10 items-center justify-center">
           menu

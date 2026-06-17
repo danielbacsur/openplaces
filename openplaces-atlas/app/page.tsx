@@ -17,7 +17,7 @@ export default function Page() {
       {!collapsed && <Aside />}
 
       {!collapsed && (
-        <div className="flex w-[408px] flex-col bg-white">
+        <div className="relative z-10 flex w-[408px] flex-col bg-white shadow-[0px_1px_2px_0px_rgba(60,64,67,0.3),0px_2px_6px_2px_rgba(60,64,67,0.15)]">
           <Search />
 
           <NoResults />
