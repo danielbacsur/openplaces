@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Aside } from "./_components/aside";
 import { Checkbox } from "./_components/checkbox";
 import { Collapse } from "./_components/collapse";
+import { Controls } from "./_components/controls";
 import { Filters } from "./_components/filters";
 import { NoResults } from "./_components/no-results";
 import { Search } from "./_components/search";
@@ -38,6 +39,8 @@ export default function Page() {
           collapsed={collapsed}
           onClick={() => setCollapsed((c) => !c)}
         />
+
+        <Controls />
       </div>
     </main>
   );
