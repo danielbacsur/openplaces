@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Aside } from "./_components/aside";
 import { Checkbox } from "./_components/checkbox";
 import { Collapse } from "./_components/collapse";
+import { Filters } from "./_components/filters";
 import { NoResults } from "./_components/no-results";
 import { Search } from "./_components/search";
 import { Separator } from "./_components/separator";
@@ -31,6 +32,8 @@ export default function Page() {
       )}
 
       <div className="relative flex-1 overflow-hidden">
+        {!collapsed && <Filters />}
+
         <Collapse
           collapsed={collapsed}
           onClick={() => setCollapsed((c) => !c)}
