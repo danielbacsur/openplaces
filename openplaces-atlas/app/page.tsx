@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 
 import { Aside } from "./_components/aside";
 import { Checkbox } from "./_components/checkbox";
@@ -8,8 +8,10 @@ import { Collapse } from "./_components/collapse";
 import { Controls } from "./_components/controls";
 import { Filters } from "./_components/filters";
 import { NoResults } from "./_components/no-results";
+import { ResultCard } from "./_components/result-card";
 import { Search } from "./_components/search";
 import { Separator } from "./_components/separator";
+import { places } from "./_data/places";
 
 export default function Page() {
   const [collapsed, setCollapsed] = useState(false);
@@ -22,9 +24,18 @@ export default function Page() {
         <div className="relative z-10 flex w-[408px] flex-col bg-white shadow-[0px_1px_2px_0px_rgba(60,64,67,0.3),0px_2px_6px_2px_rgba(60,64,67,0.15)]">
           <Search />
 
-          <NoResults />
-
-          <div className="flex-1"></div>
+          <div className="flex-1 overflow-y-auto">
+            {places.length === 0 ? (
+              <NoResults />
+            ) : (
+              places.map((place, i) => (
+                <Fragment key={place.name}>
+                  {i > 0 && <Separator />}
+                  <ResultCard place={place} />
+                </Fragment>
+              ))
+            )}
+          </div>
 
           <Separator />
 
