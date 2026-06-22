@@ -1,15 +1,15 @@
 import { type ReactNode } from "react";
 
-import { Google_Sans } from "next/font/google";
 import localFont from "next/font/local";
 
 import "./globals.css";
 
-const googleSans = Google_Sans({
+const googleSans = localFont({
   variable: "--font-google-sans",
-  subsets: ["latin"],
+  src: "./_fonts/google-sans-latin.woff2",
+  display: "block",
+  weight: "400 700",
 });
-
 
 const materialSymbols = localFont({
   src: "./_fonts/material-symbols-outlined.woff2",
