@@ -10,11 +10,11 @@ export function Search() {
         autoComplete="off"
       />
 
-      <button className="absolute top-1/2 right-[54px] -translate-y-1/2 cursor-pointer p-3 text-[#5e5e5e]">
+      <button className="absolute top-[calc(50%+1px)] right-[54px] -translate-y-1/2 cursor-pointer p-3 text-[#5e5e5e]">
         <span className="material-symbols-outlined block">search</span>
       </button>
 
-      <button className="absolute top-1/2 right-0 -translate-y-1/2 cursor-pointer px-[15px] py-3 text-[#5e5e5e]">
+      <button className="absolute top-[calc(50%+1px)] right-0 -translate-y-1/2 cursor-pointer px-[15px] py-3 text-[#5e5e5e]">
         <span className="material-symbols-outlined block">close</span>
       </button>
     </form>
