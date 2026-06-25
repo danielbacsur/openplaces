@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Aside } from "./_components/aside";
 import { Checkbox } from "./_components/checkbox";
+import { Canvas } from "./_components/canvas";
 import { Collapse } from "./_components/collapse";
 import { Controls } from "./_components/controls";
 import { Filters } from "./_components/filters";
@@ -17,6 +18,8 @@ export default function Page() {
 
   return (
     <main className="relative flex h-dvh w-dvw overflow-hidden bg-[rgb(232,234,237)]">
+      <Canvas />
+
       {!collapsed && <Aside />}
 
       {!collapsed && (
@@ -39,7 +42,7 @@ export default function Page() {
         </div>
       )}
 
-      <div className="relative flex-1 overflow-hidden">
+      <div className="pointer-events-none relative flex-1 *:pointer-events-auto">
         {!collapsed && <Filters />}
 
         <Collapse
