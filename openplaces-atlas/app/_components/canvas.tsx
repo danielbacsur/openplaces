@@ -3,7 +3,11 @@
 import { useEffect, useRef } from "react";
 
 const TILE_SIZE = 256;
+const MAX_ZOOM = 22;
 const MAX_LAT = 85.05112878;
+
+const WHEEL_ZOOM_SPEED = 0.0025;
+const PINCH_ZOOM_SPEED = 0.02;
 
 const DEFAULT_LAT = 47.4979;
 const DEFAULT_LON = 19.0402;
@@ -41,6 +45,8 @@ export function Canvas() {
     let lastY = 0;
 
     const tiles = new Map<string, Tile>();
+
+    const minZoom = () => Math.log2(Math.max(height, TILE_SIZE) / TILE_SIZE);
 
     function clampCenterY(y: number, size = TILE_SIZE * 2 ** zoom) {
       const half = Math.min(0.5, height / 2 / size);
@@ -152,6 +158,23 @@ export function Canvas() {
       return tile;
     }
 
+    function zoomAround(nextZoom: number, pivotX: number, pivotY: number) {
+      const clamped = clamp(nextZoom, minZoom(), MAX_ZOOM);
+      if (Math.abs(clamped - zoom) < 0.00001) return;
+
+      const before = TILE_SIZE * 2 ** zoom;
+      const nx = wrap01(centerX + (pivotX - width / 2) / before);
+      const ny = centerY + (pivotY - height / 2) / before;
+
+      zoom = clamped;
+
+      const after = TILE_SIZE * 2 ** zoom;
+      centerX = wrap01(nx - (pivotX - width / 2) / after);
+      centerY = clampCenterY(ny - (pivotY - height / 2) / after, after);
+
+      if (!raf) raf = window.requestAnimationFrame(frame);
+    }
+
     function onPointerDown(event: PointerEvent) {
       if (dragId !== null || event.button !== 0) return;
 
@@ -203,6 +226,20 @@ export function Canvas() {
       dragId = null;
     }
 
+    function onWheel(event: WheelEvent) {
+      event.preventDefault();
+
+      const speed = event.ctrlKey ? PINCH_ZOOM_SPEED : WHEEL_ZOOM_SPEED;
+      const delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
+      const rect = container!.getBoundingClientRect();
+
+      zoomAround(
+        zoom - delta * speed,
+        event.clientX - rect.left,
+        event.clientY - rect.top,
+      );
+    }
+
     const pane = document.createElement("div");
 
     pane.style.position = "absolute";
@@ -218,6 +255,7 @@ export function Canvas() {
       const rect = container.getBoundingClientRect();
       width = Math.round(rect.width);
       height = Math.round(rect.height);
+      zoom = clamp(zoom, minZoom(), MAX_ZOOM);
       centerY = clampCenterY(centerY);
       if (!raf) raf = window.requestAnimationFrame(frame);
     });
@@ -228,6 +266,7 @@ export function Canvas() {
     container.addEventListener("pointermove", onPointerMove);
     container.addEventListener("pointerup", onPointerUp);
     container.addEventListener("pointercancel", onPointerCancel);
+    container.addEventListener("wheel", onWheel, { passive: false });
 
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
@@ -238,6 +277,7 @@ export function Canvas() {
       container.removeEventListener("pointermove", onPointerMove);
       container.removeEventListener("pointerup", onPointerUp);
       container.removeEventListener("pointercancel", onPointerCancel);
+      container.removeEventListener("wheel", onWheel);
 
       pane.remove();
     };
