@@ -36,7 +36,16 @@ export function Canvas() {
     let anchorX = 0;
     let anchorY = 0;
 
+    let dragId: number | null = null;
+    let lastX = 0;
+    let lastY = 0;
+
     const tiles = new Map<string, Tile>();
+
+    function clampCenterY(y: number, size = TILE_SIZE * 2 ** zoom) {
+      const half = Math.min(0.5, height / 2 / size);
+      return clamp(y, half, 1 - half);
+    }
 
     function frame() {
       raf = 0;
@@ -143,6 +152,41 @@ export function Canvas() {
       return tile;
     }
 
+    function onPointerDown(event: PointerEvent) {
+      if (dragId !== null || event.button !== 0) return;
+
+      event.preventDefault();
+
+      container!.setPointerCapture(event.pointerId);
+
+      container!.style.cursor = "grabbing";
+
+      dragId = event.pointerId;
+      lastX = event.clientX;
+      lastY = event.clientY;
+    }
+
+    function onPointerMove(event: PointerEvent) {
+      if (event.pointerId !== dragId) return;
+
+      const size = TILE_SIZE * 2 ** zoom;
+
+      centerX = wrap01(centerX - (event.clientX - lastX) / size);
+      centerY = clampCenterY(centerY - (event.clientY - lastY) / size, size);
+      lastX = event.clientX;
+      lastY = event.clientY;
+
+      if (!raf) raf = window.requestAnimationFrame(frame);
+    }
+
+    function onPointerUp(event: PointerEvent) {
+      if (event.pointerId !== dragId) return;
+
+      container!.style.cursor = "";
+
+      dragId = null;
+    }
+
     const pane = document.createElement("div");
 
     pane.style.position = "absolute";
@@ -158,15 +202,24 @@ export function Canvas() {
       const rect = container.getBoundingClientRect();
       width = Math.round(rect.width);
       height = Math.round(rect.height);
+      centerY = clampCenterY(centerY);
       if (!raf) raf = window.requestAnimationFrame(frame);
     });
 
     resizeObserver.observe(container);
 
+    container.addEventListener("pointerdown", onPointerDown);
+    container.addEventListener("pointermove", onPointerMove);
+    container.addEventListener("pointerup", onPointerUp);
+
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
 
       resizeObserver.disconnect();
+
+      container.removeEventListener("pointerdown", onPointerDown);
+      container.removeEventListener("pointermove", onPointerMove);
+      container.removeEventListener("pointerup", onPointerUp);
 
       pane.remove();
     };
@@ -175,7 +228,7 @@ export function Canvas() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 overflow-hidden bg-[#e8eaed]"
+      className="absolute inset-0 cursor-grab touch-none overflow-hidden bg-[#e8eaed]"
     />
   );
 }
