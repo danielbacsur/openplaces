@@ -182,6 +182,22 @@ export function Canvas() {
     function onPointerUp(event: PointerEvent) {
       if (event.pointerId !== dragId) return;
 
+      if (container!.hasPointerCapture(event.pointerId)) {
+        container!.releasePointerCapture(event.pointerId);
+      }
+
+      container!.style.cursor = "";
+
+      dragId = null;
+    }
+
+    function onPointerCancel(event: PointerEvent) {
+      if (event.pointerId !== dragId) return;
+
+      if (container!.hasPointerCapture(event.pointerId)) {
+        container!.releasePointerCapture(event.pointerId);
+      }
+
       container!.style.cursor = "";
 
       dragId = null;
@@ -211,6 +227,7 @@ export function Canvas() {
     container.addEventListener("pointerdown", onPointerDown);
     container.addEventListener("pointermove", onPointerMove);
     container.addEventListener("pointerup", onPointerUp);
+    container.addEventListener("pointercancel", onPointerCancel);
 
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
@@ -220,6 +237,7 @@ export function Canvas() {
       container.removeEventListener("pointerdown", onPointerDown);
       container.removeEventListener("pointermove", onPointerMove);
       container.removeEventListener("pointerup", onPointerUp);
+      container.removeEventListener("pointercancel", onPointerCancel);
 
       pane.remove();
     };
