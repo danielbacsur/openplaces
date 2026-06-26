@@ -78,9 +78,31 @@ export function Canvas() {
       const top = Math.max(0, Math.floor(centerRow - halfRows) - 1);
       const bottom = Math.min(2 ** z - 1, Math.floor(centerRow + halfRows) + 1);
 
+      let allLoaded = true;
+      const needed = new Set<string>();
       for (let y = top; y <= bottom; y += 1) {
         for (let x = left; x <= right; x += 1) {
-          getTile(z, x, y);
+          needed.add(`${z}/${x}/${y}`);
+          if (!getTile(z, x, y).loaded) allLoaded = false;
+        }
+      }
+
+      const margin = TILE_SIZE;
+      for (const [key, tile] of tiles) {
+        if (needed.has(key)) continue;
+
+        const size = TILE_SIZE * 2 ** (anchorZ - tile.z);
+        const screenX = width / 2 + scale * (tile.x * size - centerPxX);
+        const screenY = height / 2 + scale * (tile.y * size - centerPxY);
+
+        // prettier-ignore
+        const offscreen =
+          screenX > width + margin || screenX + scale * size < -margin ||
+          screenY > height + margin || screenY + scale * size < -margin;
+
+        if (offscreen || allLoaded) {
+          tile.image.remove();
+          tiles.delete(key);
         }
       }
     }
