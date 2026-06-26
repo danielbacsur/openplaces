@@ -133,9 +133,10 @@ export function Canvas() {
       };
 
       const column = ((x % 2 ** z) + 2 ** z) % 2 ** z;
+      const scale = window.devicePixelRatio > 1 ? "&scale=2" : "";
       const endpoint = `https://mt${(column + y) % 4}.google.com/vt/lyrs=m`;
 
-      tile.image.src = `${endpoint}&z=${z}&x=${column}&y=${y}`;
+      tile.image.src = `${endpoint}&z=${z}&x=${column}&y=${y}${scale}`;
       tiles.set(`${z}/${x}/${y}`, tile);
       pane.appendChild(tile.image);
 
