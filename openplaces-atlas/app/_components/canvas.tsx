@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type Ref } from "react";
 
 const TILE_SIZE = 256;
 const MAX_ZOOM = 22;
@@ -20,7 +20,12 @@ type Tile = {
   loaded: boolean;
 };
 
-export function Canvas() {
+export interface CanvasHandle {
+  zoomIn: () => void;
+  zoomOut: () => void;
+}
+
+export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -240,6 +245,14 @@ export function Canvas() {
       );
     }
 
+    function zoomIn() {
+      zoomAround(zoom + 1, width / 2, height / 2);
+    }
+
+    function zoomOut() {
+      zoomAround(zoom - 1, width / 2, height / 2);
+    }
+
     const pane = document.createElement("div");
 
     pane.style.position = "absolute";
@@ -268,6 +281,9 @@ export function Canvas() {
     container.addEventListener("pointercancel", onPointerCancel);
     container.addEventListener("wheel", onWheel, { passive: false });
 
+    if (typeof ref === "function") ref({ zoomIn, zoomOut });
+    else if (ref) ref.current = { zoomIn, zoomOut };
+
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
 
@@ -280,8 +296,11 @@ export function Canvas() {
       container.removeEventListener("wheel", onWheel);
 
       pane.remove();
+
+      if (typeof ref === "function") ref(null);
+      else if (ref) ref.current = null;
     };
-  }, []);
+  }, [ref]);
 
   return (
     <div

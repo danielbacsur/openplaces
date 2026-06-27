@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Aside } from "./_components/aside";
 import { Checkbox } from "./_components/checkbox";
-import { Canvas } from "./_components/canvas";
+import { Canvas, type CanvasHandle } from "./_components/canvas";
 import { Collapse } from "./_components/collapse";
 import { Controls } from "./_components/controls";
 import { Filters } from "./_components/filters";
@@ -15,10 +15,11 @@ import { places } from "./_data/places";
 
 export default function Page() {
   const [collapsed, setCollapsed] = useState(false);
+  const canvasRef = useRef<CanvasHandle | null>(null);
 
   return (
     <main className="relative flex h-dvh w-dvw overflow-hidden bg-[rgb(232,234,237)]">
-      <Canvas />
+      <Canvas ref={canvasRef} />
 
       {!collapsed && <Aside />}
 
@@ -50,7 +51,10 @@ export default function Page() {
           onClick={() => setCollapsed((c) => !c)}
         />
 
-        <Controls />
+        <Controls
+          onZoomIn={() => canvasRef.current?.zoomIn()}
+          onZoomOut={() => canvasRef.current?.zoomOut()}
+        />
       </div>
     </main>
   );

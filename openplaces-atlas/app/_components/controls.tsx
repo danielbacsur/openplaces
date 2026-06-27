@@ -1,4 +1,9 @@
-export function Controls() {
+export interface ControlsProps {
+  onZoomIn?: () => void;
+  onZoomOut?: () => void;
+}
+
+export function Controls({ onZoomIn, onZoomOut }: ControlsProps) {
   return (
     <div className="absolute right-5 bottom-5 flex flex-col items-center gap-[3px]">
       <button className="grid size-[29px] place-items-center overflow-hidden rounded-lg bg-white text-[#1f1f1f] shadow-[0px_1px_2px_0px_rgba(60,64,67,0.3),0px_1px_3px_1px_rgba(60,64,67,0.15)]">
@@ -11,7 +16,10 @@ export function Controls() {
       </button>
 
       <div className="relative flex w-[29px] flex-col overflow-hidden rounded-lg bg-white shadow-[0px_1px_4px_0px_rgba(0,0,0,0.3)]">
-        <button className="group grid size-[29px] cursor-pointer place-items-center">
+        <button
+          onClick={onZoomIn}
+          className="group grid size-[29px] cursor-pointer place-items-center"
+        >
           <span
             className="block size-[15px] bg-no-repeat bg-position-[0px_0px] group-hover:bg-position-[-30px_0px]"
             style={{
@@ -21,7 +29,10 @@ export function Controls() {
           />
         </button>
 
-        <button className="group -mt-px grid size-[29px] cursor-pointer place-items-center">
+        <button
+          onClick={onZoomOut}
+          className="group -mt-px grid size-[29px] cursor-pointer place-items-center"
+        >
           <span
             className="block size-[15px] bg-no-repeat bg-position-[0px_-15px] group-hover:bg-position-[-30px_-15px]"
             style={{
