@@ -2,7 +2,7 @@
   "workspaces": [
     "openplaces",
     "openplaces-mcp",
-    "openplaces-atlas"
+    "openplaces-website"
   ],
   "scripts": {
     "dev": "turbo run dev",
