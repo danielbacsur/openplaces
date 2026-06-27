@@ -2,24 +2,32 @@
 
 import { useEffect, useRef, type Ref } from "react";
 
-const TILE_SIZE = 256;
-const MAX_ZOOM = 22;
-const MAX_LAT = 85.05112878;
+const VERTEX = `
+  attribute vec2 a_pos;
+  uniform vec2 u_translate, u_resolution, u_size;
+  varying vec2 v_uv;
 
-const WHEEL_ZOOM_SPEED = 0.0025;
-const PINCH_ZOOM_SPEED = 0.02;
-const GEOLOCATE_ZOOM = 15;
+  void main() {
+    vec2 clip = ((u_translate + a_pos * u_size) / u_resolution) * 2.0 - 1.0;
+    gl_Position = vec4(clip.x, -clip.y, 0.0, 1.0);
+    v_uv = a_pos;
+  }
+`;
 
-const DEFAULT_LAT = 47.4979;
-const DEFAULT_LON = 19.0402;
+const FRAGMENT = `
+  precision mediump float;
+  uniform sampler2D u_tex;
+  varying vec2 v_uv;
 
-type Tile = {
-  image: HTMLImageElement;
-  z: number;
-  x: number;
-  y: number;
-  loaded: boolean;
-};
+  void main() {
+    gl_FragColor = texture2D(u_tex, v_uv);
+  }
+`;
+
+type Coordinate = { lng: number; lat: number };
+type Drag = { clientX: number; clientY: number };
+type Position = { x: number; y: number };
+type Tile = { texture: WebGLTexture; ready: boolean };
 
 export interface CanvasHandle {
   zoomIn: () => void;
@@ -28,285 +36,228 @@ export interface CanvasHandle {
 }
 
 export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    const canvas = canvasRef.current!;
+    const gl = canvas.getContext("webgl")!;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    let raf = 0;
+    const vertex = gl.createShader(gl.VERTEX_SHADER)!;
+    gl.shaderSource(vertex, VERTEX);
+    gl.compileShader(vertex);
 
+    const fragment = gl.createShader(gl.FRAGMENT_SHADER)!;
+    gl.shaderSource(fragment, FRAGMENT);
+    gl.compileShader(fragment);
+
+    const program = gl.createProgram()!;
+    gl.attachShader(program, vertex);
+    gl.attachShader(program, fragment);
+    gl.linkProgram(program);
+    gl.useProgram(program);
+
+    const buffer = new Float32Array([0, 0, 1, 0, 0, 1, 0, 1, 1, 0, 1, 1]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW);
+
+    const a_pos = gl.getAttribLocation(program, "a_pos");
+    gl.enableVertexAttribArray(a_pos);
+    gl.vertexAttribPointer(a_pos, 2, gl.FLOAT, false, 0, 0);
+
+    const u_resolution = gl.getUniformLocation(program, "u_resolution");
+    const u_translate = gl.getUniformLocation(program, "u_translate");
+    const u_size = gl.getUniformLocation(program, "u_size");
+
+    let zoom = 12;
     let width = 0;
     let height = 0;
-    let zoom = 12;
+    let minZoom = 0;
 
-    let centerX = lonToX(DEFAULT_LON);
-    let centerY = latToY(DEFAULT_LAT);
+    let center: Coordinate = {
+      lng: 19.0402,
+      lat: 47.4979,
+    };
 
-    let anchorZ = -1;
-    let anchorX = 0;
-    let anchorY = 0;
+    const toWorldPosition = ({ lng, lat }: Coordinate): Position => {
+      const world = 256 * 2 ** zoom;
+      const sin = Math.sin((lat * Math.PI) / 180);
 
-    let dragId: number | null = null;
-    let lastX = 0;
-    let lastY = 0;
+      return {
+        x: ((lng + 180) / 360) * world,
+        y: (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * world,
+      };
+    };
+
+    const toGeoCoordinate = ({ x, y }: Position): Coordinate => {
+      const world = 256 * 2 ** zoom;
+      const n = Math.PI * (1 - (2 * y) / world);
+
+      return {
+        lng: (x / world) * 360 - 180,
+        lat: (Math.atan(Math.sinh(n)) * 180) / Math.PI,
+      };
+    };
 
     const tiles = new Map<string, Tile>();
-
-    const minZoom = () => Math.log2(Math.max(height, TILE_SIZE) / TILE_SIZE);
-
-    function clampCenterY(y: number, size = TILE_SIZE * 2 ** zoom) {
-      const half = Math.min(0.5, height / 2 / size);
-      return clamp(y, half, 1 - half);
-    }
-
-    function frame() {
-      raf = 0;
-
-      if (width === 0 || height === 0) return;
-
-      const z = Math.round(zoom);
-      const worldPx = TILE_SIZE * 2 ** z;
-      const centerPxX = centerX * worldPx;
-      const centerPxY = centerY * worldPx;
-
-      if (z !== anchorZ) {
-        anchorZ = z;
-        anchorX = centerPxX;
-        anchorY = centerPxY;
-        for (const tile of tiles.values()) {
-          const size = TILE_SIZE * 2 ** (anchorZ - tile.z);
-
-          tile.image.style.width = `${size}px`;
-          tile.image.style.height = `${size}px`;
-          tile.image.style.left = `${tile.x * size - anchorX}px`;
-          tile.image.style.top = `${tile.y * size - anchorY}px`;
-          tile.image.style.zIndex = String(tile.z);
-        }
-      }
-
-      const scale = 2 ** (zoom - z);
-      const translateX = width / 2 + scale * (anchorX - centerPxX);
-      const translateY = height / 2 + scale * (anchorY - centerPxY);
-
-      pane.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
-
-      const centerCol = centerPxX / TILE_SIZE;
-      const centerRow = centerPxY / TILE_SIZE;
-      const halfCols = width / (2 * scale * TILE_SIZE);
-      const halfRows = height / (2 * scale * TILE_SIZE);
-      const left = Math.floor(centerCol - halfCols) - 1;
-      const right = Math.floor(centerCol + halfCols) + 1;
-      const top = Math.max(0, Math.floor(centerRow - halfRows) - 1);
-      const bottom = Math.min(2 ** z - 1, Math.floor(centerRow + halfRows) + 1);
-
-      let allLoaded = true;
-      const needed = new Set<string>();
-      for (let y = top; y <= bottom; y += 1) {
-        for (let x = left; x <= right; x += 1) {
-          needed.add(`${z}/${x}/${y}`);
-          if (!getTile(z, x, y).loaded) allLoaded = false;
-        }
-      }
-
-      const margin = TILE_SIZE;
-      for (const [key, tile] of tiles) {
-        if (needed.has(key)) continue;
-
-        const size = TILE_SIZE * 2 ** (anchorZ - tile.z);
-        const screenX = width / 2 + scale * (tile.x * size - centerPxX);
-        const screenY = height / 2 + scale * (tile.y * size - centerPxY);
-
-        // prettier-ignore
-        const offscreen =
-          screenX > width + margin || screenX + scale * size < -margin ||
-          screenY > height + margin || screenY + scale * size < -margin;
-
-        if (offscreen || allLoaded) {
-          tile.image.remove();
-          tiles.delete(key);
-        }
-      }
-    }
-
-    function getTile(z: number, x: number, y: number) {
+    const getTile = (z: number, x: number, y: number) => {
       const cached = tiles.get(`${z}/${x}/${y}`);
       if (cached) return cached;
 
-      const tile: Tile = { image: new Image(), z, x, y, loaded: false };
+      const texture = gl.createTexture()!;
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
-      tile.image.alt = "";
-      tile.image.draggable = false;
-      tile.image.decoding = "async";
-      tile.image.style.position = "absolute";
-      tile.image.style.maxWidth = "none";
+      const tile: Tile = { texture, ready: false };
+      tiles.set(`${z}/${x}/${y}`, tile);
 
-      const size = TILE_SIZE * 2 ** (anchorZ - tile.z);
+      const image = new Image();
+      image.crossOrigin = "anonymous";
 
-      tile.image.style.width = `${size}px`;
-      tile.image.style.height = `${size}px`;
-      tile.image.style.left = `${tile.x * size - anchorX}px`;
-      tile.image.style.top = `${tile.y * size - anchorY}px`;
-      tile.image.style.zIndex = String(tile.z);
-
-      tile.image.onload = () => {
-        tile.loaded = true;
-        if (!raf) raf = window.requestAnimationFrame(frame);
+      image.onload = () => {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        // prettier-ignore
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        tile.ready = true;
+        schedule();
       };
 
-      const column = ((x % 2 ** z) + 2 ** z) % 2 ** z;
-      const scale = window.devicePixelRatio > 1 ? "&scale=2" : "";
-      const endpoint = `https://mt${(column + y) % 4}.google.com/vt/lyrs=m`;
-
-      tile.image.src = `${endpoint}&z=${z}&x=${column}&y=${y}${scale}`;
-      tiles.set(`${z}/${x}/${y}`, tile);
-      pane.appendChild(tile.image);
+      const params = `z=${z}&x=${x}&y=${y}${dpr > 1 ? "&scale=2" : ""}`;
+      image.src = `https://mt${(x + y) % 4}.google.com/vt/lyrs=m&${params}`;
 
       return tile;
-    }
+    };
 
-    function zoomAround(nextZoom: number, pivotX: number, pivotY: number) {
-      const clamped = clamp(nextZoom, minZoom(), MAX_ZOOM);
-      if (Math.abs(clamped - zoom) < 0.00001) return;
+    const frame = () => {
+      const world = 256 * 2 ** zoom;
+      const vector = toWorldPosition(center);
 
-      const before = TILE_SIZE * 2 ** zoom;
-      const nx = wrap01(centerX + (pivotX - width / 2) / before);
-      const ny = centerY + (pivotY - height / 2) / before;
+      const x = vector.x;
+      const y = Math.max(height / 2, Math.min(world - height / 2, vector.y));
 
-      zoom = clamped;
+      center = toGeoCoordinate({ x, y });
 
-      const after = TILE_SIZE * 2 ** zoom;
-      centerX = wrap01(nx - (pivotX - width / 2) / after);
-      centerY = clampCenterY(ny - (pivotY - height / 2) / after, after);
+      const z = Math.min(Math.round(zoom), 22);
+      const count = 2 ** z;
+      const size = world / count;
 
-      if (!raf) raf = window.requestAnimationFrame(frame);
-    }
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.uniform2f(u_resolution, width, height);
+      gl.uniform2f(u_size, size, size);
 
-    function onPointerDown(event: PointerEvent) {
-      if (dragId !== null || event.button !== 0) return;
+      const x0 = Math.floor(((x - width / 2) / world) * count);
+      const x1 = Math.floor(((x + width / 2) / world) * count);
+      const y0 = Math.floor(((y - height / 2) / world) * count);
+      const y1 = Math.floor(((y + height / 2) / world) * count);
 
+      for (let ty = Math.max(0, y0); ty <= Math.min(count - 1, y1); ty++) {
+        for (let tx = x0; tx <= x1; tx++) {
+          const tile = getTile(z, ((tx % count) + count) % count, ty);
+
+          if (!tile.ready) continue;
+
+          const dx = tx * size - x + width / 2;
+          const dy = ty * size - y + height / 2;
+
+          gl.bindTexture(gl.TEXTURE_2D, tile.texture);
+          gl.uniform2f(u_translate, dx, dy);
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+        }
+      }
+    };
+
+    let raf = 0;
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(() => ((raf = 0), frame()));
+    };
+
+    let drag: Drag | null = null;
+    const onPointerDown = (event: PointerEvent) => {
+      canvas.setPointerCapture(event.pointerId);
+      drag = { clientX: event.clientX, clientY: event.clientY };
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      if (!drag) return;
+
+      const point = toWorldPosition(center);
+      const x = point.x - (event.clientX - drag.clientX);
+      const y = point.y - (event.clientY - drag.clientY);
+
+      center = toGeoCoordinate({ x, y });
+      drag = { clientX: event.clientX, clientY: event.clientY };
+
+      schedule();
+    };
+
+    const onPointerUp = () => {
+      drag = null;
+    };
+
+    const onWheel = (event: WheelEvent) => {
       event.preventDefault();
 
-      container!.setPointerCapture(event.pointerId);
+      const vector = toWorldPosition(center);
+      const px = event.offsetX - width / 2;
+      const py = event.offsetY - height / 2;
+      const cursor = toGeoCoordinate({ x: vector.x + px, y: vector.y + py });
 
-      container!.style.cursor = "grabbing";
+      zoom = Math.max(minZoom, Math.min(22, zoom - event.deltaY * 0.002));
+      const next = toWorldPosition(cursor);
+      center = toGeoCoordinate({ x: next.x - px, y: next.y - py });
 
-      dragId = event.pointerId;
-      lastX = event.clientX;
-      lastY = event.clientY;
-    }
+      schedule();
+    };
 
-    function onPointerMove(event: PointerEvent) {
-      if (event.pointerId !== dragId) return;
+    const zoomIn = () => {
+      zoom = Math.min(22, zoom + 1);
+      schedule();
+    };
 
-      const size = TILE_SIZE * 2 ** zoom;
+    const zoomOut = () => {
+      zoom = Math.max(minZoom, zoom - 1);
+      schedule();
+    };
 
-      centerX = wrap01(centerX - (event.clientX - lastX) / size);
-      centerY = clampCenterY(centerY - (event.clientY - lastY) / size, size);
-      lastX = event.clientX;
-      lastY = event.clientY;
-
-      if (!raf) raf = window.requestAnimationFrame(frame);
-    }
-
-    function onPointerUp(event: PointerEvent) {
-      if (event.pointerId !== dragId) return;
-
-      if (container!.hasPointerCapture(event.pointerId)) {
-        container!.releasePointerCapture(event.pointerId);
-      }
-
-      container!.style.cursor = "";
-
-      dragId = null;
-    }
-
-    function onPointerCancel(event: PointerEvent) {
-      if (event.pointerId !== dragId) return;
-
-      if (container!.hasPointerCapture(event.pointerId)) {
-        container!.releasePointerCapture(event.pointerId);
-      }
-
-      container!.style.cursor = "";
-
-      dragId = null;
-    }
-
-    function onWheel(event: WheelEvent) {
-      event.preventDefault();
-
-      const speed = event.ctrlKey ? PINCH_ZOOM_SPEED : WHEEL_ZOOM_SPEED;
-      const delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
-      const rect = container!.getBoundingClientRect();
-
-      zoomAround(
-        zoom - delta * speed,
-        event.clientX - rect.left,
-        event.clientY - rect.top,
-      );
-    }
-
-    function zoomIn() {
-      zoomAround(zoom + 1, width / 2, height / 2);
-    }
-
-    function zoomOut() {
-      zoomAround(zoom - 1, width / 2, height / 2);
-    }
-
-    function locate() {
+    const locate = () => {
       navigator.geolocation?.getCurrentPosition((position) => {
-        zoom = clamp(Math.max(zoom, GEOLOCATE_ZOOM), minZoom(), MAX_ZOOM);
-        centerX = lonToX(position.coords.longitude);
-        centerY = clampCenterY(latToY(position.coords.latitude));
-        if (!raf) raf = window.requestAnimationFrame(frame);
+        const { longitude, latitude } = position.coords;
+        center = { lng: longitude, lat: latitude };
+        zoom = Math.max(zoom, 15);
+        schedule();
       });
-    }
-
-    const pane = document.createElement("div");
-
-    pane.style.position = "absolute";
-    pane.style.top = "0";
-    pane.style.left = "0";
-    pane.style.transformOrigin = "0 0";
-    pane.style.willChange = "transform";
-    pane.style.pointerEvents = "none";
-
-    container.appendChild(pane);
+    };
 
     const resizeObserver = new ResizeObserver(() => {
-      const rect = container.getBoundingClientRect();
-      width = Math.round(rect.width);
-      height = Math.round(rect.height);
-      zoom = clamp(zoom, minZoom(), MAX_ZOOM);
-      centerY = clampCenterY(centerY);
-      if (!raf) raf = window.requestAnimationFrame(frame);
+      width = canvas.clientWidth;
+      height = canvas.clientHeight;
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      minZoom = Math.log2(height / 256);
+      zoom = Math.max(zoom, minZoom);
+      schedule();
     });
 
-    resizeObserver.observe(container);
+    resizeObserver.observe(canvas);
 
-    container.addEventListener("pointerdown", onPointerDown);
-    container.addEventListener("pointermove", onPointerMove);
-    container.addEventListener("pointerup", onPointerUp);
-    container.addEventListener("pointercancel", onPointerCancel);
-    container.addEventListener("wheel", onWheel, { passive: false });
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("wheel", onWheel, { passive: false });
 
     if (typeof ref === "function") ref({ zoomIn, zoomOut, locate });
     else if (ref) ref.current = { zoomIn, zoomOut, locate };
 
     return () => {
-      if (raf) window.cancelAnimationFrame(raf);
+      cancelAnimationFrame(raf);
 
       resizeObserver.disconnect();
 
-      container.removeEventListener("pointerdown", onPointerDown);
-      container.removeEventListener("pointermove", onPointerMove);
-      container.removeEventListener("pointerup", onPointerUp);
-      container.removeEventListener("pointercancel", onPointerCancel);
-      container.removeEventListener("wheel", onWheel);
-
-      pane.remove();
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", onPointerUp);
+      canvas.removeEventListener("wheel", onWheel);
 
       if (typeof ref === "function") ref(null);
       else if (ref) ref.current = null;
@@ -314,28 +265,9 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
   }, [ref]);
 
   return (
-    <div
-      ref={containerRef}
-      className="absolute inset-0 cursor-grab touch-none overflow-hidden bg-[#e8eaed]"
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 size-full cursor-grab touch-none bg-[#e8eaed] select-none active:cursor-grabbing"
     />
   );
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
-}
-
-function wrap01(value: number) {
-  const wrapped = value % 1;
-  return wrapped < 0 ? wrapped + 1 : wrapped;
-}
-
-function lonToX(lon: number) {
-  return wrap01((lon + 180) / 360);
-}
-
-function latToY(lat: number) {
-  const safeLat = clamp(lat, -MAX_LAT, MAX_LAT);
-  const sin = Math.sin((safeLat * Math.PI) / 180);
-  return 0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI);
 }
