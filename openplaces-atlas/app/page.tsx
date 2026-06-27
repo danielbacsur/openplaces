@@ -52,6 +52,7 @@ export default function Page() {
         />
 
         <Controls
+          onLocate={() => canvasRef.current?.locate()}
           onZoomIn={() => canvasRef.current?.zoomIn()}
           onZoomOut={() => canvasRef.current?.zoomOut()}
         />

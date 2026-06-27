@@ -1,12 +1,16 @@
 export interface ControlsProps {
+  onLocate?: () => void;
   onZoomIn?: () => void;
   onZoomOut?: () => void;
 }
 
-export function Controls({ onZoomIn, onZoomOut }: ControlsProps) {
+export function Controls({ onLocate, onZoomIn, onZoomOut }: ControlsProps) {
   return (
     <div className="absolute right-5 bottom-5 flex flex-col items-center gap-[3px]">
-      <button className="grid size-[29px] place-items-center overflow-hidden rounded-lg bg-white text-[#1f1f1f] shadow-[0px_1px_2px_0px_rgba(60,64,67,0.3),0px_1px_3px_1px_rgba(60,64,67,0.15)]">
+      <button
+        onClick={onLocate}
+        className="grid size-[29px] cursor-pointer place-items-center overflow-hidden rounded-lg bg-white text-[#1f1f1f] shadow-[0px_1px_2px_0px_rgba(60,64,67,0.3),0px_1px_3px_1px_rgba(60,64,67,0.15)]"
+      >
         <span
           className="material-symbols-outlined block translate-x-px"
           style={{ fontSize: "18px", fontVariationSettings: "'FILL' 1" }}

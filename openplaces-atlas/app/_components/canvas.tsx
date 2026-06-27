@@ -8,6 +8,7 @@ const MAX_LAT = 85.05112878;
 
 const WHEEL_ZOOM_SPEED = 0.0025;
 const PINCH_ZOOM_SPEED = 0.02;
+const GEOLOCATE_ZOOM = 15;
 
 const DEFAULT_LAT = 47.4979;
 const DEFAULT_LON = 19.0402;
@@ -23,6 +24,7 @@ type Tile = {
 export interface CanvasHandle {
   zoomIn: () => void;
   zoomOut: () => void;
+  locate: () => void;
 }
 
 export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
@@ -253,6 +255,15 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
       zoomAround(zoom - 1, width / 2, height / 2);
     }
 
+    function locate() {
+      navigator.geolocation?.getCurrentPosition((position) => {
+        zoom = clamp(Math.max(zoom, GEOLOCATE_ZOOM), minZoom(), MAX_ZOOM);
+        centerX = lonToX(position.coords.longitude);
+        centerY = clampCenterY(latToY(position.coords.latitude));
+        if (!raf) raf = window.requestAnimationFrame(frame);
+      });
+    }
+
     const pane = document.createElement("div");
 
     pane.style.position = "absolute";
@@ -281,8 +292,8 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
     container.addEventListener("pointercancel", onPointerCancel);
     container.addEventListener("wheel", onWheel, { passive: false });
 
-    if (typeof ref === "function") ref({ zoomIn, zoomOut });
-    else if (ref) ref.current = { zoomIn, zoomOut };
+    if (typeof ref === "function") ref({ zoomIn, zoomOut, locate });
+    else if (ref) ref.current = { zoomIn, zoomOut, locate };
 
     return () => {
       if (raf) window.cancelAnimationFrame(raf);
