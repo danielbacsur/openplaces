@@ -4,7 +4,7 @@ import { search } from "./search";
 import { stream } from "./stream";
 
 export class Places {
-  constructor(protected client: OpenPlaces) {}
+  constructor(protected readonly client: OpenPlaces) {}
 
   declare search: (
     query: string,
