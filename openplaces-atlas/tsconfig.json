@@ -1,0 +1,5 @@
+{
+  "extends": "../tsconfig.json",
+
+  "include": ["openplaces-atlas/**/*.ts", "tsdown.config.ts"]
+}

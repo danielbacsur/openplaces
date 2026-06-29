@@ -1,6 +1,7 @@
 {
   "workspaces": [
     "openplaces",
+    "openplaces-atlas",
     "openplaces-mcp",
     "openplaces-website"
   ],
