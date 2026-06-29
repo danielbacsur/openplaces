@@ -24,14 +24,19 @@ export async function* stream(
 
     let count = 0;
 
+    this.client.emit("query", query);
+
     for (const prototype of parse(query)) {
       if (count >= limit) return;
 
       if (!prototype.location) {
         for (const place of await search({ query: prototype.query })) {
           if (seen.has(place.id)) continue;
+
+          this.client.emit("place", place);
           seen.add(place.id);
           yield place;
+
           if (++count >= limit) return;
         }
         continue;
@@ -80,9 +85,11 @@ export async function* stream(
               continue;
             if (seen.has(place.id)) continue;
 
+            this.client.emit("place", place);
             seen.add(place.id);
-            fresh++;
             yield place;
+            fresh++;
+
             if (++count >= limit) return;
           }
 
