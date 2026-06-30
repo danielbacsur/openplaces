@@ -10,6 +10,7 @@ const VERTEX = `
   void main() {
     vec2 clip = ((u_translate + a_pos * u_size) / u_resolution) * 2.0 - 1.0;
     gl_Position = vec4(clip.x, -clip.y, 0.0, 1.0);
+    gl_PointSize = u_size.x;
     v_uv = a_pos;
   }
 `;
@@ -17,15 +18,22 @@ const VERTEX = `
 const FRAGMENT = `
   precision mediump float;
   uniform sampler2D u_tex;
+  uniform bool u_marker;
   varying vec2 v_uv;
 
   void main() {
-    gl_FragColor = texture2D(u_tex, v_uv);
+    if (u_marker) {
+      if (length(gl_PointCoord - 0.5) > 0.5) discard;
+      gl_FragColor = vec4(0.918, 0.263, 0.208, 1.0);
+    } else {
+      gl_FragColor = texture2D(u_tex, v_uv);
+    }
   }
 `;
 
 type Coordinate = { lng: number; lat: number };
 type Drag = { clientX: number; clientY: number };
+type Marker = { latitude?: number; longitude?: number };
 type Position = { x: number; y: number };
 type Tile = { texture: WebGLTexture; ready: boolean };
 
@@ -33,6 +41,7 @@ export interface CanvasHandle {
   zoomIn: () => void;
   zoomOut: () => void;
   locate: () => void;
+  setMarkers: (markers: Marker[]) => void;
 }
 
 export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
@@ -68,6 +77,7 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
     const u_resolution = gl.getUniformLocation(program, "u_resolution");
     const u_translate = gl.getUniformLocation(program, "u_translate");
     const u_size = gl.getUniformLocation(program, "u_size");
+    const u_marker = gl.getUniformLocation(program, "u_marker");
 
     let zoom = 12;
     let width = 0;
@@ -78,6 +88,8 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
       lng: 19.0402,
       lat: 47.4979,
     };
+
+    let markers: Coordinate[] = [];
 
     const toWorldPosition = ({ lng, lat }: Coordinate): Position => {
       const world = 256 * 2 ** zoom;
@@ -144,6 +156,7 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.uniform2f(u_resolution, width, height);
       gl.uniform2f(u_size, size, size);
+      gl.uniform1i(u_marker, 0);
 
       const x0 = Math.floor(((x - width / 2) / world) * count);
       const x1 = Math.floor(((x + width / 2) / world) * count);
@@ -163,6 +176,18 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
           gl.uniform2f(u_translate, dx, dy);
           gl.drawArrays(gl.TRIANGLES, 0, 6);
         }
+      }
+
+      gl.uniform1i(u_marker, 1);
+      gl.uniform2f(u_size, 8 * dpr, 0);
+
+      for (const marker of markers) {
+        const point = toWorldPosition(marker);
+        const dx = point.x - x + width / 2;
+        const dy = point.y - y + height / 2;
+
+        gl.uniform2f(u_translate, dx, dy);
+        gl.drawArrays(gl.POINTS, 0, 1);
       }
     };
 
@@ -228,6 +253,11 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
       });
     };
 
+    const setMarkers = (coordinates: Marker[]) => {
+      markers = coordinates.map((m) => ({ lng: m.longitude!, lat: m.latitude! }));
+      schedule();
+    };
+
     const resizeObserver = new ResizeObserver(() => {
       width = canvas.clientWidth;
       height = canvas.clientHeight;
@@ -246,8 +276,8 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
     canvas.addEventListener("pointerup", onPointerUp);
     canvas.addEventListener("wheel", onWheel, { passive: false });
 
-    if (typeof ref === "function") ref({ zoomIn, zoomOut, locate });
-    else if (ref) ref.current = { zoomIn, zoomOut, locate };
+    if (typeof ref === "function") ref({ zoomIn, zoomOut, locate, setMarkers });
+    else if (ref) ref.current = { zoomIn, zoomOut, locate, setMarkers };
 
     return () => {
       cancelAnimationFrame(raf);
