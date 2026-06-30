@@ -17,6 +17,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "^1",
+    "openplaces": "*",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
