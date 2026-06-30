@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Aside } from "./_components/aside";
 import { Checkbox } from "./_components/checkbox";
@@ -11,11 +11,15 @@ import { Filters } from "./_components/filters";
 import { NoResults } from "./_components/no-results";
 import { ResultCard } from "./_components/result-card";
 import { Search } from "./_components/search";
-import { places } from "./_data/places";
+import { useAtlas } from "./_hooks/use-atlas";
 
 export default function Page() {
   const [collapsed, setCollapsed] = useState(false);
   const canvasRef = useRef<CanvasHandle | null>(null);
+
+  const { query, places } = useAtlas();
+
+  useEffect(() => canvasRef.current?.setMarkers(places), [places]);
 
   return (
     <main className="relative flex h-dvh w-dvw overflow-hidden bg-[rgb(232,234,237)]">
@@ -25,15 +29,13 @@ export default function Page() {
 
       {!collapsed && (
         <div className="relative z-10 flex w-[408px] flex-col bg-white shadow-[0px_1px_2px_0px_rgba(60,64,67,0.3),0px_2px_6px_2px_rgba(60,64,67,0.15)]">
-          <Search />
+          <Search query={query ?? undefined} />
 
           <div className="flex-1 divide-y divide-[#e3e3e3] overflow-y-auto">
             {places.length === 0 ? (
               <NoResults />
             ) : (
-              places.map((place) => (
-                <ResultCard key={place.name} place={place} />
-              ))
+              places.map((place) => <ResultCard key={place.id} place={place} />)
             )}
           </div>
 

@@ -1,5 +1,4 @@
-import { type Place } from "../_types/place";
-import { photo } from "../_utils/photo";
+import { type Place } from "openplaces";
 
 function Stars({ rating }: { rating: number }) {
   const rounded = Math.round(rating * 2) / 2;
@@ -24,92 +23,111 @@ const row = "text-[14px] leading-5 tracking-[0.1px] text-[#5e5e5e]";
 
 export function ResultCard({ place }: { place: Place }) {
   return (
-    <a className="block cursor-pointer pb-4">
-      {place.sponsored && (
-        <div className="flex items-center pt-[15px] pb-[9px] pr-4 pl-6">
-          <span className="text-[14px] leading-none font-bold text-[#1f1f1f]">
-            Sponsored
-          </span>
-          <span
-            className="material-symbols-outlined ml-1 leading-none text-[#5e5e5e]"
-            style={{ fontSize: "16px" }}
-          >
-            more_vert
-          </span>
-        </div>
-      )}
-
-      <div
-        className={`flex gap-4 pr-4 pl-6 ${place.sponsored ? "" : "pt-4"}`}
+    <div className="pb-4">
+      <a
+        href={`https://www.google.com/maps/place/?q=place_id:${place.id}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block cursor-pointer"
       >
-        <div className="min-w-0 flex-1">
-          <div className="mb-0.5 truncate text-[16px] leading-5 font-medium text-[#1f1f1f]">
-            {place.name}
-          </div>
-
-          <div className={row}>
-            <span className="mr-1">{place.rating.toFixed(1)}</span>
-            <Stars rating={place.rating} />
-            <span className="pl-1">({place.reviews})</span>
-            <img
-              src="/info_grey.png"
-              alt=""
-              className="ml-[3px] inline-block size-[18px] -translate-y-px align-middle"
-            />
-            {place.price && ` · ${place.price.replace(/ /g, " ")}`}
-          </div>
-
-          <div className={`truncate ${row}`}>
-            {place.category}
-            {" · "}
-            {place.accessible && (
-              <>
-                <span
-                  className="material-symbols-outlined inline-block -translate-y-[2px] align-middle leading-none text-[#0b57d0]"
-                  style={{ fontSize: "15px" }}
-                >
-                  accessible_forward
-                </span>
-                {" · "}
-              </>
-            )}
-            {place.address}
-          </div>
-
-          {place.description && (
-            <div className={`truncate ${row}`}>{place.description}</div>
-          )}
-
-          <div className={row}>
-            <span style={{ color: place.hours.color }}>{place.hours.status}</span>
-            {" · "}
-            {place.hours.detail.replace(/ ([ap]m)/g, " $1")}
-          </div>
-        </div>
-
-        <img
-          src={photo(place.image)}
-          alt=""
-          className="mb-1 size-[84px] shrink-0 rounded-lg object-cover"
-        />
-      </div>
-
-      {place.services ? (
-        <div className={`flex items-center pt-2 pr-4 pl-6 ${row}`}>
-          {place.services.map((s, i) => (
-            <span key={s.label} className="flex items-center">
-              {i > 0 && <span className="px-1.5">·</span>}
-              <img
-                src={s.available ? "/done_green.png" : "/close_red.png"}
-                alt=""
-                className="mr-1.5 size-[18px]"
-              />
-              {s.label}
+        {place.sponsored && (
+          <div className="flex items-center pt-[15px] pb-[9px] pr-4 pl-6">
+            <span className="text-[14px] leading-none font-bold text-[#1f1f1f]">
+              Sponsored
             </span>
-          ))}
+            <span
+              className="material-symbols-outlined ml-1 leading-none text-[#5e5e5e]"
+              style={{ fontSize: "16px" }}
+            >
+              more_vert
+            </span>
+          </div>
+        )}
+
+        <div
+          className={`flex gap-4 pr-4 pl-6 ${place.sponsored ? "" : "pt-4"}`}
+        >
+          <div className="min-w-0 flex-1">
+            <div className="mb-0.5 truncate text-[16px] leading-5 font-medium text-[#1f1f1f]">
+              {place.name}
+            </div>
+
+            {place.rating != null && (
+              <div className={row}>
+                <span className="mr-1">{place.rating.toFixed(1)}</span>
+                <Stars rating={place.rating} />
+                {place.reviews && (
+                  <span className="pl-1">({place.reviews})</span>
+                )}
+                <img
+                  src="/info_grey.png"
+                  alt=""
+                  className="ml-[3px] inline-block size-[18px] -translate-y-px align-middle"
+                />
+                {place.price && ` · ${place.price.replace(/ /g, " ")}`}
+              </div>
+            )}
+
+            {(place.category || place.address) && (
+              <div className={`truncate ${row}`}>
+                {place.category}
+                {place.category && (place.accessible || place.address) && " · "}
+                {place.accessible && (
+                  <>
+                    <span
+                      className="material-symbols-outlined inline-block -translate-y-0.5 align-middle leading-none text-[#0b57d0]"
+                      style={{ fontSize: "15px" }}
+                    >
+                      accessible_forward
+                    </span>
+                    {place.address && " · "}
+                  </>
+                )}
+                {place.address}
+              </div>
+            )}
+
+            {place.description && (
+              <div className={`truncate ${row}`}>{place.description}</div>
+            )}
+
+            {place.hours && (
+              <div className={row}>
+                <span style={{ color: place.hours.color }}>
+                  {place.hours.status}
+                </span>
+                {place.hours.detail &&
+                  ` · ${place.hours.detail.replace(/ ([ap]m)/g, " $1")}`}
+              </div>
+            )}
+          </div>
+
+          {place.image && (
+            <img
+              src={place.image.replace(/=[^=/]*$/, "") + "=w168-h168-k-no"}
+              alt=""
+              className="mb-1 size-[84px] shrink-0 rounded-lg object-cover"
+            />
+          )}
         </div>
-      ) : (
-        place.review && (
+
+        {place.sponsored && place.services && (
+          <div className={`flex items-center pt-2 pr-4 pl-6 ${row}`}>
+            {place.services.slice(0, 3).map((s, i) => (
+              <span key={s.label} className="flex items-center">
+                {i > 0 && <span className="px-1.5">·</span>}
+                <img
+                  src={s.available ? "/done_green.png" : "/close_red.png"}
+                  alt=""
+                  className="mr-1.5 size-[18px]"
+                />
+                {s.label}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* {place.review && (
           <div className="flex items-center gap-1 pt-2 pr-[34px] pl-6">
             <img
               src="/default_user.png"
@@ -118,11 +136,16 @@ export function ResultCard({ place }: { place: Place }) {
             />
             <span className={`line-clamp-2 ${row}`}>{place.review}</span>
           </div>
-        )
-      )}
+        )} */}
+      </a>
 
       {place.reserve && (
-        <div className="px-6 pt-2 pb-1">
+        <a
+          href={place.reserve}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block px-6 pt-2 pb-1"
+        >
           <div className="flex h-10 items-center justify-center rounded-[20px] bg-[#d3f7ff] text-[#014f5a]">
             <span
               className="material-symbols-outlined mr-2"
@@ -134,8 +157,8 @@ export function ResultCard({ place }: { place: Place }) {
               Reserve a table
             </span>
           </div>
-        </div>
+        </a>
       )}
-    </a>
+    </div>
   );
 }
