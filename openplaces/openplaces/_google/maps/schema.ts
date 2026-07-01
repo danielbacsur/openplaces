@@ -386,9 +386,9 @@ export const Photos = z.positional([
 ]);
 
 export const LegacyPhoto = z.positional([
-  /* 0 */ z.mapped("id", z.string()), /* "CIHM0ogKEICAgID5vvCh7wE" */
-  /* 1 */ z.mapped("mediaSource", z.number()), /* 10 */
-  /* 2 */ z.mapped("mediaFormat", z.number()), /* 12 */
+  /* 0 */ z.mapped("id", z.string().nullish()), /* "CIHM0ogKEICAgID5vvCh7wE" */
+  /* 1 */ z.mapped("mediaSource", z.number().nullish()), /* 10 */
+  /* 2 */ z.mapped("mediaFormat", z.number().nullish()), /* 12 */
   /* 3 */ z.mapped("caption", z.string().nullish()), /* "" */
   /* 4 */ z.unused(),
   /* 5 */ z.unused(),
@@ -408,7 +408,7 @@ export const LegacyPhoto = z.positional([
   /* 19 */ z.unused(),
   /* 20 */ z.mapped("kindLabel", z.string().nullish()), /* "Photo" */
   /* 21 */ z.mapped("detail", z.unknown().nullish()), /* [null, [null, "CIABIhCt3SBwDByinNpLQYbvhguK"], [0, 3, [5917, 3945]]] */
-  /* 22 */ z.mapped("kind", z.number()), /* 1 */
+  /* 22 */ z.mapped("kind", z.number().nullish()), /* 1 */
   /* 23 */ z.unused(),
   /* 24 */ z.unused(),
   /* 25 */ z.unused(),
