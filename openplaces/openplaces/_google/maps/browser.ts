@@ -18,9 +18,10 @@ async function open() {
 
   const session = await browser.newPage({ userAgent, locale: "en-US" });
 
-  await session
-    .goto("https://www.google.com/maps", { waitUntil: "domcontentloaded" })
-    .catch(() => {});
+  // prettier-ignore
+  await session.goto("https://www.google.com/maps/search/restaurants", {
+    waitUntil: "domcontentloaded",
+  }).catch(() => {});
 
   if (/consent\.google\.com/.test(session.url())) {
     await session
@@ -29,9 +30,10 @@ async function open() {
       .click()
       .catch(() => {});
 
-    await session
-      .goto("https://www.google.com/maps", { waitUntil: "domcontentloaded" })
-      .catch(() => {});
+    // prettier-ignore
+    await session.goto("https://www.google.com/maps/search/restaurants", {
+      waitUntil: "domcontentloaded",
+    }).catch(() => {});
   }
 
   page = session;
