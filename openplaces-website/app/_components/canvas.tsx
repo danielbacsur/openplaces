@@ -31,9 +31,8 @@ const FRAGMENT = `
   }
 `;
 
-type Coordinate = { lng: number; lat: number };
+type Coordinate = { latitude: number; longitude: number };
 type Drag = { clientX: number; clientY: number };
-type Marker = { latitude?: number; longitude?: number };
 type Position = { x: number; y: number };
 type Tile = { texture: WebGLTexture; ready: boolean };
 
@@ -41,7 +40,7 @@ export interface CanvasHandle {
   zoomIn: () => void;
   zoomOut: () => void;
   locate: () => void;
-  setMarkers: (markers: Marker[]) => void;
+  setMarkers: (markers: Coordinate[]) => void;
 }
 
 export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
@@ -85,18 +84,18 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
     let minZoom = 0;
 
     let center: Coordinate = {
-      lng: 19.0402,
-      lat: 47.4979,
+      latitude: 47.4979,
+      longitude: 19.0402,
     };
 
     let markers: Coordinate[] = [];
 
-    const toWorldPosition = ({ lng, lat }: Coordinate): Position => {
+    const toWorldPosition = ({ latitude, longitude }: Coordinate): Position => {
       const world = 256 * 2 ** zoom;
-      const sin = Math.sin((lat * Math.PI) / 180);
+      const sin = Math.sin((latitude * Math.PI) / 180);
 
       return {
-        x: ((lng + 180) / 360) * world,
+        x: ((longitude + 180) / 360) * world,
         y: (0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI)) * world,
       };
     };
@@ -106,8 +105,8 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
       const n = Math.PI * (1 - (2 * y) / world);
 
       return {
-        lng: (x / world) * 360 - 180,
-        lat: (Math.atan(Math.sinh(n)) * 180) / Math.PI,
+        latitude: (Math.atan(Math.sinh(n)) * 180) / Math.PI,
+        longitude: (x / world) * 360 - 180,
       };
     };
 
@@ -228,8 +227,8 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
       const cursor = toGeoCoordinate({ x: vector.x + px, y: vector.y + py });
 
       zoom = Math.max(minZoom, Math.min(22, zoom - event.deltaY * 0.002));
-      const next = toWorldPosition(cursor);
-      center = toGeoCoordinate({ x: next.x - px, y: next.y - py });
+      const point = toWorldPosition(cursor);
+      center = toGeoCoordinate({ x: point.x - px, y: point.y - py });
 
       schedule();
     };
@@ -246,15 +245,14 @@ export function Canvas({ ref }: { ref?: Ref<CanvasHandle> }) {
 
     const locate = () => {
       navigator.geolocation?.getCurrentPosition((position) => {
-        const { longitude, latitude } = position.coords;
-        center = { lng: longitude, lat: latitude };
+        center = position.coords;
         zoom = Math.max(zoom, 15);
         schedule();
       });
     };
 
-    const setMarkers = (coordinates: Marker[]) => {
-      markers = coordinates.map((m) => ({ lng: m.longitude!, lat: m.latitude! }));
+    const setMarkers = (coordinates: Coordinate[]) => {
+      markers = coordinates;
       schedule();
     };
 
