@@ -36,6 +36,10 @@ async function open() {
     }).catch(() => {});
   }
 
+  await session
+    .waitForSelector('[role="feed"]', { timeout: 20000 })
+    .catch(() => {});
+
   page = session;
   return session;
 }
