@@ -78,7 +78,7 @@ function place(node: PlaceNode | null | undefined, sponsored: boolean): Place[] 
 
     hours: hours(node.openingHours),
 
-    services: services(node.attributes),
+    services: services(node),
     accessible: accessible(node.attributes),
 
     reserve: node.reserve?.[0]?.url ?? undefined,
@@ -122,16 +122,27 @@ function hours(opening: PlaceNode["openingHours"]) {
   return { status, detail, color };
 }
 
-function services(attributes: PlaceNode["attributes"]) {
-  const group = attributes?.groups?.find((g) => g?.key === "service_options");
+function services(node: PlaceNode) {
+  const group = node.attributes?.groups?.find((g) => g?.key === "service_options");
 
-  const list = (group?.attributes ?? []).flatMap((attribute) => {
+  const organic = (group?.attributes ?? []).flatMap((attribute) => {
     const label = attribute?.label;
     if (!label) return [];
     return [{ label, available: attribute?.availability?.state === 1 }];
   });
 
-  return list.length ? list : undefined;
+  if (organic.length) return organic;
+
+  const promoted = (node.promoted?.groups?.[0]?.services?.[0] ?? []).flatMap(
+    (service) => {
+      const label = service?.label?.[0];
+      if (!label) return [];
+      const icon = service?.icons?.[0]?.[0] ?? "";
+      return [{ label, available: /green/.test(icon) }];
+    },
+  );
+
+  return promoted.length ? promoted : undefined;
 }
 
 function accessible(attributes: PlaceNode["attributes"]) {

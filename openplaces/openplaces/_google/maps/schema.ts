@@ -195,6 +195,29 @@ export const Attributes = z.positional([
   /* 5 */ z.mapped("secondaryGroups", z.array(AttributesGroup.nullish()).nullish()),
 ]);
 
+export const PromotedService = z.positional([
+  /* 0 */ z.mapped("label", z.array(z.string().nullish()).nullish()), /* ["Dine-in"] */
+  /* 1 */ z.unused(),
+  /* 2 */ z.unused(),
+  /* 3 */ z.mapped("icons", z.array(z.array(z.string().nullish()).nullish()).nullish()), /* [["https://ssl.gstatic.com/images/icons/material/system_gm/2x/done_gm_green700_24dp.png", "https://ssl.gstatic.com/images/icons/material/system_gm/2x/done_gm_green200_24dp.png"]] */
+  /* 4 */ z.mapped("detail", z.string().nullish()), /* "Serves dine-in" */
+]);
+
+export const PromotedServiceGroup = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.unused(),
+  /* 2 */ z.unused(),
+  /* 3 */ z.unused(),
+  /* 4 */ z.unused(),
+  /* 5 */ z.unused(),
+  /* 6 */ z.mapped("services", z.array(z.array(PromotedService.nullish()).nullish()).nullish()),
+]);
+
+export const PromotedServices = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.mapped("groups", z.array(PromotedServiceGroup.nullish()).nullish()),
+]);
+
 export const HoursPeriodTime = z.positional([
   /* 0 */ z.mapped("open", z.array(z.number().nullish())), /* [11, 30] */
   /* 1 */ z.mapped("close", z.array(z.number().nullish())), /* [22] */
@@ -948,7 +971,7 @@ export const PlaceNode = z.positional([
   /* 139 */ z.unused(),
   /* 140 */ z.unused(),
   /* 141 */ z.unused(),
-  /* 142 */ z.opaque(/* ordering options */),
+  /* 142 */ z.mapped("promoted", PromotedServices.nullish().catch(null)), /* sponsored-card service badges (ads use this instead of slot 100 attributes) */
   /* 143 */ z.unused(),
   /* 144 */ z.unused(),
   /* 145 */ z.unused(),
