@@ -48,6 +48,9 @@ function place(node: PlaceNode | null | undefined, sponsored: boolean): Place[] 
 
   const address = node.structuredAddress?.flat;
 
+  const priceLevel = node.ratings?.priceLevel;
+  const symbolic = !!priceLevel && /^\p{Sc}+$/u.test(priceLevel);
+
   const result = Place.safeParse({
     id: node.identifiers?.bundle?.placeId ?? node.placeId,
     name: node.name,
@@ -77,7 +80,11 @@ function place(node: PlaceNode | null | undefined, sponsored: boolean): Place[] 
 
     rating: node.ratings?.rating ?? undefined,
     reviews: count(node.ratings?.reviewCount),
-    price: node.ratings?.priceRange?.short ?? node.ratings?.priceLevel ?? undefined,
+    price: symbolic ? priceLevel : undefined,
+    priceRange:
+      node.ratings?.priceRange?.short ??
+      (symbolic ? undefined : priceLevel) ??
+      undefined,
 
     hours: hours(node.openingHours),
 
