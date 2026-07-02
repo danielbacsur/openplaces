@@ -22,7 +22,6 @@ export const Place = z.object({
   rating: z.number().optional(),
   reviews: z.string().optional(),
   price: z.string().optional(),
-  priceRange: z.string().optional(),
 
   hours: z
     .object({

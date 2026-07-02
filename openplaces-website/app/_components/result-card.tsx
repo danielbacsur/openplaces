@@ -23,7 +23,6 @@ const row = "text-[14px] leading-5 tracking-[0.1px] text-[#5e5e5e]";
 
 export function ResultCard({ place }: { place: Place }) {
   const location = place.street ?? place.address;
-  const price = place.price ?? place.priceRange;
 
   return (
     <div className="pb-4">
@@ -67,7 +66,7 @@ export function ResultCard({ place }: { place: Place }) {
                   alt=""
                   className="ml-[3px] inline-block size-[18px] -translate-y-px align-middle"
                 />
-                {price && ` · ${price.replace(/ /g, " ")}`}
+                {place.price && ` · ${place.price.replace(/ /g, " ")}`}
               </div>
             )}
 
