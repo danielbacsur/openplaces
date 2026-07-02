@@ -22,6 +22,8 @@ function Stars({ rating }: { rating: number }) {
 const row = "text-[14px] leading-5 tracking-[0.1px] text-[#5e5e5e]";
 
 export function ResultCard({ place }: { place: Place }) {
+  const location = place.street ?? place.address;
+
   return (
     <div className="pb-4">
       <a
@@ -68,10 +70,10 @@ export function ResultCard({ place }: { place: Place }) {
               </div>
             )}
 
-            {(place.category || place.address) && (
-              <div className={`truncate ${row}`}>
+            {(place.category || location) && (
+              <div className={row}>
                 {place.category}
-                {place.category && (place.accessible || place.address) && " · "}
+                {place.category && (place.accessible || location) && " · "}
                 {place.accessible && (
                   <>
                     <span
@@ -80,10 +82,10 @@ export function ResultCard({ place }: { place: Place }) {
                     >
                       accessible_forward
                     </span>
-                    {place.address && " · "}
+                    {location && " · "}
                   </>
                 )}
-                {place.address}
+                {location}
               </div>
             )}
 
