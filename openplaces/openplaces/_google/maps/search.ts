@@ -53,13 +53,16 @@ function place(node: PlaceNode | null | undefined, sponsored: boolean): Place[] 
     name: node.name,
     localName: node.localName ?? undefined,
 
-    category: node.categories?.[0] ?? undefined,
+    category: node.relatedTypes?.[0]?.label ?? node.categories?.[0] ?? undefined,
     categories: strings(node.categories),
     description: node.description?.summary?.text ?? node.description?.blurb?.text,
 
     latitude: node.coordinates?.latitude,
     longitude: node.coordinates?.longitude,
-    timezone: node.timezone ?? undefined,
+    timezone:
+      node.timezone && node.timezone !== "Etc/Unknown"
+        ? node.timezone
+        : undefined,
 
     address: node.address ?? join(node.addressLines),
     street: address?.streetDisplay ?? node.addressComponents?.street ?? undefined,
@@ -114,12 +117,19 @@ function hours(opening: PlaceNode["openingHours"]) {
   const current = opening?.current;
   if (!current) return undefined;
 
-  const detail = current.status?.text ?? undefined;
-  const status = current.shortStatus?.text ?? detail?.split("·")[0]?.trim();
+  const full = current.status?.text ?? undefined;
+  const status = current.shortStatus?.text ?? full?.split("·")[0]?.trim();
+
+  const detail = (
+    full && status && full.startsWith(status)
+      ? full.slice(status.length).replace(/^\s*·\s*/, "")
+      : full
+  )?.replace(/\b([ap])m\b/gi, (_, meridiem) => `${meridiem.toLowerCase()}m`);
+
   const color = argb(current.status?.colorRuns?.[0]?.style?.colors?.[0]);
 
   if (!status && !detail) return undefined;
-  return { status, detail, color };
+  return { status, detail: detail || undefined, color };
 }
 
 function services(node: PlaceNode) {
