@@ -49,7 +49,7 @@ function place(node: PlaceNode | null | undefined, sponsored: boolean): Place[] 
   const address = node.structuredAddress?.flat;
 
   const result = Place.safeParse({
-    id: node.placeId,
+    id: node.placeId ?? node.featureId,
     name: node.name,
     localName: node.localName ?? undefined,
 
