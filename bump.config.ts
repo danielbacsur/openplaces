@@ -8,14 +8,18 @@ export default defineConfig({
   install: true,
   push: true,
 
-  execute: (op) => {
-    op.update({
+  execute: (operation) => {
+    operation.update({
       updatedFiles: [
-        ...op.state.updatedFiles,
-        path.resolve(op.options.cwd, "package-lock.json"),
+        ...operation.state.updatedFiles,
+        path.resolve(operation.options.cwd, "package-lock.json"),
       ],
     });
   },
 
-  files: ["openplaces/package.json", "openplaces-mcp/package.json"],
+  files: [
+    "openplaces/package.json",
+    "openplaces-atlas/package.json",
+    "openplaces-mcp/package.json",
+  ],
 });

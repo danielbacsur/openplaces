@@ -30,4 +30,6 @@ jobs:
 
       - run: npm publish --workspace openplaces
 
+      - run: npm publish --workspace @openplaces/atlas
+
       - run: npm publish --workspace @openplaces/mcp
