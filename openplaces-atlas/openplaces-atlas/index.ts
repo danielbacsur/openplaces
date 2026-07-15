@@ -20,7 +20,6 @@ export const atlas: OpenPlaces.Plugin = (client) => {
       "Cache-Control": "no-store",
     });
 
-    response.socket?.unref();
     clients.add(response);
 
     for (const event of buffer) {
@@ -29,6 +28,8 @@ export const atlas: OpenPlaces.Plugin = (client) => {
 
     request.on("close", () => clients.delete(response));
   });
+
+  server.on("connection", (socket) => socket.unref());
 
   server.on("error", (error: NodeJS.ErrnoException) =>
     console.error(
