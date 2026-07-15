@@ -1,6 +1,6 @@
 {
   "name": "openplaces",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Look up places, businesses, addresses, and location metadata without a proprietary places API.",
   "keywords": [
     "google-maps",
