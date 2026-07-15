@@ -1,6 +1,9 @@
-import { createServer, type ServerResponse } from "node:http";
+import { type ServerResponse } from "node:http";
+import { createServer } from "node:https";
+
 import { type OpenPlaces, type Place } from "openplaces";
 
+import { mkcert } from "./mkcert";
 import { open } from "./open";
 
 type Event = { type: "query"; query: string } | { type: "place"; place: Place };
@@ -10,7 +13,7 @@ export const atlas: OpenPlaces.Plugin = (client) => {
 
   let buffer: Event[] = [];
 
-  const server = createServer((request, response) => {
+  const server = createServer(mkcert(), (request, response) => {
     response.writeHead(200, {
       "Access-Control-Allow-Origin": request.headers.origin ?? "*",
       "Content-Type": "text/event-stream",
@@ -53,7 +56,10 @@ export const atlas: OpenPlaces.Plugin = (client) => {
   client.on("query", (query) => push({ type: "query", query }));
   client.on("place", (place) => push({ type: "place", place }));
 
-  open("http://localhost:3000");
+  open(
+    process.env.OPENPLACES_ATLAS_URL ??
+      "https://atlas.openplaces.danielbacsur.dev",
+  );
 };
 
 declare module "openplaces" {
