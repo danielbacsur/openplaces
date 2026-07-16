@@ -11,6 +11,7 @@ import {
 import { search } from "../_google/maps/search";
 import { parse } from "../_openplaces/language";
 import { geocode } from "../_openstreetmap/nominatim/geocode";
+import { contains, intersects } from "../_openstreetmap/nominatim/polygon";
 import { EARTH_CIRCUMFERENCE, HALF_FIELD_OF_VIEW_TANGENT } from "./config";
 
 export async function* stream(
@@ -42,11 +43,12 @@ export async function* stream(
         continue;
       }
 
-      const { bounds: root } = await geocode(prototype.location);
+      const { bounds: root, polygons } = await geocode(prototype.location);
       const queue = [root];
 
       while (queue.length > 0) {
         const cell = queue.shift()!;
+        if (polygons && !intersects(polygons, cell)) continue;
 
         const latitude = (cell.south + cell.north) / 2;
         const longitude = (cell.west + cell.east) / 2;
@@ -82,6 +84,8 @@ export async function* stream(
             if (place.latitude < cell.south || place.latitude > cell.north)
               continue;
             if (place.longitude < cell.west || place.longitude > cell.east)
+              continue;
+            if (polygons && !contains(polygons, place.latitude, place.longitude))
               continue;
             if (seen.has(place.id)) continue;
 

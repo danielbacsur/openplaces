@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { geocode, type Area } from "./geocode";
+import { contains } from "./polygon";
 
 describe("geocode", () => {
   describe("query: budapest", () => {
@@ -25,6 +26,26 @@ describe("geocode", () => {
       expect(area.center.latitude).toBeLessThan(area.bounds.north);
       expect(area.center.longitude).toBeGreaterThan(area.bounds.west);
       expect(area.center.longitude).toBeLessThan(area.bounds.east);
+    });
+  });
+
+  describe("query: hungary", () => {
+    let area: Area;
+
+    beforeAll(async () => {
+      area = await geocode("hungary");
+    }, 5000);
+
+    it("returns an area polygon for a country-level query", () => {
+      expect(area.polygons).toBeDefined();
+    });
+
+    it("keeps budapest inside the returned country polygon", () => {
+      expect(contains(area.polygons!, 47.5, 19.04)).toBe(true);
+    });
+
+    it("excludes vienna from the returned country polygon", () => {
+      expect(contains(area.polygons!, 48.21, 16.37)).toBe(false);
     });
   });
 
