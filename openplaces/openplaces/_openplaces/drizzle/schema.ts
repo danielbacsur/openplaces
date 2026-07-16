@@ -21,7 +21,7 @@ export const places = sqliteTable("places", {
   website: text(),
   logo: text(),
   rating: real(),
-  reviews: text(),
+  reviews: integer(),
   price: text(),
   hours: text({ mode: "json" }).$type<{
     status?: string;

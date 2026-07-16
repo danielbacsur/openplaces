@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// prettier-ignore
 export const Place = z.object({
   id: z.string(),
   name: z.string(),
@@ -20,22 +21,18 @@ export const Place = z.object({
   website: z.string().optional(),
   logo: z.string().optional(),
   rating: z.number().optional(),
-  reviews: z.string().optional(),
+  reviews: z.number().optional(),
   price: z.string().optional(),
-
-  hours: z
-    .object({
-      status: z.string().optional(),
-      detail: z.string().optional(),
-      color: z.string().optional(),
-    })
-    .optional(),
-
-  services: z
-    .array(z.object({ label: z.string(), available: z.boolean() }))
-    .optional(),
+  hours: z.object({
+    status: z.string().optional(),
+    detail: z.string().optional(),
+    color: z.string().optional(),
+  }).optional(),
+  services: z.array(z.object({
+    label: z.string(),
+    available: z.boolean()
+  })).optional(),
   accessible: z.boolean().optional(),
-
   reserve: z.string().optional(),
   sponsored: z.boolean().optional(),
   image: z.string().optional(),

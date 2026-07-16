@@ -76,7 +76,7 @@ function place(node: PlaceNode | null | undefined, sponsored: boolean): Place[] 
     logo: node.logo ?? undefined,
 
     rating: node.ratings?.rating ?? undefined,
-    reviews: count(node.ratings?.reviewCount),
+    reviews: node.ratings?.reviewCount ?? undefined,
     price: node.ratings?.priceLevel ?? node.ratings?.priceRange?.short ?? undefined,
 
     hours: hours(node.openingHours),
@@ -104,9 +104,6 @@ function join(lines: (string | null | undefined)[] | null | undefined) {
   return lines?.filter(Boolean).join(", ") || undefined;
 }
 
-function count(reviews: number | null | undefined): string | undefined {
-  return typeof reviews === "number" ? reviews.toLocaleString("en") : undefined;
-}
 
 function argb(value: number | null | undefined): string {
   if (typeof value !== "number") return "#5e5e5e";
