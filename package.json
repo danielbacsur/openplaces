@@ -24,6 +24,7 @@
     "better-sqlite3@12.11.1": true,
     "fsevents@2.3.3": true,
     "fsevents@2.3.2": true,
-    "sharp@0.34.5": true
+    "sharp@0.34.5": true,
+    "esbuild@0.25.12": true
   }
 }
