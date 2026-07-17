@@ -46,5 +46,21 @@ export const sqlite = async (): Promise<Database> => {
     return Object.assign(db, { close: () => sqlite.close() });
   } catch {}
 
-  throw new Error();
+  const reset = "\x1b[0m";
+  const bold = "\x1b[1m";
+  const dim = "\x1b[2m";
+  const red = "\x1b[31m";
+  const cyan = "\x1b[36m";
+
+  console.error(
+    `\n${red}${bold}Error:${reset} ` +
+      `No SQLite driver is available for the where option\n\n` +
+      `${dim}The where filter runs on SQLite. ` +
+      `Install ${reset}${cyan}better-sqlite3${reset}${dim}, ` +
+      `or use ${reset}${cyan}Node.js 22.13+${reset}${dim}, ` +
+      `${reset}${cyan}Bun 1.0+${reset}${dim}, or ${reset}${cyan}Deno 2.2+${reset}${dim}, ` +
+      `which ship SQLite built in.${reset}\n`,
+  );
+
+  process.exit(1);
 };
