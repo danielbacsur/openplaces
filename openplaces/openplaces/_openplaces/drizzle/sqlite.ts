@@ -35,5 +35,16 @@ export const sqlite = async (): Promise<Database> => {
     return Object.assign(db, { close: () => sqlite.close() });
   } catch {}
 
+  try {
+    const { DatabaseSync } = await _import("node:sqlite");
+    const { drizzle } = await import("drizzle-orm/node-sqlite");
+    const { migrate } = await import("drizzle-orm/node-sqlite/migrator");
+
+    const sqlite = new DatabaseSync(":memory:");
+    const db = drizzle(sqlite);
+    migrate(db, { migrationsFolder });
+    return Object.assign(db, { close: () => sqlite.close() });
+  } catch {}
+
   throw new Error();
 };
