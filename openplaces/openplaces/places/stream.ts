@@ -1,3 +1,5 @@
+import { sql } from "drizzle-orm";
+
 import { type OpenPlaces, Place } from "openplaces";
 
 import { type Places } from ".";
@@ -9,6 +11,8 @@ import {
   VIEWPORT_WIDTH,
 } from "../_google/maps/config";
 import { search } from "../_google/maps/search";
+import { places } from "../_openplaces/drizzle/schema";
+import { sqlite } from "../_openplaces/drizzle/sqlite";
 import { parse } from "../_openplaces/language";
 import { geocode } from "../_openstreetmap/nominatim/geocode";
 import { contains, intersects } from "../_openstreetmap/nominatim/polygon";
@@ -19,6 +23,24 @@ export async function* stream(
   query: string,
   options: OpenPlaces.Places.Stream.Options = {},
 ): AsyncGenerator<Place> {
+  const where = options.where;
+  const database = where ? await sqlite() : undefined;
+
+  const match = (place: Place) => {
+    if (!where || !database) return true;
+
+    database.delete(places).run();
+    database.insert(places).values(place).run();
+
+    return (
+      database
+        .select({ one: sql`1` })
+        .from(places)
+        .where(sql.raw(where))
+        .all().length > 0
+    );
+  };
+
   try {
     const limit = options.limit ?? Infinity;
     const seen = new Set<string>();
@@ -33,9 +55,11 @@ export async function* stream(
       if (!prototype.location) {
         for (const place of await search({ query: prototype.query })) {
           if (seen.has(place.id)) continue;
+          seen.add(place.id);
+
+          if (!match(place)) continue;
 
           this.client.emit("place", place);
-          seen.add(place.id);
           yield place;
 
           if (++count >= limit) return;
@@ -87,12 +111,15 @@ export async function* stream(
               continue;
             if (polygons && !contains(polygons, place.latitude, place.longitude))
               continue;
+
             if (seen.has(place.id)) continue;
+            seen.add(place.id);
+            fresh++;
+
+            if (!match(place)) continue;
 
             this.client.emit("place", place);
-            seen.add(place.id);
             yield place;
-            fresh++;
 
             if (++count >= limit) return;
           }
@@ -133,6 +160,7 @@ export async function* stream(
       }
     }
   } finally {
+    database?.close();
     await browser.close();
   }
 }
@@ -140,6 +168,7 @@ export async function* stream(
 declare module "openplaces" {
   namespace OpenPlaces.Places.Stream {
     interface Options {
+      where?: string;
       limit?: number;
     }
   }
