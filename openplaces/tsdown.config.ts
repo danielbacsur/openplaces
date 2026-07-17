@@ -1,4 +1,4 @@
-import { glob, readFile, writeFile } from "node:fs/promises";
+import { cp, glob, readFile, writeFile } from "node:fs/promises";
 import { dirname, relative } from "node:path";
 
 import { defineConfig } from "tsdown";
@@ -30,14 +30,21 @@ export default defineConfig({
         imports.push(`import "${rel}";`);
       }
 
-      if (imports.length === 0) return;
+      if (imports.length > 0) {
+        const banner = imports.join("\n") + "\n\n";
 
-      const banner = imports.join("\n") + "\n\n";
+        const current = await readFile(entry, "utf8");
 
-      const current = await readFile(entry, "utf8");
-      if (current.startsWith(imports[0])) return;
+        if (!current.startsWith(imports[0])) {
+          await writeFile(entry, banner + current);
+        }
+      }
 
-      await writeFile(entry, banner + current);
+      await cp(
+        "openplaces/_openplaces/drizzle/migrations",
+        "dist/_openplaces/drizzle/migrations",
+        { recursive: true },
+      );
     },
   },
 });
