@@ -2,6 +2,7 @@
   "workspaces": [
     "openplaces",
     "openplaces-atlas",
+    "openplaces-docs",
     "openplaces-mcp",
     "openplaces-website"
   ],
