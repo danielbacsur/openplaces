@@ -1,0 +1,39 @@
+---
+title: search
+description: Collect the complete result set of a query into an array of places.
+---
+
+A convenience wrapper around [`stream`](/openplaces/openplaces/places/stream) that drives the async iterator to completion, aggregates every emitted place, and resolves with a flat array — deduplicated by `place.id`, capped at 100 places by default.
+
+Use it when you need the complete result set before doing anything with it and the volume is manageable — nothing resolves until every expanded search has finished or the limit is reached.
+
+## Signature
+
+```ts
+search(query: string, options?: OpenPlaces.Places.Search.Options): Promise<Place[]>
+```
+
+```ts
+import { OpenPlaces } from "openplaces";
+
+const client = new OpenPlaces();
+
+const places = await client.places.search("restaurants in tokyo", {
+  limit: 10,
+});
+```
+
+## Options
+
+<TypeTable
+  type={{
+    where: {
+      type: 'string',
+      description: 'Raw SQL WHERE clause evaluated against each candidate place before it counts toward the limit.',
+    },
+    limit: {
+      type: 'number',
+      description: 'Maximum number of places to resolve with. Defaults to 100 for places.search.',
+    },
+  }}
+/>

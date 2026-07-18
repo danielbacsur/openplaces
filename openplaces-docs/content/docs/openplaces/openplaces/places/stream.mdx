@@ -1,0 +1,39 @@
+---
+title: stream
+description: Yield places one at a time as they are discovered.
+---
+
+The engine the library is built on. It returns an async iterator that yields places one at a time as they are discovered, so your loop can start processing results long before collection is complete.
+
+You can break out early and no further network work is done. When a query is scoped to a location, the stream subdivides the area recursively to gather an effectively unbounded result set.
+
+## Signature
+
+```ts
+stream(query: string, options?: OpenPlaces.Places.Stream.Options): AsyncGenerator<Place>
+```
+
+```ts
+import { OpenPlaces } from "openplaces";
+
+const client = new OpenPlaces();
+
+for await (const place of client.places.stream("restaurants in tokyo")) {
+  console.log(place.name);
+}
+```
+
+## Options
+
+<TypeTable
+  type={{
+    where: {
+      type: 'string',
+      description: 'Raw SQL WHERE clause evaluated against each candidate place. Non-matching places are skipped and do not count toward the limit.',
+    },
+    limit: {
+      type: 'number',
+      description: 'Maximum number of places to yield. Unbounded by default — unlike places.search, which defaults to 100.',
+    },
+  }}
+/>

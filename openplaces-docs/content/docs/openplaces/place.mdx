@@ -1,0 +1,67 @@
+---
+title: Place
+description: Full reference of the Place schema returned by every search.
+---
+
+Every result yielded by [`places.search`](/openplaces/openplaces/places/search) and [`places.stream`](/openplaces/openplaces/places/stream) is a `Place`: a single flat object with 27 top-level fields. Everything OpenPlaces can parse out of a result is surfaced on the object directly, rather than nested behind sub-resources.
+
+`Place` is a Zod schema exported from the package root, and the TypeScript type is inferred from it. You can use the schema to validate data that crosses a process or serialization boundary:
+
+```ts
+import { Place } from "openplaces";
+
+const place = Place.parse(data); // throws if the shape is invalid
+const checked = Place.safeParse(data); // { success, data } | { success, error }
+```
+
+Internally, every candidate parsed from a results page is passed through `Place.safeParse`, and candidates that fail validation are dropped — so anything the library yields already conforms to this schema. Fields that could not be parsed are absent, not `null`.
+
+## Fields
+
+Only `id`, `name`, `latitude`, and `longitude` are always present; every other field is optional.
+
+<TypeTable
+  type={{
+    id: { type: 'string', required: true, description: 'Google Maps place ID, e.g. "ChIJhzNeW4jbQUcRDpNeQSc81aA". Used to deduplicate results within a stream.' },
+    name: { type: 'string', required: true, description: 'Display name of the place.' },
+    localName: { type: 'string', description: 'Name in the local language, when it differs from the display name.' },
+    category: { type: 'string', description: 'Primary category label, e.g. "Hungarian restaurant".' },
+    categories: { type: 'string[]', description: 'All category labels attached to the place.' },
+    description: { type: 'string', description: 'Short editorial summary, e.g. "Chic hangout for global eats & cocktails".' },
+    latitude: { type: 'number', required: true, description: 'Latitude in decimal degrees.' },
+    longitude: { type: 'number', required: true, description: 'Longitude in decimal degrees.' },
+    timezone: { type: 'string', description: 'IANA timezone identifier, e.g. "Europe/Budapest".' },
+    address: { type: 'string', description: 'Full single-line address.' },
+    street: { type: 'string', description: 'Street name and number, e.g. "Gundel Károly út 4".' },
+    district: { type: 'string', description: 'District or neighborhood, e.g. "District XIV.".' },
+    city: { type: 'string', description: 'City name.' },
+    postalCode: { type: 'string', description: 'Postal code.' },
+    country: { type: 'string', description: 'Two-letter country code, e.g. "HU".' },
+    phone: { type: 'string', description: 'Formatted phone number of the primary listed number.' },
+    website: { type: 'string', description: 'Website URL.' },
+    logo: { type: 'string', description: 'URL of the business logo image.' },
+    rating: { type: 'number', description: 'Average star rating, e.g. 4.7.' },
+    reviews: { type: 'number', description: 'Number of reviews behind the rating, e.g. 5203.' },
+    price: { type: 'string', description: 'Price level as displayed: a symbol run such as "$$" or a localized range such as "20 000 Ft+".' },
+    hours: { type: '{ status?, detail?, color? }', description: 'Current opening state at the time of the search. See below.' },
+    services: { type: '{ label, available }[]', description: 'Service options such as dine-in, takeaway, delivery. See below.' },
+    accessible: { type: 'boolean', description: 'Whether the place is wheelchair accessible.' },
+    reserve: { type: 'string', description: 'Reservation URL, e.g. a table-booking link.' },
+    sponsored: { type: 'boolean', description: 'True when the result came from a sponsored (ad) slot; absent otherwise.' },
+    image: { type: 'string', description: 'URL of the first photo of the place.' },
+  }}
+/>
+
+## Nested fields
+
+Two fields carry structure; everything else is a scalar or a string array.
+
+`hours` describes the opening state at the time of the search, split into three optional strings:
+
+- `status` — the short state, e.g. `"Open"` or `"Closed"`.
+- `detail` — the remainder of the status line, e.g. `"Closes 10 pm"`.
+- `color` — a hex color derived from the color Google renders the status in, e.g. green while open.
+
+`services` is an array of `{ label: string; available: boolean }` entries taken from the service options of the listing — for a restaurant, typically entries like `{ label: "Dine-in", available: true }` or `{ label: "Delivery", available: false }`. For sponsored results the entries come from the ad card's service badges instead.
+
+Two more fields deserve a note. `accessible` is derived from the wheelchair-accessibility attribute of the listing, so it is `true`, `false`, or absent when the listing does not state it. `sponsored` is only ever `true` or absent — organic results omit the field rather than carrying `false`.
