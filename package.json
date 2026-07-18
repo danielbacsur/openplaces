@@ -7,12 +7,14 @@
   ],
   "scripts": {
     "dev": "turbo run dev",
-    "test": "turbo run test",
-    "build": "turbo run build"
+    "test": "turbo run vitest --log-prefix=none",
+    "build": "turbo run build",
+    "vitest": "vitest --run"
   },
   "devDependencies": {
     "bumpp": "^11.1.0",
-    "turbo": "^2.10.5"
+    "turbo": "^2.10.5",
+    "vitest": "^4.1.10"
   },
   "overrides": {
     "next": {

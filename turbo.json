@@ -5,15 +5,21 @@
       "cache": false,
       "persistent": true
     },
-    "test": {
-      "dependsOn": ["^build", "build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": []
-    },
+
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "//#vitest": {
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "openplaces/**",
+        "openplaces-atlas/**",
+        "openplaces-mcp/**",
+        "openplaces-website/**"
+      ],
+      "outputs": []
     }
   }
 }

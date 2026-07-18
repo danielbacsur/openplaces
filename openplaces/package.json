@@ -37,7 +37,6 @@
     "build": "tsdown",
     "prepack": "npm run typecheck && npm run build && rm -f readme.md license && cp ../readme.md ./readme.md && cp ../license ./license",
     "postpack": "git checkout -- readme.md license",
-    "test": "vitest --run",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -51,8 +50,7 @@
     "@types/node": "^26.1.1",
     "drizzle-kit": "^1.0.0-rc.4",
     "tsdown": "^0.22.9",
-    "typescript": "^7.0.2",
-    "vitest": "^4.1.10"
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": ">=22.0.0"
