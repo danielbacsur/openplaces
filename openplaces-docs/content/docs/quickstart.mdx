@@ -1,0 +1,91 @@
+---
+title: Quickstart
+description: Install OpenPlaces and go from an empty project to your first search results.
+---
+
+OpenPlaces is a TypeScript library for looking up places, businesses, addresses, and location metadata. It runs on Node.js 22 or later, Bun, or Deno. This page takes you from installation to your first results; the rest of the docs cover each part in depth.
+
+<Steps>
+<Step>
+
+## Install the package
+
+```bash
+npm install openplaces
+npx playwright install chromium
+```
+
+Searches run inside a headless Chromium managed by Playwright. The library ships with the package, but the browser does not — the second command downloads it once per machine. On Linux CI images, run `npx playwright install --with-deps chromium` instead to also pull in the system libraries.
+
+</Step>
+<Step>
+
+## Create a client
+
+```ts
+import { OpenPlaces } from "openplaces";
+
+const client = new OpenPlaces();
+```
+
+</Step>
+<Step>
+
+## Run a search
+
+```ts
+const places = await client.places.search("eiffel tower");
+
+console.log(places[0]?.name, places[0]?.rating);
+```
+
+`places.search` resolves with an array of `Place` objects, returning at most 100 results unless you pass a different `limit`. Each place always has an id, name, and coordinates, and can include address details, category, rating, review count, website, opening hours, and more — see [`Place`](/openplaces/place) for the full shape.
+
+</Step>
+<Step>
+
+## Scope the search to a location
+
+```ts
+const places = await client.places.search("restaurants in tokyo", {
+  limit: 10,
+});
+```
+
+The `IN` keyword scopes a query to a geocoded area, and `AND`/`OR` let a single string expand into several searches at once — see [Writing compound queries](/writing-compound-queries) for the grammar, quoting, and parentheses.
+
+</Step>
+<Step>
+
+## Stream results as they arrive
+
+`places.stream` yields each place as it is discovered, instead of collecting everything up front the way `places.search` does. Use it to process results before the search finishes, or when gathering a large set:
+
+```ts
+const stream = client.places.stream("restaurants in tokyo", { limit: 200 });
+
+for await (const place of stream) {
+  console.log(place.name);
+}
+```
+
+Streams have no default `limit` and keep searching until the whole area is exhausted — pass one or break out of the loop once you have enough. See [Streaming search results](/streaming-search-results) for how the iterator behaves.
+
+</Step>
+<Step>
+
+## Filter the results
+
+Every search also takes a `where` option, a SQL `WHERE` clause evaluated against each place's fields, such as its rating, review count, or category — anything that does not match is dropped before it is yielded:
+
+```ts
+const places = await client.places.search("cafes in vienna", {
+  where: "rating >= 4.5 AND reviews > 100",
+  limit: 10,
+});
+```
+
+See [Filtering results with SQL](/filtering-results-with-sql) for the mechanism and clause-writing techniques.
+
+</Step>
+</Steps>

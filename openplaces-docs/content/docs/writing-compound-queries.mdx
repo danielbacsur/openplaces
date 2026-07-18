@@ -1,0 +1,50 @@
+---
+title: Writing compound queries
+description: How queries expand into independent searches with IN, AND, OR, quotes, and parentheses.
+---
+
+A search query can express more than a single lookup. The parser is a recursive descent implementation that tokenizes the input and expands it into a flat list of `{ query, location }` pairs. Each pair is executed as an independent search, and the results are merged into a single stream, deduplicated by `place.id`.
+
+```ts
+import { OpenPlaces } from "openplaces";
+
+const client = new OpenPlaces();
+
+const places = await client.places.search("coffee and tea in paris or london");
+```
+
+This query expands into four searches — `coffee in paris`, `coffee in london`, `tea in paris`, and `tea in london` — whose results arrive as one collection.
+
+## Keywords
+
+Three keywords are recognized: `IN`, `AND`, and `OR`. They are case-insensitive and only match as free-standing words — `in-n-out` and `rock-and-roll` pass through untouched as query text.
+
+`IN` attaches a location to everything on its left. The location is geocoded and the search is confined to that area. When both sides list multiple terms, `IN` takes the cross product: every query is paired with every location.
+
+`AND` and `OR` both split the input into separate terms, and each term becomes its own search. The two keywords are interchangeable: `a and b`, `a or b`, and `a and b or c` all expand each term into an independent query.
+
+<Callout type="warn">
+  `AND` and `OR` are separators, not boolean operators. `coffee and tea` does not
+  find places matching both terms — it runs two searches and merges the results.
+  To constrain results by field values, use the [`where`](/filtering-results-with-sql) option.
+</Callout>
+
+## Quotes
+
+Wrap a phrase in double quotes to treat it as a single term and suppress keyword matching inside it.
+
+```ts
+await client.places.search('"bed and breakfast" in "turks and caicos"');
+```
+
+## Parentheses
+
+Parentheses control how far an `IN` clause reaches. `a and (b in x)` scopes only `b` while `a` searches globally, whereas `(a and b) in x` scopes both. Groups nest to any depth but allow one `IN` each — `a in x in y` is an error, so to combine several located searches, parenthesize each clause:
+
+```ts
+await client.places.search(
+  '(coffee or tea in paris) and ("bed and breakfast" in amsterdam)',
+);
+```
+
+This expands into three searches: `coffee in paris`, `tea in paris`, and `bed and breakfast in amsterdam`.

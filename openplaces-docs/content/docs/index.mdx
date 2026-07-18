@@ -3,4 +3,16 @@ title: Introduction
 description: Look up places, businesses, and location metadata without a proprietary places API.
 ---
 
-OpenPlaces is a free, open-source alternative to Google's Places API.
+OpenPlaces is a free, open-source alternative to Google's Places API. It looks up places, businesses, addresses, and location metadata, and it ships three npm packages that run on Node.js 22 or later, Bun, or Deno:
+
+- **`openplaces`** — the core library: search, streaming, the query language, and SQL filtering.
+- **`@openplaces/mcp`** — an MCP server that exposes search as a tool for agents such as Claude Code.
+- **`@openplaces/atlas`** — a plugin that opens a visual inspector, showing searches running on a map in real time.
+
+## Under the hood
+
+OpenPlaces is a scraper: it drives Google Maps search through Playwright's headless Chromium and parses what the page renders into flat [`Place`](/openplaces/place) objects. There is no API key to configure and no bill — the only requirement is that the browser is available on the machine.
+
+## Compliance and roadmap
+
+You are responsible for ensuring your usage complies with the terms of the upstream services and your local laws, which makes OpenPlaces a fit for prototyping, research, and personal projects. A mode that routes requests through the official Google Places API — compliant with Google Maps Platform Terms and billed to your Google Cloud project — is on the roadmap, but it is not implemented today.

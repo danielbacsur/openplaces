@@ -1,0 +1,37 @@
+---
+title: Inspecting with Atlas
+description: Watch a search run on a live map as places are discovered.
+---
+
+`@openplaces/atlas` is a visual inspector for the search process. Attach it to a client and it opens the hosted inspector in your browser, where every search you run streams live to the map — you can watch the query run and see places appear in real time.
+
+## Installation
+
+```bash
+npm install @openplaces/atlas
+```
+
+The package exports a single plugin, `atlas`, which you pass to the constructor:
+
+```ts
+import { OpenPlaces } from "openplaces";
+import { atlas } from "@openplaces/atlas";
+
+const client = new OpenPlaces({ atlas });
+
+await client.places.search("cafes in copenhagen");
+```
+
+The plugin subscribes to the client's `"query"` and `"place"` events, so everything the stream yields is mirrored to the inspector as it happens, whether you call `places.search` or `places.stream`.
+
+## Requirements
+
+The inspector page is served over HTTPS, so the local bridge it connects to must be served over HTTPS as well. The plugin generates a locally-trusted certificate with [mkcert](https://mkcert.dev). Install mkcert and run `mkcert -install` once; if certificate generation fails, the plugin prints instructions and exits the process rather than continuing without a secure bridge. The generated certificate is cached, so mkcert only runs on first use.
+
+## What to expect
+
+When the plugin is constructed, it starts a local bridge and opens your system browser to the inspector UI. The page renders the events as they arrive: the query as a header, the places as markers accumulating on the map, deduplicated by `place.id`. A tab opened or refreshed mid-search immediately catches up on the search in progress, and when your script finishes, the process exits normally and the tab shows the final state of the last search.
+
+## Configuration
+
+Set the `OPENPLACES_ATLAS_URL` environment variable to open a different inspector URL — useful when developing the UI itself — instead of the default `https://atlas.openplaces.danielbacsur.dev`.

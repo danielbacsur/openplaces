@@ -1,0 +1,64 @@
+---
+title: Extending with plugins
+description: Extend the client with plugins that observe searches through typed events.
+---
+
+`OpenPlaces` extends Node's `EventEmitter`, so every client is also an event source. As a search runs, it emits two typed events: `"query"` once when a stream begins, and `"place"` for every place the stream yields, after deduplication and `where` filtering. Anything that wants to watch a search — from a log line to a full visual inspector — subscribes to these two events.
+
+Subscribe with the standard `EventEmitter` API. The listener signatures are fully typed, so `place` is a [`Place`](/openplaces/place) with no casting required:
+
+```ts
+import { OpenPlaces } from "openplaces";
+
+const client = new OpenPlaces();
+
+client.on("query", (query) => console.log(`query: ${query}`));
+client.on("place", (place) => console.log(`name: ${place.name}`));
+
+await client.places.search("coffee in amsterdam", { limit: 20 });
+```
+
+Because `places.search` drains `places.stream`, the same events fire regardless of which method you call, and if you break out of a stream early, no further events fire — see [Streaming search results](/streaming-search-results).
+
+## Writing a plugin
+
+A plugin is a function that receives the client:
+
+```ts
+type Plugin = (client: OpenPlaces) => void;
+```
+
+The constructor invokes every function value of its options object as a plugin, so listeners are attached before any search can begin and never miss an event. A minimal logging plugin looks like this:
+
+```ts
+const logger: OpenPlaces.Plugin = (client) => {
+  client.on("query", (query) => console.error(`[logger] ${query}`));
+  client.on("place", (place) => console.error(`[logger] ${place.name}`));
+};
+
+const client = new OpenPlaces({ logger });
+```
+
+The core `OpenPlaces.Options` interface declares no properties of its own — it exists to be extended. Published plugins augment it with `declare module "openplaces"` so their option key is typed for consumers, and once any such augmentation is in your program (`@openplaces/atlas` below does exactly that), TypeScript rejects undeclared keys like `logger`. Declaring a local key the same way keeps it compiling either way:
+
+```ts
+declare module "openplaces" {
+  namespace OpenPlaces {
+    interface Options {
+      logger?: OpenPlaces.Plugin;
+    }
+  }
+}
+```
+
+## Atlas, the shipped plugin
+
+Atlas, the visual inspector, is exactly such a plugin. It subscribes to `query` and `place`, forwards each event over a local bridge to the inspector UI, and opens it in your browser — all from the same two events shown above.
+
+```ts
+import { atlas } from "@openplaces/atlas";
+
+const client = new OpenPlaces({ atlas });
+```
+
+The `@openplaces/atlas` package augments `OpenPlaces.Options` with an `atlas` key, so the option typechecks once the package is imported. See [Inspecting with Atlas](/inspecting-with-atlas) for setup.

@@ -1,3 +1,13 @@
 {
-  "pages": ["index"]
+  "pages": [
+    "index",
+    "quickstart",
+    "---Guides---",
+    "writing-compound-queries",
+    "streaming-search-results",
+    "filtering-results-with-sql",
+    "extending-with-plugins",
+    "using-the-mcp-server",
+    "inspecting-with-atlas"
+  ]
 }

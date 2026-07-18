@@ -1,0 +1,90 @@
+---
+title: Filtering results with SQL
+description: Filter search results with a raw SQL WHERE clause evaluated against each place.
+---
+
+Both [`places.search`](/openplaces/openplaces/places/search) and [`places.stream`](/openplaces/openplaces/places/stream) take a `where` option, a SQL `WHERE` clause checked against each candidate place as it is discovered — anything that does not match is dropped before it is yielded.
+
+```ts
+import { OpenPlaces } from "openplaces";
+
+const client = new OpenPlaces();
+
+const places = await client.places.search("restaurants in tokyo", {
+  where: "rating >= 4.5 AND reviews > 100",
+});
+```
+
+Filtering happens before the `limit` is counted, so `{ where, limit: 10 }` yields up to ten places that match the clause, not ten places of which some are then discarded.
+
+## How it works
+
+Each candidate place is loaded into a one-row SQLite table with one column per `Place` field, and kept if the clause matches. The clause is spliced in verbatim — anything SQLite accepts as a `WHERE` expression works, and nothing is escaped, so treat it as code you author. `id`, `name`, `latitude`, and `longitude` are `NOT NULL`; the rest may be `NULL`.
+
+<Callout>
+  The filter needs a SQLite driver. OpenPlaces tries `bun:sqlite`, then
+  `better-sqlite3`, then `node:sqlite` (built into Node.js 22.13+ and Deno
+  2.2+). If none of these load, it prints an error and exits the process.
+</Callout>
+
+## Text columns
+
+String fields are `text` columns and compare directly:
+
+```ts
+await client.places.search("coffee in paris", {
+  where: "category LIKE '%coffee%' AND website IS NOT NULL",
+});
+```
+
+## Numeric columns
+
+Numeric fields are `real` or `integer` columns and compare directly:
+
+```ts
+await client.places.search("hotels in lisbon", {
+  where: "rating >= 4.5 AND reviews > 100",
+});
+```
+
+## Boolean columns
+
+Boolean fields are stored as `1` or `0` — compare directly, or use them as truth values:
+
+```ts
+await client.places.search("museums in berlin", {
+  where: "accessible = 1 AND NOT sponsored",
+});
+```
+
+## Object columns
+
+Object fields are stored as JSON-serialized text, so plain equality would compare the whole serialized string rather than anything inside it — extract a single field with `json_extract` and compare that:
+
+```ts
+await client.places.search("bars in madrid", {
+  where: "json_extract(hours, '$.status') = 'Open'",
+});
+```
+
+## Array columns
+
+Array fields are JSON-serialized text as well, so reaching inside means iterating their elements with `json_each` inside an `EXISTS` subquery, combined with `json_extract` when the elements are objects:
+
+```ts
+await client.places.search("bakeries in vienna", {
+  where: "EXISTS (SELECT 1 FROM json_each(categories) WHERE value = 'Cafe')",
+});
+
+await client.places.search("restaurants in oslo", {
+  where: `EXISTS (
+    SELECT 1 FROM json_each(services)
+    WHERE json_extract(value, '$.label') = 'Delivery'
+      AND json_extract(value, '$.available')
+  )`,
+});
+```
+
+JSON booleans such as `available` surface as `1` and `0` when read through `json_extract`, exactly like the boolean columns above — so the last condition matches only places where delivery is offered.
+
+For the shape of each field as it appears on the yielded objects, see the [`Place`](/openplaces/place) reference.

@@ -1,0 +1,39 @@
+---
+title: Using the MCP server
+description: Connect OpenPlaces to Claude Code and other MCP clients through a single search tool.
+---
+
+`@openplaces/mcp` packages OpenPlaces as a [Model Context Protocol](https://modelcontextprotocol.io) server, so tools like Claude Code can look up real places and work with the results directly. It runs over stdio and requires no API key or configuration — the server constructs a plain `new OpenPlaces()` client internally.
+
+## Installation
+
+For Claude Code, register the server with a single command:
+
+```bash
+claude mcp add openplaces -- npx -y @openplaces/mcp@latest
+```
+
+For other MCP clients, add the equivalent entry to the client's server configuration:
+
+```json
+{
+  "mcpServers": {
+    "openplaces": {
+      "command": "npx",
+      "args": ["-y", "@openplaces/mcp@latest"]
+    }
+  }
+}
+```
+
+The package ships an `openplaces-mcp` binary, so any client that can spawn a stdio subprocess can run it. Under the hood it uses the same scraping backend as the `openplaces` library, which drives a headless Chromium via Playwright.
+
+## What to expect
+
+The server exposes exactly one tool, `search`, described to the model as a way to look up real places by name, category, or address. Each call runs to completion and responds once with the full result set of [`Place`](/openplaces/place) objects — no partial streaming, and up to 100 places when no limit is given. If the search throws, the response carries the error message instead, so the model can see what went wrong and adjust the query.
+
+<Callout>
+  The library's [`where`](/filtering-results-with-sql) option is not exposed through the
+  tool. Models can narrow results by writing more specific queries, or you can
+  post-process the returned places yourself.
+</Callout>
