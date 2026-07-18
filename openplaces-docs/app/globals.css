@@ -1,25 +1,20 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
+:root {
+  --color-fd-background: hsl(0, 0%, 100%);
+}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
+.dark {
+  --color-fd-background: hsl(0, 0%, 6%);
+}
+
+:not(pre) > code {
+  white-space: nowrap;
 }

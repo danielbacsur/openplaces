@@ -1,4 +1,6 @@
 .next
+.source
 .turbo
 node_modules
 next-env.d.ts
+*.tsbuildinfo
