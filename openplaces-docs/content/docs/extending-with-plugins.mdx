@@ -3,9 +3,9 @@ title: Extending with plugins
 description: Extend the client with plugins that observe searches through typed events.
 ---
 
-`OpenPlaces` extends Node's `EventEmitter`, so every client is also an event source. As a search runs, it emits two typed events: `"query"` once when a stream begins, and `"place"` for every place the stream yields, after deduplication and `where` filtering. Anything that wants to watch a search — from a log line to a full visual inspector — subscribes to these two events.
+`OpenPlaces` extends Node's `EventEmitter`, so every client is also an event source. As a search runs, it emits two typed events: `"query"` once when a stream begins, and `"place"` for every place the stream yields, after deduplication and `where` filtering. Anything that wants to watch a search subscribes to these two events.
 
-Subscribe with the standard `EventEmitter` API. The listener signatures are fully typed, so `place` is a [`Place`](/openplaces/place) with no casting required:
+Subscribe with the standard `EventEmitter` API — listeners are typed, so `place` needs no casting:
 
 ```ts
 import { OpenPlaces } from "openplaces";

@@ -3,7 +3,7 @@ title: Place
 description: Full reference of the Place schema returned by every search.
 ---
 
-Every result yielded by [`places.search`](/openplaces/openplaces/places/search) and [`places.stream`](/openplaces/openplaces/places/stream) is a `Place`: a single flat object with 27 top-level fields. Everything OpenPlaces can parse out of a result is surfaced on the object directly, rather than nested behind sub-resources.
+Every result yielded by [`places.search`](/openplaces/openplaces/places/search) and [`places.stream`](/openplaces/openplaces/places/stream) is a `Place` — a single flat object with 27 fields, where everything OpenPlaces can parse is surfaced directly rather than nested behind sub-resources.
 
 `Place` is a Zod schema exported from the package root, and the TypeScript type is inferred from it. You can use the schema to validate data that crosses a process or serialization boundary:
 
@@ -14,7 +14,7 @@ const place = Place.parse(data); // throws if the shape is invalid
 const checked = Place.safeParse(data); // { success, data } | { success, error }
 ```
 
-Internally, every candidate parsed from a results page is passed through `Place.safeParse`, and candidates that fail validation are dropped — so anything the library yields already conforms to this schema. Fields that could not be parsed are absent, not `null`.
+Internally, every parsed candidate goes through `Place.safeParse` and is dropped on failure — anything the library yields already conforms to this schema, and fields that could not be parsed are absent, not `null`.
 
 ## Fields
 

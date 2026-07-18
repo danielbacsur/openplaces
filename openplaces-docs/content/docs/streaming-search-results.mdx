@@ -3,7 +3,7 @@ title: Streaming search results
 description: Consume places one at a time as they are discovered.
 ---
 
-Every search in OpenPlaces is a stream underneath. `places.stream` exposes it directly as an async iterator, yielding each place the moment it is discovered — your loop runs while the search does, instead of waiting for the whole collection.
+Every search is a stream underneath. `places.stream` exposes it as an async iterator, yielding each place as it is discovered — your loop runs while the search does, instead of waiting for the whole collection.
 
 ```ts
 import { OpenPlaces } from "openplaces";
@@ -19,7 +19,7 @@ Yielded places conform to the [`Place`](/openplaces/place) schema and arrive ded
 
 ## When to stream, when to search
 
-Use `places.search` when you need the complete result set before doing anything with it and the volume is manageable — a bounded lookup, a script that writes a file, a request handler that returns JSON. The promise does not resolve until every expanded search has finished or the limit is reached, so nothing is available until the end.
+Use `places.search` when you need the complete result set before doing anything with it and the volume is manageable — a bounded lookup, a script that writes a file, a request handler that returns JSON. Its promise resolves only once every expanded search has finished or the limit is reached.
 
 Use `places.stream` when results should be processed as they arrive, when a search covers a dense area and may run for a while, or when you want to stop early based on what comes back. Both accept the same `where` and `limit` options, but only `search` defaults its limit to 100 — a stream keeps going until the search space is exhausted, so pass a `limit` or be prepared to break out.
 
@@ -38,8 +38,8 @@ for await (const place of client.places.stream("cafes in berlin")) {
 
 ## How location-scoped queries work
 
-A plain query such as `"eiffel tower"` runs a single search. When a query is scoped to a location — `"restaurants in tokyo"` — the stream switches to a recursive subdivision algorithm that can gather an effectively unbounded result set from a bounded area, with no manual tiling or pagination on your part.
+A plain query like `"eiffel tower"` is a single search. A location-scoped query like `"restaurants in tokyo"` switches the stream to recursive subdivision, gathering an effectively unbounded result set from a bounded area.
 
-First, the location is geocoded through Nominatim, which returns a bounding box and, where available, the location's boundary polygons. The box becomes the root cell of a work queue: each cell is searched through a viewport zoomed to fit it, paging until a page comes back empty, short, or free of new results — and anything outside the cell or the location's polygon is skipped, so a city search does not leak into neighboring towns.
+The location is geocoded through Nominatim into a bounding box and, where available, its boundary polygons. The box becomes the root cell of a work queue: each cell is searched through a viewport zoomed to fit it, paging until a page comes back empty, short, or free of new results — and anything outside the cell or the location's polygon is skipped, so a city search does not leak into neighboring towns.
 
-A cell that fills its last page is considered saturated: more places likely exist there than paging could surface. It is split at its midpoint into four sub-cells that join the queue, with those outside the polygon discarded outright, and this repeats until every branch of the subdivision is exhausted — fanning out automatically across dense areas while spending little effort on sparse ones.
+A cell that fills its last page is considered saturated: more places likely exist there than paging could surface. It is split at its midpoint into four sub-cells that join the queue, with those outside the polygon discarded outright, and this repeats until every branch is exhausted — fanning out across dense areas while barely touching sparse ones.

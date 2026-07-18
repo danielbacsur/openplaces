@@ -13,7 +13,7 @@ const client = new OpenPlaces();
 const places = await client.places.search("coffee and tea in paris or london");
 ```
 
-This query expands into four searches — `coffee in paris`, `coffee in london`, `tea in paris`, and `tea in london` — whose results arrive as one collection.
+This query expands into four searches — `coffee in paris`, `coffee in london`, `tea in paris`, and `tea in london` — run independently, with their results merged and deduplicated into one collection.
 
 ## Keywords
 

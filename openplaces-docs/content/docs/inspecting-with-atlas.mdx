@@ -3,7 +3,7 @@ title: Inspecting with Atlas
 description: Watch a search run on a live map as places are discovered.
 ---
 
-`@openplaces/atlas` is a visual inspector for the search process. Attach it to a client and it opens the hosted inspector in your browser, where every search you run streams live to the map — you can watch the query run and see places appear in real time.
+`@openplaces/atlas` is a visual inspector for the search process. Attach it to a client and it opens the hosted inspector in your browser, where every search streams live to the map, places appearing in real time.
 
 ## Installation
 
@@ -30,7 +30,7 @@ The inspector page is served over HTTPS, so the local bridge it connects to must
 
 ## What to expect
 
-When the plugin is constructed, it starts a local bridge and opens your system browser to the inspector UI. The page renders the events as they arrive: the query as a header, the places as markers accumulating on the map, deduplicated by `place.id`. A tab opened or refreshed mid-search immediately catches up on the search in progress, and when your script finishes, the process exits normally and the tab shows the final state of the last search.
+When the plugin is constructed, it starts a local bridge and opens your system browser to the inspector UI. The page renders the events as they arrive: the query as a header, the places as markers accumulating on the map, deduplicated by `place.id`. A tab opened or refreshed mid-search immediately catches up on the search in progress, and when your script finishes, the process exits and the tab keeps the final state.
 
 ## Configuration
 
