@@ -48,11 +48,11 @@
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
-    "@types/node": "^25",
+    "@types/node": "^26.1.1",
     "drizzle-kit": "^1.0.0-rc.4",
-    "tsdown": "^0.22.0",
-    "typescript": "^6",
-    "vitest": "^4"
+    "tsdown": "^0.22.9",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.10"
   },
   "engines": {
     "node": ">=22.0.0"

@@ -40,8 +40,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "tsdown": "^0.22.0",
-    "typescript": "^6"
+    "tsdown": "^0.22.9",
+    "typescript": "^7.0.2"
   },
   "engines": {
     "node": ">=22.0.0"
