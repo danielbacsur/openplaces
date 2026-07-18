@@ -18,8 +18,6 @@ Internally, every candidate parsed from a results page is passed through `Place.
 
 ## Fields
 
-Only `id`, `name`, `latitude`, and `longitude` are always present; every other field is optional.
-
 <TypeTable
   type={{
     id: { type: 'string', required: true, description: 'Google Maps place ID, e.g. "ChIJhzNeW4jbQUcRDpNeQSc81aA". Used to deduplicate results within a stream.' },
@@ -43,25 +41,38 @@ Only `id`, `name`, `latitude`, and `longitude` are always present; every other f
     rating: { type: 'number', description: 'Average star rating, e.g. 4.7.' },
     reviews: { type: 'number', description: 'Number of reviews behind the rating, e.g. 5203.' },
     price: { type: 'string', description: 'Price level as displayed: a symbol run such as "$$" or a localized range such as "20 000 Ft+".' },
-    hours: { type: '{ status?, detail?, color? }', description: 'Current opening state at the time of the search. See below.' },
-    services: { type: '{ label, available }[]', description: 'Service options such as dine-in, takeaway, delivery. See below.' },
-    accessible: { type: 'boolean', description: 'Whether the place is wheelchair accessible.' },
+    hours: {
+      type: 'object',
+      description: (
+        <>
+          <p>Current opening state at the time of the search.</p>
+          <TypeTable
+            type={{
+              status: { type: 'string', description: 'The short state, e.g. "Open" or "Closed".' },
+              detail: { type: 'string', description: 'The remainder of the status line, e.g. "Closes 10 pm".' },
+              color: { type: 'string', description: 'Hex color derived from the color Google renders the status in, e.g. green while open.' },
+            }}
+          />
+        </>
+      ),
+    },
+    services: {
+      type: 'object[]',
+      description: (
+        <>
+          <p>Service options of the listing, e.g. dine-in, takeaway, delivery. For sponsored results, taken from the ad card service badges.</p>
+          <TypeTable
+            type={{
+              label: { type: 'string', required: true, description: 'Name of the service option, e.g. "Dine-in".' },
+              available: { type: 'boolean', required: true, description: 'Whether the listing offers the service.' },
+            }}
+          />
+        </>
+      ),
+    },
+    accessible: { type: 'boolean', description: 'Wheelchair accessibility of the listing: true, false, or absent when the listing does not state it.' },
     reserve: { type: 'string', description: 'Reservation URL, e.g. a table-booking link.' },
     sponsored: { type: 'boolean', description: 'True when the result came from a sponsored (ad) slot; absent otherwise.' },
     image: { type: 'string', description: 'URL of the first photo of the place.' },
   }}
 />
-
-## Nested fields
-
-Two fields carry structure; everything else is a scalar or a string array.
-
-`hours` describes the opening state at the time of the search, split into three optional strings:
-
-- `status` — the short state, e.g. `"Open"` or `"Closed"`.
-- `detail` — the remainder of the status line, e.g. `"Closes 10 pm"`.
-- `color` — a hex color derived from the color Google renders the status in, e.g. green while open.
-
-`services` is an array of `{ label: string; available: boolean }` entries taken from the service options of the listing — for a restaurant, typically entries like `{ label: "Dine-in", available: true }` or `{ label: "Delivery", available: false }`. For sponsored results the entries come from the ad card's service badges instead.
-
-Two more fields deserve a note. `accessible` is derived from the wheelchair-accessibility attribute of the listing, so it is `true`, `false`, or absent when the listing does not state it. `sponsored` is only ever `true` or absent — organic results omit the field rather than carrying `false`.
