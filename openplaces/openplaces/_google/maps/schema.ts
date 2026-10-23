@@ -1450,7 +1450,7 @@ export const ResultContainer = z.positional([
   /* 0 */ z.mapped("query", z.string().nullish()), /* "restaurants" */
   /* 1 */ z.mapped("rows", z.array(ResultRow.nullish().catch(null)).nullish()),
   /* 2 */ z.unused(),
-  /* 3 */ z.opaque(/* page/result flag */), /* 1 */
+  /* 3 */ z.mapped("hasMore", z.number().nullish()), /* 1; server "more results" bit */
   /* 4 */ z.unused(),
   /* 5 */ z.mapped("context", ResultContext.nullish()), /* ["1782666870346", [["Europe/Budapest", ["CET", "Central European Standard Time", "CEST", "Central European Summer Time"], 60, [492985, 60, 498025, 0, 501721, 60]]]] */
   /* 6 */ z.unused(),

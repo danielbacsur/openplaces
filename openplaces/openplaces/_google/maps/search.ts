@@ -14,7 +14,16 @@ interface Options {
   offset?: number;
 }
 
+interface Page {
+  places: Place[];
+  more?: boolean;
+}
+
 export async function search(options: Options): Promise<Place[]> {
+  return (await page(options)).places;
+}
+
+export async function page(options: Options): Promise<Page> {
   const { query, viewport, offset } = options;
 
   const url = new URL(
@@ -30,7 +39,7 @@ export async function search(options: Options): Promise<Place[]> {
   const data = JSON.parse((await browser.get(url)).replace(/^\)\]\}'/, ""));
 
   const parsed = Response.safeParse(data);
-  if (!parsed.success) return [];
+  if (!parsed.success) return { places: [] };
 
   const { results, ads, feed } = parsed.data;
 
@@ -57,12 +66,16 @@ export async function search(options: Options): Promise<Place[]> {
     organic.flatMap((node) => (node ? [node.featureId] : [])),
   );
 
-  return [
+  const places = [
     ...organic.flatMap((node) => place(node, false, fallback)),
     ...sponsored
       .filter((node) => !(node && listed.has(node.featureId)))
       .flatMap((node) => place(node, true, fallback)),
   ];
+
+  const more = results?.hasMore;
+
+  return { places, more: more == null ? undefined : more === 1 };
 }
 
 function place(
