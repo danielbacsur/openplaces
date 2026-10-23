@@ -93,7 +93,7 @@ function place(
     address: node.address ?? join(node.addressLines),
     street: address?.streetDisplay ?? node.addressComponents?.street ?? undefined,
     district: address?.district ?? node.district ?? undefined,
-    city: address?.city ?? node.locality ?? undefined,
+    city: address?.city ?? locality(node),
     postalCode: address?.postalCode ?? undefined,
     country: address?.country ?? undefined,
 
@@ -128,6 +128,16 @@ function strings(values: (string | null | undefined)[] | null | undefined) {
 
 function join(lines: (string | null | undefined)[] | null | undefined) {
   return lines?.filter(Boolean).join(", ") || undefined;
+}
+
+// flat.city is missing on sponsored nodes and on some places ("Dubai - United Arab
+// Emirates"); take the first segment of the locality line instead
+function locality(node: PlaceNode) {
+  const line =
+    node.locality ??
+    node.structuredAddress?.parts?.find((part) => part?.type === 4)?.values?.[0]?.[0];
+
+  return line?.split(/,| - /)[0]?.trim() || undefined;
 }
 
 function image(node: PlaceNode) {
