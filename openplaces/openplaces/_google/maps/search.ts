@@ -44,9 +44,16 @@ export async function search(options: Options): Promise<Place[]> {
     ...(ads?.hotelAds ?? []).flat().map((ad) => ad?.place),
   ];
 
+  // an advertised place can also be listed organically; keep the richer organic copy
+  const listed = new Set(
+    organic.flatMap((node) => (node ? [node.featureId] : [])),
+  );
+
   return [
     ...organic.flatMap((node) => place(node, false, fallback)),
-    ...sponsored.flatMap((node) => place(node, true, fallback)),
+    ...sponsored
+      .filter((node) => !(node && listed.has(node.featureId)))
+      .flatMap((node) => place(node, true, fallback)),
   ];
 }
 
