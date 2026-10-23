@@ -6,6 +6,7 @@
     "openplaces-mcp",
     "openplaces-website"
   ],
+  "type": "module",
   "scripts": {
     "dev": "turbo run dev",
     "test": "turbo run vitest --log-prefix=none",
