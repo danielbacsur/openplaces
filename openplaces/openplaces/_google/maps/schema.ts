@@ -595,33 +595,38 @@ export const AffiliatedLink = z.positional([
 ]);
 
 export const LocationSummary = z.positional([
-  /* 0 */ z.mapped("name", z.string().nullish()), /* "Petit-Montrouge" */
+  /* 0 */ z.mapped("name", z.string().nullish()), /* "Petit-Montrouge"; neighborhood name (seen only on vacation rentals, n=2) */
   /* 1 */ z.mapped("text", z.string().nullish()), /* "Sharing a sleek high-rise with offices, this premium hotel is 2 km from both the iconic Burj Khalifa, and shops at The Dubai Mall. It's a 15-minute walk from Emirates Towers metro station." */
-  /* 2 */ z.mapped("featureId", z.string().nullish()), /* "0x47e671b10c5eeeb5:0xc39f906a4301f6e7" */
-  /* 3 */ z.opaque(/* scores */), /* [[4.1993379792879875, 1], [3.5437653304603973, 2], [4.43424683835341, 3], [1.8405167090446382, 4]] */
+  /* 2 */ z.mapped("featureId", z.string().nullish()), /* "0x47e671b10c5eeeb5:0xc39f906a4301f6e7"; neighborhood feature id (seen only on vacation rentals, n=2) */
+  /* 3 */ z.opaque(/* location scores [[score 0-5, aspect 1..4]] */), /* [[4.1993379792879875, 1], [3.5437653304603973, 2], [4.43424683835341, 3], [1.8405167090446382, 4]] */
 ]);
 
 export const HighlightEntry = z.positional([
   /* 0 */ z.opaque(/* ved / tracking token */), /* "0ahUKEwjmuZ7Mt6qVAxVBQVUIHQ7YBngQgLcGCMcHKBE" */
   /* 1 */ z.mapped("label", z.array(z.string().nullish())), /* ["LGBTQ+ friendly"] */
-  /* 2 */ z.unused(),
+  /* 2 */ z.opaque(/* help link */), /* ["https://support.google.com/maps/?p=businessownership"] */
   /* 3 */ z.mapped("icon", z.string()), /* "https://gstatic.com/local/placeinfo/lgbtq_friendly_ic_24dp.png" */
   /* 4 */ z.mapped("iconDark", z.string()), /* "https://gstatic.com/local/placeinfo/lgbtq_friendly_ic_24dp.png" */
   /* 5 */ z.unused(),
   /* 6 */ z.unused(),
-  /* 7 */ z.unused(),
-  /* 8 */ z.unused(),
+  /* 7 */ z.opaque(/* copy-link a11y label */), /* "Copy black-owned business help center link" */
+  /* 8 */ z.opaque(/* open-link a11y label */), /* "Open black-owned business help center link" */
   /* 9 */ z.unused(),
-  /* 10 */ z.opaque(/* detail */), /* [["Check-out time: 10:00"]] */
+  /* 10 */ z.mapped("detail", z.array(z.array(z.string().nullish()).nullish()).nullish()), /* [["Check-out time: 10:00"]]; hotels: check-out time paired with the check-in badge */
   /* 11 */ z.opaque(/* flag */), /* 1 */
   /* 12 */ z.opaque(/* label */), /* "" */
+]);
+
+export const HighlightTyped = z.positional([
+  /* 0 */ z.mapped("type", z.number().nullish()), /* 4; 1 Black-owned, 4 LGBTQ+ friendly, 6 veteran-owned, 8 women-owned, 13 check-in/check-out time, 26 Latino-owned, 27 LGBTQ+ owned, 28 Asian-owned */
+  /* 1 */ z.mapped("entry", HighlightEntry.nullish()),
 ]);
 
 export const Highlights = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.mapped("badges", z.array(HighlightEntry.nullish())),
   /* 2 */ z.unused(),
-  /* 3 */ z.mapped("altBadges", z.unknown().nullish()), /* [[4, ["0ahUKEwjmuZ7Mt6qVAxVBQVUIHQ7YBngQgLcGCMYHKBA", ["LGBTQ+ friendly"], null, "https://gstatic.com/local/placeinfo/lgbtq_friendly_ic_24dp.png", "https://gstatic.com/local/placeinfo/lgbtq_friendly_ic_24dp.png", null, null, null, null, null, null, 1]]] */
+  /* 3 */ z.mapped("typedBadges", z.array(HighlightTyped.nullish()).nullish()), /* [[4, ["0ahUKEwjmuZ7Mt6qVAxVBQVUIHQ7YBngQgLcGCMYHKBA", ["LGBTQ+ friendly"], null, "https://gstatic.com/local/placeinfo/lgbtq_friendly_ic_24dp.png", "https://gstatic.com/local/placeinfo/lgbtq_friendly_ic_24dp.png", null, null, null, null, null, null, 1]]] */
 ]);
 
 export const SavedListId = z.positional([
@@ -723,10 +728,21 @@ export const DescriptionLine = z.positional([
   /* 12 */ z.opaque(/* flag */), /* 2 */
 ]);
 
+export const DescriptionExtended = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.unused(),
+  /* 2 */ z.unused(),
+  /* 3 */ z.unused(),
+  /* 4 */ z.unused(),
+  /* 5 */ z.opaque(/* flag */), /* 1 */
+  /* 6 */ z.unused(),
+  /* 7 */ z.mapped("paragraphs", z.array(z.array(z.string().nullish()).nullish()).nullish()), /* [["This down-to-earth hotel is a 9-minute walk from Buda Castle, ...", "Warmly decorated rooms feature ...", "A breakfast buffet is complimentary. ..."]]; usually 3 paragraphs, sometimes 2 */
+]);
+
 export const Description = z.positional([
   /* 0 */ z.mapped("summary", DescriptionLine.nullish()),
   /* 1 */ z.mapped("blurb", DescriptionLine.nullish()),
-  /* 2 */ z.mapped("extended", z.unknown().nullish()),
+  /* 2 */ z.mapped("extended", DescriptionExtended.nullish()), /* hotel long description */
   /* 3 */ z.opaque(/* report url */), /* "https://www.google.com/local/content/rap/report?d=286732321&t=5&postId=0x4741dd76d0c10b09:0x4afa4824537f85a1%7C/g/11g0gd5y53%7Cen-HU" */
   /* 4 */ z.opaque(/* learn-more url */), /* "https://support.google.com/local-listings/answer/9851099" */
 ]);
@@ -773,16 +789,59 @@ export const StructuredAddress = z.positional([
   /* 1 */ z.mapped("flat", StructuredAddressFlat.nullish()),
 ]);
 
+export const HotelOffer = z.positional([
+  /* 0 */ z.mapped("provider", z.string().nullish()), /* "Booking.com" */
+  /* 1 */ z.mapped("price", z.string().nullish()), /* "29 179 HUF" */
+  /* 2 */ z.opaque(/* price (duplicate) */), /* "29 179 HUF" */
+  /* 3 */ z.opaque(/* flag */), /* 1 */
+  /* 4 */ z.opaque(/* flag */), /* 0 */
+  /* 5 */ z.opaque(/* click link [url, provider, null, ved] */), /* ["https://www.google.com/travel/lodging/clk?pc=...", "Booking.com", null, "2ahUKEwi..."] */
+  /* 6 */ z.opaque(/* label */), /* "" */
+  /* 7 */ z.unused(),
+  /* 8 */ z.mapped("logo", z.string().nullish()), /* "//www.gstatic.com/travel-hotels/branding/icon_184.png" */
+  /* 9 */ z.mapped("official", z.number().nullish()), /* 1; 1 = hotel's own site */
+  /* 10 */ z.opaque(/* flag */), /* 0 */
+  /* 11 */ z.mapped("perks", z.array(z.array(z.unknown()).nullish()).nullish()), /* [["Official site", 1], ["Earn Marriott Rewards"]] */
+  /* 12 */ z.opaque(/* flag */), /* 1 */
+  /* 13 */ z.opaque(/* member price */), /* [null, "137 275 HUF", ..., "137K", ["Get a lower price plus free Wi-Fi with free enrollment", 1]] */
+  /* 14 */ z.unused(),
+  /* 15 */ z.unused(),
+  /* 16 */ z.unused(),
+  /* 17 */ z.opaque(/* internal */), /* [2] */
+  /* 18 */ z.unused(),
+  /* 19 */ z.opaque(/* internal */),
+  /* 20 */ z.opaque(/* price */), /* "29 179 HUF" */
+  /* 21 */ z.opaque(/* price */), /* "29 179 HUF" */
+  /* 22 */ z.opaque(/* price delta (fees/savings?) */), /* "1 122 HUF" */
+  /* 23 */ z.opaque(/* ved / tracking token */), /* "2ahUKEwivoK_Z-8-XAxV3bvEDHWSCHTsQ96AIKAB6BAgEEFc" */
+  /* 24 */ z.unused(),
+  /* 25 */ z.unused(),
+  /* 26 */ z.opaque(/* flag */),
+  /* 27 */ z.unused(),
+  /* 28 */ z.opaque(/* flag */), /* 1 */
+]);
+
+export const HotelAdCreative = z.positional([
+  /* 0 */ z.mapped("headline", z.string().nullish()), /* "29 179 HUF/night on 3 Nov - 4" */
+  /* 1 */ z.mapped("highlight", z.string().nullish()), /* "Free Wi-Fi" */
+  /* 2 */ z.mapped("cta", z.string().nullish()), /* "Visit Site" */
+  /* 3 */ z.mapped("advertiser", z.string().nullish()), /* "Booking.com" */
+  /* 4 */ z.mapped("url", z.string().nullish()), /* "https://www.google.com/aclk?sa=L&ai=...&adurl=" */
+  /* 5 */ z.unused(),
+  /* 6 */ z.mapped("logo", z.string().nullish()), /* "//www.gstatic.com/travel-hotels/branding/icon_184.png" */
+  /* 7 */ z.opaque(/* official-site flag */), /* 0 */
+]);
+
 export const HotelBooking = z.positional([
   /* 0 */ z.mapped("checkIn", z.string().nullish()), /* "2026-07-21" */
   /* 1 */ z.mapped("checkOut", z.string().nullish()), /* "2026-07-22" */
   /* 2 */ z.mapped("checkInLabel", z.string().nullish()), /* "Tue, 21 Jul" */
   /* 3 */ z.mapped("checkOutLabel", z.string().nullish()), /* "Wed, 22 Jul" */
   /* 4 */ z.mapped("nights", z.number().nullish()), /* 1 */
-  /* 5 */ z.unused(),
+  /* 5 */ z.mapped("sponsoredOffers", z.array(HotelOffer.nullish()).nullish()), /* sponsored hotel ads only */
   /* 6 */ z.mapped("starsText", z.string().nullish()), /* "5 stars" */
   /* 7 */ z.mapped("availability", z.unknown().nullish()), /* ["2026-07-21", 1, null, 1, null, null, null, null, [4, 0, 2, 4], null, null, null, null, null, [2], 1, [[2026, 7, 21], [2026, 7, 22], null, 0, null, 0], null, 0, null, null, "Q2hnSW5Ia1NFd2k1d2FyYnQ2cVZBeFhSSTZJREhjbVNKRWM="] */
-  /* 8 */ z.unused(),
+  /* 8 */ z.mapped("advertiser", z.string().nullish()), /* "Booking.com"; sponsored hotel ads only */
   /* 9 */ z.mapped("priceText", z.string().nullish()), /* "HUF 15,516" */
   /* 10 */ z.opaque(/* token */), /* "CPPMlb7GqpUDFf8qogMdyOwOGQ" */
   /* 11 */ z.opaque(/* session id */), /* "EmZBavqdKt2xwPAP6sLB2A4" */
@@ -802,7 +861,7 @@ export const HotelBooking = z.positional([
   /* 25 */ z.unused(),
   /* 26 */ z.opaque(/* internal */), /* [[2]] */
   /* 27 */ z.unused(),
-  /* 28 */ z.unused(),
+  /* 28 */ z.opaque(/* advertiser brand [logo, name] (sponsored only) */), /* ["//www.gstatic.com/travel-hotels/branding/icon_184.png", "Booking.com"] */
   /* 29 */ z.opaque(/* internal metadata */),
   /* 30 */ z.unused(),
   /* 31 */ z.opaque(/* flag */), /* 0 */
@@ -811,29 +870,29 @@ export const HotelBooking = z.positional([
   /* 34 */ z.unused(),
   /* 35 */ z.unused(),
   /* 36 */ z.unused(),
-  /* 37 */ z.opaque(/* review count */), /* "45,5K" */
+  /* 37 */ z.mapped("displayPrice", z.string().nullish()), /* "75,3K"; nightly price as rendered on the card; compact ("75,3K", "HUF 25K") when large, else equal to [9] */
   /* 38 */ z.opaque(/* listing id */), /* "2939934847940497748" */
   /* 39 */ z.opaque(/* flag */), /* 0 */
   /* 40 */ z.unused(),
   /* 41 */ z.unused(),
   /* 42 */ z.unused(),
   /* 43 */ z.unused(),
-  /* 44 */ z.opaque(/* partner offers */),
+  /* 44 */ z.mapped("offers", z.array(HotelOffer.nullish()).nullish()),
   /* 45 */ z.opaque(/* prices */), /* ["45 477 HUF", "45 477 HUF", "45 477 HUF"] */
   /* 46 */ z.opaque(/* prices */), /* ["48 330 HUF", "48 330 HUF", "48 330 HUF"] */
-  /* 47 */ z.unused(),
+  /* 47 */ z.opaque(/* ad click signature (sponsored only) */), /* [["avs=ChMI5I7i2fvPlwMV...&avsig=US_ncteRiaA&opi=79508299"]] */
   /* 48 */ z.unused(),
   /* 49 */ z.opaque(/* price note */), /* [null, 149126, ["This price was customized by the booking partner based on factors such as your device type. Learn more", [[0, 92, [null, [4284441448, 4293454573]]], [92, 102, [null, [4279923688, 4287280376], 0], ["https://support.google.com/travel/answer/6276008?hl=#&ref_topic=7687750"]]]]] */
   /* 50 */ z.opaque(/* internal */),
   /* 51 */ z.opaque(/* internal */), /* [null, 161407] */
   /* 52 */ z.opaque(/* token */), /* "Q2dvSTFLS2trcV9sci1Zb01BRkFBUQ==" */
-  /* 53 */ z.opaque(/* empty */), /* [] */
+  /* 53 */ z.opaque(/* ad disclosure: [null, [[aboutthisad url]]] on sponsored, [] otherwise */), /* [] */
   /* 54 */ z.unused(),
   /* 55 */ z.unused(),
   /* 56 */ z.unused(),
   /* 57 */ z.unused(),
   /* 58 */ z.unused(),
-  /* 59 */ z.unused(),
+  /* 59 */ z.mapped("adCreative", HotelAdCreative.nullish()), /* sponsored hotel ads only */
   /* 60 */ z.opaque(/* partner offer */),
 ]);
 
@@ -852,7 +911,7 @@ export const HotelClass = z.positional([
   /* 1 */ z.unused(),
   /* 2 */ z.mapped("amenities", z.array(HotelAmenity.nullish()).nullish()),
   /* 3 */ z.mapped("label", z.string().nullish()), /* "5-star hotel" */
-  /* 4 */ z.opaque(/* rating breakdown */), /* [[null, null, null, null, 8], [null, 3], [null, null, 4], [null, null, null, 2], [1], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 80]] */
+  /* 4 */ z.opaque(/* vacation-rental capacity specs: sparse [index -> count] entries; index meaning unverified (not a rating breakdown) */), /* [[null, null, null, null, 8], [null, 3], [null, null, 4], [null, null, null, 2], [1], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 80]] */
   /* 5 */ z.opaque(/* flag */), /* 1 */
 ]);
 
