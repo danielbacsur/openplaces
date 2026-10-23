@@ -50,7 +50,7 @@ export async function get(url: string | URL | Request, init?: RequestInit) {
   // prettier-ignore
   return page.evaluate(({ href, init }) => {
     return fetch(href, {
-      credentials: "include", ...init
+      credentials: "include", ...(init as RequestInit | undefined)
     }).then((r) => r.text());
   }, { href: new Request(url).url, init });
 }
