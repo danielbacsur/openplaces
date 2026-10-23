@@ -81,7 +81,7 @@ function place(
 
     category: node.categories?.find((c): c is string => typeof c === "string"),
     categories: strings(node.categories),
-    description: node.description?.summary?.text ?? node.description?.blurb?.text,
+    description: description(node),
 
     latitude: node.coordinates?.latitude,
     longitude: node.coordinates?.longitude,
@@ -131,6 +131,15 @@ function strings(values: (string | null | undefined)[] | null | undefined) {
 
 function join(lines: (string | null | undefined)[] | null | undefined) {
   return lines?.filter(Boolean).join(", ") || undefined;
+}
+
+function description(node: PlaceNode) {
+  const text =
+    node.description?.summary?.text ??
+    node.description?.blurb?.text ??
+    node.merchantDescription?.text?.[0];
+
+  return text?.trim() || undefined;
 }
 
 // flat.city is missing on sponsored nodes and on some places ("Dubai - United Arab
