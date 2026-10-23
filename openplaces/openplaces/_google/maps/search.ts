@@ -99,7 +99,9 @@ function place(
 
     phone: node.phones?.[0]?.number ?? undefined,
     website: node.website?.url ?? undefined,
-    logo: node.logo ?? undefined,
+    logo:
+      node.logo?.replace(/\/s\d+(-p-k-no-ns-nd\/photo\.jpg)$/, "/s256$1") ??
+      undefined,
 
     rating: node.ratings?.rating ?? undefined,
     reviews: node.ratings?.reviewCount ?? undefined,
@@ -113,10 +115,7 @@ function place(
 
     reserve: node.reserve?.[0]?.url ?? undefined,
     sponsored: sponsored || node.adFlag === 1 || undefined,
-    image:
-      node.photos?.photos?.[0]?.image?.url ??
-      node.legacyPhotos?.photos?.[0]?.image?.url ??
-      undefined,
+    image: image(node),
   });
 
   return result.success ? [result.data] : [];
@@ -131,6 +130,18 @@ function join(lines: (string | null | undefined)[] | null | undefined) {
   return lines?.filter(Boolean).join(", ") || undefined;
 }
 
+function image(node: PlaceNode) {
+  const url =
+    node.photos?.photos?.find((p) => p?.image?.url)?.image?.url ??
+    node.legacyPhotos?.photos?.find((p) => p?.image?.url)?.image?.url;
+
+  if (!url) return undefined;
+
+  const absolute = url.startsWith("//") ? `https:${url}` : url;
+
+  // cards get =wN-hN thumbnails of about 100px; the same key serves any size
+  return absolute.replace(/=w\d+-h\d+-k-no$/, "=s1600-k-no");
+}
 
 function argb(value: number | null | undefined): string {
   if (typeof value !== "number") return "#5e5e5e";
