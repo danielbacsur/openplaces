@@ -403,6 +403,48 @@ export const PhotoCamera = z.positional([
   /* 3 */ z.mapped("fieldOfView", z.number().nullish()), /* 75 */
 ]);
 
+export const PhotoUploadClient = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.unused(),
+  /* 2 */ z.mapped("name", z.string().nullish()), /* "photos:gmm_android" */
+  /* 3 */ z.opaque(/* client capability codes */), /* [6, 7, 4, 1, 3] */
+]);
+
+export const PhotoUpload = z.positional([
+  /* 0 */ z.mapped("uploaderType", z.number().nullish()), /* 2; 1 business (bizbuilder/innerspace), 2 user (photos:*), 3 Google/partner */
+  /* 1 */ z.unused(),
+  /* 2 */ z.unused(),
+  /* 3 */ z.opaque(/* variable-length content codes */), /* [9, 1] */
+  /* 4 */ z.unused(),
+  /* 5 */ z.mapped("client", PhotoUploadClient.nullish()),
+  /* 6 */ z.opaque(/* flag */), /* 1 */
+  /* 7 */ z.unused(),
+  /* 8 */ z.mapped("uploadedAt", z.array(z.number().nullish()).nullish()), /* [2022, 10, 15, 22] */
+]);
+
+export const PhotoMetadata = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.opaque(/* [store, photo id] */), /* [10, "CIHM0ogKEICAgIDe1YvTpwE"] */
+  /* 2 */ z.opaque(/* [store, 3, [height, width]] */), /* [10, 3, [2456, 4032]] */
+  /* 3 */ z.unused(),
+  /* 4 */ z.unused(),
+  /* 5 */ z.opaque(/* capture location */), /* [[[2], [[null, null, 47.4978836, 19.062777]]]] */
+  /* 6 */ z.mapped("upload", PhotoUpload.nullish()),
+  /* 7 */ z.unused(),
+  /* 8 */ z.unused(),
+  /* 9 */ z.unused(),
+  /* 10 */ z.unused(),
+  /* 11 */ z.unused(),
+  /* 12 */ z.unused(),
+  /* 13 */ z.unused(),
+  /* 14 */ z.unused(),
+  /* 15 */ z.unused(),
+  /* 16 */ z.unused(),
+  /* 17 */ z.unused(),
+  /* 18 */ z.unused(),
+  /* 19 */ z.mapped("reference", z.array(z.string().nullish()).nullish()), /* ["UGCS_REFERENCE", "CIHM0ogKEICAgIDe1YvTpwE||", "1"] */
+]);
+
 export const Photo = z.positional([
   /* 0 */ z.mapped("id", z.string().nullish()), /* "CIHM0ogKEICAgID5vvCh7wE" */
   /* 1 */ z.mapped("mediaSource", z.number().nullish()), /* 10 */
@@ -413,7 +455,7 @@ export const Photo = z.positional([
   /* 6 */ z.mapped("image", PhotoImage),
   /* 7 */ z.unused(),
   /* 8 */ z.mapped("camera", PhotoCamera.nullish()),
-  /* 9 */ z.opaque(/* session token */), /* "dVZBatecE4_-wPAPjOKogAQ" */
+  /* 9 */ z.opaque(/* response ei token (== Response[7]) */), /* "dVZBatecE4_-wPAPjOKogAQ" */
   /* 10 */ z.opaque(/* ved / request token */), /* "0ahUKEwiXq_7Lt6qVAxUPPxAIHQwxCkAQzCcINCgW" */
   /* 11 */ z.unused(),
   /* 12 */ z.unused(),
@@ -425,7 +467,7 @@ export const Photo = z.positional([
   /* 18 */ z.unused(),
   /* 19 */ z.unused(),
   /* 20 */ z.mapped("kindLabel", z.string().nullish()), /* "Photo" */
-  /* 21 */ z.mapped("metadata", z.unknown().nullish()), /* [null, [null, "CIABIhCt3SBwDByinNpLQYbvhguK"], [0, 3, [5917, 3945]]] */
+  /* 21 */ z.mapped("metadata", PhotoMetadata.nullish().catch(null)), /* [null, [null, "CIABIhCt3SBwDByinNpLQYbvhguK"], [0, 3, [5917, 3945]]] */
   /* 22 */ z.mapped("kind", z.number().nullish()), /* 1 */
   /* 23 */ z.unused(),
   /* 24 */ z.unused(),
@@ -439,7 +481,7 @@ export const Photo = z.positional([
 ]);
 
 export const Photos = z.positional([
-  /* 0 */ z.mapped("photos", z.array(Photo.nullish()).nullish()),
+  /* 0 */ z.mapped("photos", z.array(Photo.nullish().catch(null)).nullish()),
 ]);
 
 export const LegacyPhoto = z.positional([
@@ -452,7 +494,7 @@ export const LegacyPhoto = z.positional([
   /* 6 */ z.mapped("image", PhotoImage.nullish()),
   /* 7 */ z.unused(),
   /* 8 */ z.mapped("camera", PhotoCamera.nullish()),
-  /* 9 */ z.opaque(/* session id */), /* "dVZBatecE4_-wPAPjOKogAQ" */
+  /* 9 */ z.opaque(/* response ei token (== Response[7]) */), /* "dVZBatecE4_-wPAPjOKogAQ" */
   /* 10 */ z.opaque(/* auth / page token */), /* "0ahUKEwiXq_7Lt6qVAxUPPxAIHQwxCkAQzCcIMSgA" */
   /* 11 */ z.unused(),
   /* 12 */ z.unused(),
@@ -464,7 +506,7 @@ export const LegacyPhoto = z.positional([
   /* 18 */ z.unused(),
   /* 19 */ z.unused(),
   /* 20 */ z.mapped("kindLabel", z.string().nullish()), /* "Photo" */
-  /* 21 */ z.mapped("detail", z.unknown().nullish()), /* [null, [null, "CIABIhCt3SBwDByinNpLQYbvhguK"], [0, 3, [5917, 3945]]] */
+  /* 21 */ z.mapped("metadata", PhotoMetadata.nullish().catch(null)), /* [null, [null, "CIABIhCt3SBwDByinNpLQYbvhguK"], [0, 3, [5917, 3945]]] */
   /* 22 */ z.mapped("kind", z.number().nullish()), /* 1 */
   /* 23 */ z.unused(),
   /* 24 */ z.unused(),
@@ -478,12 +520,12 @@ export const LegacyPhoto = z.positional([
 ]);
 
 export const LegacyPhotos = z.positional([
-  /* 0 */ z.mapped("photos", z.array(LegacyPhoto.nullish()).nullish()),
+  /* 0 */ z.mapped("photos", z.array(LegacyPhoto.nullish().catch(null)).nullish()),
   /* 1 */ z.mapped("totalCount", z.number().nullish()), /* 9653 */
   /* 2 */ z.unused(),
-  /* 3 */ z.opaque(/* session id */), /* "dVZBatecE4_-wPAPjOKogAQ" */
+  /* 3 */ z.opaque(/* response ei token (== Response[7]) */), /* "dVZBatecE4_-wPAPjOKogAQ" */
   /* 4 */ z.unused(),
-  /* 5 */ z.opaque(/* continuation token */), /* "CmYKAgABEgIAARgC" */
+  /* 5 */ z.opaque(/* photo-gallery continuation token, base64, ~46-130 chars */), /* "CmYKAgABEgIAARgC" */
   /* 6 */ z.unused(),
   /* 7 */ z.unused(),
   /* 8 */ z.mapped("paging", z.unknown().nullish()), /* [[[1, 191]], 3, null, 70, 129] */
