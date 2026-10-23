@@ -218,14 +218,27 @@ export const PromotedService = z.positional([
   /* 4 */ z.mapped("detail", z.string().nullish()), /* "Serves dine-in" */
 ]);
 
+export const JustificationQuote = z.positional([
+  /* 0 */ z.mapped("text", z.array(z.string().nullish()).nullish()), /* ["\"The tour takes around 20 minutes to see many art pieces inside.\""] */
+  /* 1 */ z.unused(),
+  /* 2 */ z.mapped("avatar", z.string().nullish()), /* "https://ssl.gstatic.com/local/servicebusiness/default_user.png" */
+]);
+
+// PlaceNode[142][1][i] is the card "justification" line: a review quote ([1]) or sponsored service badges ([6])
 export const PromotedServiceGroup = z.positional([
   /* 0 */ z.unused(),
-  /* 1 */ z.unused(),
+  /* 1 */ z.mapped("quote", JustificationQuote.nullish()),
   /* 2 */ z.unused(),
-  /* 3 */ z.unused(),
+  /* 3 */ z.opaque(/* unknown id, not the review count */), /* 210379 */
   /* 4 */ z.unused(),
   /* 5 */ z.unused(),
   /* 6 */ z.mapped("services", z.array(z.array(PromotedService.nullish()).nullish()).nullish()), /* dark: null for anonymous sessions as of 2026-10 */
+  /* 7 */ z.unused(),
+  /* 8 */ z.unused(),
+  /* 9 */ z.opaque(/* flag */), /* 1 */
+  /* 10 */ z.opaque(/* nested base64 protobuf wrapping an rp_h:... review-highlight id */), /* "Ci9DQUlRQUNvZENodHljRjlvT2tOb0xYaGlabVoxV1dJdFJYWXlaVjlMVTBVeVJHYxAB" */
+  /* 11 */ z.unused(),
+  /* 12 */ z.opaque(/* ved */), /* "2ahUKEwjLsK3__c-XAxXjBtsEHWcpNi0QwusMKBV6BQgEEPkB" */
 ]);
 
 export const PromotedServices = z.positional([
@@ -997,7 +1010,7 @@ export const PlaceNode = z.positional([
   /* 139 */ z.unused(),
   /* 140 */ z.unused(),
   /* 141 */ z.unused(),
-  /* 142 */ z.mapped("promoted", PromotedServices.nullish().catch(null)), /* sponsored-card service badges (ads use this instead of slot 100 attributes) */
+  /* 142 */ z.mapped("promoted", PromotedServices.nullish().catch(null)), /* card justification block: sponsored service badges at groups[i].services (dark: null for anonymous sessions as of 2026-10) or a review quote at groups[i].quote (also on organic places) */
   /* 143 */ z.unused(),
   /* 144 */ z.unused(),
   /* 145 */ z.unused(),
