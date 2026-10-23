@@ -146,7 +146,7 @@ function hours(opening: PlaceNode["openingHours"]) {
 
   const detail = (
     full && status && full.startsWith(status)
-      ? full.slice(status.length).replace(/^\s*·\s*/, "")
+      ? full.slice(status.length).replace(/^\s*(?:·\s*)?/, "")
       : full
   )?.replace(/\b([ap])m\b/gi, (_, meridiem) => `${meridiem.toLowerCase()}m`);
 
