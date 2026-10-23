@@ -50,7 +50,7 @@ export function ResultCard({ place }: { place: Place }) {
           className={`flex gap-4 pr-4 pl-6 ${place.sponsored ? "" : "pt-4"}`}
         >
           <div className="min-w-0 flex-1">
-            <div className="mb-0.5 truncate text-[16px] leading-5 font-medium text-[#1f1f1f]">
+            <div className="mb-0.5 text-[16px] leading-5 font-medium text-[#1f1f1f]">
               {place.name}
             </div>
 
@@ -59,7 +59,9 @@ export function ResultCard({ place }: { place: Place }) {
                 <span className="mr-1">{place.rating.toFixed(1)}</span>
                 <Stars rating={place.rating} />
                 {place.reviews && (
-                  <span className="pl-1">({place.reviews})</span>
+                  <span className="pl-1">
+                    ({place.reviews.toLocaleString("en-US")})
+                  </span>
                 )}
                 <img
                   src="/info_grey.png"

@@ -61,3 +61,22 @@ export function Controls({ onLocate, onZoomIn, onZoomOut }: ControlsProps) {
     </div>
   );
 }
+
+export function Layers() {
+  return (
+    <div
+      className="absolute bottom-5 left-6 flex size-[79px] items-end overflow-hidden rounded-lg border-2 border-white bg-cover shadow-[0px_1px_2px_0px_rgba(60,64,67,0.3),0px_1px_3px_1px_rgba(60,64,67,0.15)]"
+      style={{ backgroundImage: "url(/layers.webp)" }}
+    >
+      <div className="flex w-full items-center gap-1 bg-linear-to-t from-black/60 px-2 pt-3 pb-1.5 font-sans text-[12px] leading-4 font-medium text-white">
+        <span
+          className="material-symbols-outlined block"
+          style={{ fontSize: "16px" }}
+        >
+          layers
+        </span>
+        Layers
+      </div>
+    </div>
+  );
+}
