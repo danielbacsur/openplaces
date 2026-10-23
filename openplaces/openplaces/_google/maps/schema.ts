@@ -662,8 +662,8 @@ export const AffiliatedEntry = z.positional([
 
 export const AffiliatedGroup = z.positional([
   /* 0 */ z.mapped("entries", z.array(AffiliatedEntry.nullish()).nullish()),
-  /* 1 */ z.opaque(/* type code */), /* 1 */
-  /* 2 */ z.opaque(/* type code */), /* 1 */
+  /* 1 */ z.mapped("relation", z.number().nullish()), /* 2; 1 = this place is located in the entries, 2 = the entries are inside this place */
+  /* 2 */ z.opaque(/* relation subtype (4 with relation 2; 1 or 5 with relation 1); meaning unknown */), /* 4 */
 ]);
 
 export const AffiliatedLink = z.positional([
@@ -860,9 +860,17 @@ export const StructuredAddressFlat = z.positional([
   /* 6 */ z.mapped("country", z.string()), /* "HU" */
 ]);
 
+export const PlusCode = z.positional([
+  /* 0 */ z.opaque(/* ved token */), /* "2ahUKEwjCk8us-M-XAxUVR_EDHS7VNTsQqtMBKAx6BAgGEBI" */
+  /* 1 */ z.mapped("global", z.array(z.string().nullish()).nullish()), /* ["8FVXG38G+XW"] */
+  /* 2 */ z.mapped("compound", z.array(z.string().nullish()).nullish()), /* ["G38G+XW Budapest, Hungary"] */
+  /* 3 */ z.opaque(/* kind */), /* 2 */
+]);
+
 export const StructuredAddress = z.positional([
   /* 0 */ z.mapped("parts", z.array(StructuredAddressPart.nullish())),
   /* 1 */ z.mapped("flat", StructuredAddressFlat.nullish()),
+  /* 2 */ z.mapped("plusCode", PlusCode.nullish()), /* direct-hit single-place queries only */
 ]);
 
 export const HotelOffer = z.positional([
@@ -991,6 +999,78 @@ export const HotelClass = z.positional([
   /* 5 */ z.opaque(/* flag */), /* 1 */
 ]);
 
+export const ContainedPlaceCoordinate = z.positional([
+  /* 0 */ z.mapped("latitude", z.number().nullish()), /* 40.757207099999995 */
+  /* 1 */ z.mapped("longitude", z.number().nullish()), /* -73.9863737 */
+]);
+
+export const ContainedPlaceRatings = z.positional([
+  /* 0 */ z.mapped("rating", z.number().nullish()), /* 4.3 */
+  /* 1 */ z.mapped("histogram", z.array(z.number().nullish()).nullish()), /* [684, 567, 1551, 3663, 10296] */
+  /* 2 */ z.mapped("reviewCount", z.number().nullish()), /* 16761 */
+]);
+
+export const ContainedPlaceIds = z.positional([
+  /* 0 */ z.mapped("featureId", z.string().nullish()), /* "0x89c25854e6657b87:0x1627fdc289dd3acf" */
+  /* 1 */ z.unused(),
+  /* 2 */ z.unused(),
+  /* 3 */ z.mapped("mid", z.string().nullish()), /* "/g/1w1132lq" */
+]);
+
+export const ContainedPlace = z.positional([
+  /* 0 */ z.mapped("ids", ContainedPlaceIds.nullish()),
+  /* 1 */ z.mapped("name", z.string().nullish()), /* "Bubba Gump Shrimp Co." */
+  /* 2 */ z.opaque(/* thumbnail */), /* [["https://lh3.googleusercontent.com/grass-cs/...=w86-h86-n-k-no", null, null, null, [86, 86]]] */
+  /* 3 */ z.mapped("coordinates", ContainedPlaceCoordinate.nullish()),
+  /* 4 */ z.mapped("ratings", ContainedPlaceRatings.nullish()),
+  /* 5 */ z.opaque(/* categories */), /* [["Seafood restaurant", "gcid:seafood_restaurant"]] */
+  /* 6 */ z.mapped("openingHours", OpeningHours.nullish().catch(null)),
+  /* 7 */ z.mapped("price", z.array(z.string().nullish()).nullish()), /* ["$$"] */
+  /* 8 */ z.unused(),
+  /* 9 */ z.opaque(/* address + floor */), /* [[[1, [["1501 Broadway, New York, NY 10036"]]]], [null, null, null, null, null, null, null, ["Floor 1"]]] */
+  /* 10 */ z.opaque(/* search url */), /* "/search?sca_esv=...&tbm=map&q=Bubba+Gump+Shrimp+Co.&ludocid=..." */
+]);
+
+export const ContainedPlaceItem = z.positional([
+  /* 0 */ z.opaque(/* kind */), /* 2 */
+  /* 1 */ z.mapped("place", ContainedPlace.nullish()),
+  /* 2 */ z.opaque(/* rich-card flag */), /* 1 */
+  /* 3 */ z.opaque(/* flag */), /* 1 */
+  /* 4 */ z.opaque(/* flag */), /* 1 */
+]);
+
+// PlaceNode[204]: businesses inside a landmark ("At this place"); landmark lookups only
+export const ContainedPlaces = z.positional([
+  /* 0 */ z.mapped("items", z.array(ContainedPlaceItem.nullish().catch(null)).nullish()),
+  /* 1 */ z.opaque(/* section titles */), /* ["At this place", "At this place"] */
+]);
+
+export const ReviewSnippet = z.positional([
+  /* 0 */ z.opaque(/* author [profileUrl, null, avatar, null, tracking] */), /* ["https://www.google.com/maps/contrib/105387012031483794339?hl=en-US", null, "//lh3.googleusercontent.com/a-/ALV-...=s40-k-cc-rp-mo", null, ",AOvVaw...,,2ahUKEwi...,"] */
+  /* 1 */ z.mapped("text", z.string().nullish()), /* "\"Tons of shopping, people watching, food and bar options and more.\"" */
+  /* 2 */ z.unused(),
+  /* 3 */ z.unused(),
+  /* 4 */ z.opaque(/* highlighted spans [[start, end]] */), /* [[1, 5], [19, 25], [36, 40], [49, 56]] */
+  /* 5 */ z.opaque(/* type code */), /* 2 */
+  /* 6 */ z.opaque(/* avatar block */),
+  /* 7 */ z.unused(),
+  /* 8 */ z.opaque(/* author gaia id */), /* "105387012031483794339" */
+  /* 9 */ z.mapped("rating", z.number().nullish()), /* 5 */
+  /* 10 */ z.opaque(/* review id */), /* "ChZDSUhNMG9nS0VJQ0FnSUNzbzhEeFhnEAE" */
+  /* 11 */ z.opaque(/* internal */), /* [0, 0] */
+]);
+
+// PlaceNode[31]: top review quotes; single-place lookups only
+export const ReviewSnippets = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.mapped("snippets", z.array(ReviewSnippet.nullish()).nullish()),
+]);
+
+export const MerchantDescription = z.positional([
+  /* 0 */ z.mapped("text", z.array(z.string().nullish()).nullish()), /* ["Kóstolja meg a magyar gasztronómia ikonikus fogásait a szülőhelyén! ..."] */
+  /* 1 */ z.opaque(/* policy links */), /* ["https://www.google.com/local/place/rap/merchantdescription", "https://support.google.com/legal/troubleshooter/1114905#ts=1115658%2C1115689"] */
+]);
+
 // PlaceNode[260]: sponsored booking-partner offer on organic hotel cards; rare, ad-auction dependent
 export const PartnerOffer = z.positional([
   /* 0 */ z.mapped("clickUrl", z.string().nullish()), /* "https://www.google.com/aclk?sa=L&ai=DChsSEwjdzeXf-8-XAxX_GQYAHWLjKt8YACICCAEQWRoCd3M&...&adurl=" */
@@ -1032,9 +1112,9 @@ export const PlaceNode = z.positional([
   /* 26 */ z.unused(),
   /* 27 */ z.unused(),
   /* 28 */ z.unused(),
-  /* 29 */ z.unused(),
+  /* 29 */ z.opaque(/* containing feature */), /* [["0x89c258f52ad45a79:0x8131f549e8af76f4", 0, "1"]] */
   /* 30 */ z.mapped("timezone", z.string().nullish()), /* "Europe/Budapest" (null on sponsored-hotel PlaceNodes) */
-  /* 31 */ z.unused(),
+  /* 31 */ z.mapped("reviewSnippets", ReviewSnippets.nullish().catch(null)),
   /* 32 */ z.mapped("description", Description.nullish()),
   /* 33 */ z.unused(),
   /* 34 */ z.unused(),
@@ -1047,7 +1127,7 @@ export const PlaceNode = z.positional([
   /* 41 */ z.unused(),
   /* 42 */ z.unused(),
   /* 43 */ z.unused(),
-  /* 44 */ z.unused(),
+  /* 44 */ z.opaque(/* geo entity description */), /* [null, null, [["Budapest, Hungary’s capital, is bisected by the River Danube. ..."]]] */
   /* 45 */ z.unused(),
   /* 46 */ z.mapped("reserve", z.array(Website.nullish()).nullish()), /* reservation links = ActionsList type-1 providers[*]; null when only the Reserve-with-Google button exists */
   /* 47 */ z.unused(),
@@ -1071,7 +1151,7 @@ export const PlaceNode = z.positional([
   /* 65 */ z.unused(),
   /* 66 */ z.unused(),
   /* 67 */ z.opaque(/* flag */), /* 1 */
-  /* 68 */ z.unused(),
+  /* 68 */ z.opaque(/* places at this address */), /* [[["KzjbarLhMtOUxc8PutfEmAg", "2ahUKEw...", null, null, [null, null, null, null, null, null, null, 4.9], ..., "M1 Med Beauty Budapest (VI. kerület)", ...]]] */
   /* 69 */ z.unused(),
   /* 70 */ z.unused(),
   /* 71 */ z.unused(),
@@ -1125,7 +1205,7 @@ export const PlaceNode = z.positional([
   /* 119 */ z.mapped("entrance", EntranceLocation.nullish()),
   /* 120 */ z.opaque(/* menu */),
   /* 121 */ z.opaque(/* flag */), /* 1 */
-  /* 122 */ z.unused(),
+  /* 122 */ z.opaque(/* owner posts / updates */), /* [["Gundel Cafe Patisserie Restaurant", "https://lh3.googleusercontent.com/-LzNCOr0ygq4/.../s40-c-k-mo/photo.jpg"], [[null, [[["Budapest's most iconic table is waiting for you. ", 1], ...]]]], 1] */
   /* 123 */ z.unused(),
   /* 124 */ z.unused(),
   /* 125 */ z.opaque(/* services */), /* [[[null, [[["Hotel"], [[[["Costa Coffee", "We Proudly Serve Costa Coffee"], ["From AED 22.00"]], [["EV Charging Station", "Available for all in-house guests"], ["Free"]]]]]], null, null, 4]]] */
@@ -1157,7 +1237,7 @@ export const PlaceNode = z.positional([
   /* 151 */ z.unused(),
   /* 152 */ z.unused(),
   /* 153 */ z.opaque(/* related topics */),
-  /* 154 */ z.unused(),
+  /* 154 */ z.mapped("merchantDescription", MerchantDescription.nullish()), /* "From the business" text; single-place lookups only */
   /* 155 */ z.unused(),
   /* 156 */ z.unused(),
   /* 157 */ z.mapped("logo", z.string().nullish()), /* "https://lh3.googleusercontent.com/-LzNCOr0ygq4/AAAAAAAAAAI/AAAAAAAAAAA/FdoZVpgjS44/s44-p-k-no-ns-nd/photo.jpg" */
@@ -1178,7 +1258,7 @@ export const PlaceNode = z.positional([
   /* 172 */ z.unused(),
   /* 173 */ z.unused(),
   /* 174 */ z.opaque(/* local-guide program url */), /* ["https://www.google.com/search?q=local+guide+program&ibp=gwp;0,26,OjAKLiIqR3VuZGVsIENhZmUgUGF0aXNzZXJpZSBSZXN0YXVyYW50IEJ1ZGFwZXN0KAI&pcl=lp"] */
-  /* 175 */ z.unused(),
+  /* 175 */ z.opaque(/* rate-and-review prompt */), /* [null, [null, 1], 0, null, ["Rate and review", "Share your experience to help others", 1, "Share details of your own experience at this place"], ...] */
   /* 176 */ z.unused(),
   /* 177 */ z.unused(),
   /* 178 */ z.mapped("phones", z.array(PhoneEntry.nullish()).nullish()),
@@ -1207,7 +1287,7 @@ export const PlaceNode = z.positional([
   /* 201 */ z.unused(),
   /* 202 */ z.unused(),
   /* 203 */ z.mapped("openingHours", OpeningHours.nullish()),
-  /* 204 */ z.opaque(/* nearby places */),
+  /* 204 */ z.mapped("containedPlaces", ContainedPlaces.nullish().catch(null)),
   /* 205 */ z.opaque(/* rank/tier */), /* 1 */
   /* 206 */ z.unused(),
   /* 207 */ z.unused(),
