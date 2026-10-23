@@ -189,6 +189,9 @@ function hours(opening: PlaceNode["openingHours"]) {
   return { status, detail: detail || undefined, color };
 }
 
+// "More hours" groups that imply the service exists; English labels, positive only
+const SERVICE_HOURS = /^(delivery|takeout|takeaway|pickup|drive through|dine-in)$/i;
+
 function services(node: PlaceNode) {
   const group = [
     ...(node.attributes?.groups ?? []),
@@ -213,7 +216,14 @@ function services(node: PlaceNode) {
     },
   );
 
-  return promoted.length ? promoted : undefined;
+  if (promoted.length) return promoted;
+
+  const fromHours = (node.mealHours ?? []).flatMap((group) => {
+    const label = group?.service ?? undefined;
+    return label && SERVICE_HOURS.test(label) ? [{ label, available: true }] : [];
+  });
+
+  return fromHours.length ? fromHours : undefined;
 }
 
 // the card's wheelchair icon follows only the entrance attribute
