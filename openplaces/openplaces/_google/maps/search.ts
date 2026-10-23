@@ -32,17 +32,25 @@ export async function search(options: Options): Promise<Place[]> {
   const parsed = Response.safeParse(data);
   if (!parsed.success) return [];
 
-  const { results, ads } = parsed.data;
+  const { results, ads, feed } = parsed.data;
 
   // sponsored hotels carry no timezone; use the response's when it has only one
   const zones = results?.context?.timezones ?? [];
   const fallback = zones.length === 1 ? (zones[0]?.id ?? undefined) : undefined;
 
-  const organic = (results?.rows ?? []).map((row) => row?.place);
-  const sponsored = [
-    ...(ads?.ads ?? []).flat().map((ad) => ad?.place),
-    ...(ads?.hotelAds ?? []).flat().map((ad) => ad?.place),
-  ];
+  // our pb puts rows, ads and hotel ads in their own sections; the web-app layout
+  // (pb !34m19) inlines all three at [64]
+  const inline = !results?.rows?.some((row) => row?.place) && !!feed?.length;
+
+  const organic = inline
+    ? (feed ?? []).map((row) => row?.place)
+    : (results?.rows ?? []).map((row) => row?.place);
+  const sponsored = inline
+    ? (feed ?? []).flatMap((row) => [row?.ad?.place, row?.hotelAd?.place])
+    : [
+        ...(ads?.ads ?? []).flat().map((ad) => ad?.place),
+        ...(ads?.hotelAds ?? []).flat().map((ad) => ad?.place),
+      ];
 
   // an advertised place can also be listed organically; keep the richer organic copy
   const listed = new Set(

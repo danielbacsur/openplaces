@@ -1203,6 +1203,18 @@ export const AdEntry = z.positional([
   /* 45 */ z.mapped("aiGenerated", z.number().nullish()), /* 1; card shows an "AI" badge (n=2) */
 ]);
 
+// Response[64][i]: web-app layout, only sent when the pb carries !34m19
+export const FeedRow = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.mapped("place", PlaceNode.nullish()),
+  /* 2 */ z.unused(),
+  /* 3 */ z.unused(),
+  /* 4 */ z.unused(),
+  /* 5 */ z.mapped("ad", AdEntry.nullish().catch(null)),
+  /* 6 */ z.unused(),
+  /* 7 */ z.mapped("hotelAd", HotelAdEntry.nullish().catch(null)), /* sponsored hotel card ("Sponsored · By Booking.com") */
+]);
+
 export const ResultTimezone = z.positional([
   /* 0 */ z.mapped("id", z.string().nullish()), /* "Europe/Budapest" */
   /* 1 */ z.opaque(/* abbreviations and names */), /* ["CET", "Central European Standard Time", "CEST", "Central European Summer Time"] */
@@ -1381,7 +1393,7 @@ export const Response = z.positional([
   /* 61 */ z.unused(),
   /* 62 */ z.unused(),
   /* 63 */ z.unused(),
-  /* 64 */ z.unused(),
+  /* 64 */ z.mapped("feed", z.array(FeedRow.nullish().catch(null)).nullish()), /* web-app layout (pb !34m19): [[null, PlaceNode], [null x5, AdEntry], [null x7, HotelAdEntry]] */
   /* 65 */ z.unused(),
   /* 66 */ z.opaque(/* ved token */), /* "0ahUKEwjmuZ7Mt6qVAxVBQVUIHQ7YBngQmRkIAQ" */
   /* 67 */ z.unused(),
