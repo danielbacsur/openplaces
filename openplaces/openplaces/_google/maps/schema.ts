@@ -859,7 +859,7 @@ export const PlaceNode = z.positional([
   /* 27 */ z.unused(),
   /* 28 */ z.unused(),
   /* 29 */ z.unused(),
-  /* 30 */ z.mapped("timezone", z.string()), /* "Europe/Budapest" */
+  /* 30 */ z.mapped("timezone", z.string().nullish()), /* "Europe/Budapest" (null on sponsored-hotel PlaceNodes) */
   /* 31 */ z.unused(),
   /* 32 */ z.mapped("description", Description.nullish()),
   /* 33 */ z.unused(),
@@ -902,7 +902,7 @@ export const PlaceNode = z.positional([
   /* 70 */ z.unused(),
   /* 71 */ z.unused(),
   /* 72 */ z.mapped("photos", Photos.nullish()),
-  /* 73 */ z.opaque(/* flag */), /* 1 */
+  /* 73 */ z.mapped("adFlag", z.number().nullish()), /* 1; set only on sponsored PlaceNodes (AdEntry[15] and sponsored hotel rows) */
   /* 74 */ z.unused(),
   /* 75 */ z.mapped("actions", z.array(z.array(ActionsList.nullish()).nullish()).nullish()),
   /* 76 */ z.mapped("relatedTypes", z.array(RelatedTypeEntry.nullish()).nullish()),
@@ -1111,6 +1111,15 @@ export const ResultRow = z.positional([
   /* 14 */ z.mapped("place", PlaceNode.nullish()),
 ]);
 
+// sponsored hotel card: AdsSection[7][0][i] with our pb, Response[64][i][7] with the web-app pb
+export const HotelAdEntry = z.positional([
+  /* 0 */ z.mapped("place", PlaceNode.nullish()),
+  /* 1 */ z.opaque(/* shared result token (= Response[7]) */), /* "WUDbapeQBZWJ7NYPtJHSQA" */
+  /* 2 */ z.opaque(/* per-ad ved token */), /* "2ahUKEwjXoP2UgNCXAxWVBNsEHbSIFAgQ9EsoFXoFCAQQ2RE" */
+  /* 3 */ z.unused(),
+  /* 4 */ z.opaque(/* flag */), /* 1 */
+]);
+
 export const AdEntry = z.positional([
   /* 0 */ z.mapped("tagline", z.string().nullish()), /* "Budapest’s award‑winning Neapolitan pizzas promise an unforgettable culinary experience." */
   /* 1 */ z.opaque(/* unknown */), /* 1 */
@@ -1130,13 +1139,25 @@ export const AdEntry = z.positional([
   /* 15 */ z.mapped("place", PlaceNode.nullish()),
 ]);
 
+export const ResultTimezone = z.positional([
+  /* 0 */ z.mapped("id", z.string().nullish()), /* "Europe/Budapest" */
+  /* 1 */ z.opaque(/* abbreviations and names */), /* ["CET", "Central European Standard Time", "CEST", "Central European Summer Time"] */
+  /* 2 */ z.mapped("offsetMinutes", z.number().nullish()), /* 60 */
+  /* 3 */ z.opaque(/* DST transitions */), /* [492985, 60, 498025, 0, 501721, 60] */
+]);
+
+export const ResultContext = z.positional([
+  /* 0 */ z.opaque(/* server time (ms) */), /* "1792751538547" */
+  /* 1 */ z.mapped("timezones", z.array(ResultTimezone.nullish()).nullish()), /* timezones covering the results; our pb only */
+]);
+
 export const ResultContainer = z.positional([
   /* 0 */ z.mapped("query", z.string().nullish()), /* "restaurants" */
   /* 1 */ z.mapped("rows", z.array(ResultRow.nullish().catch(null)).nullish()),
   /* 2 */ z.unused(),
   /* 3 */ z.opaque(/* page/result flag */), /* 1 */
   /* 4 */ z.unused(),
-  /* 5 */ z.opaque(/* result token + continuation */), /* ["1782666870346", [["Europe/Budapest", ["CET", "Central European Standard Time", "CEST", "Central European Summer Time"], 60, [492985, 60, 498025, 0, 501721, 60, 506929, 0, 510457, 60, 515665, 0, 519193, 60, 524401, 0, 528097, 60, 533137, 0, 536833, 60]]]] */
+  /* 5 */ z.mapped("context", ResultContext.nullish()), /* ["1782666870346", [["Europe/Budapest", ["CET", "Central European Standard Time", "CEST", "Central European Summer Time"], 60, [492985, 60, 498025, 0, 501721, 60]]]] */
   /* 6 */ z.unused(),
   /* 7 */ z.unused(),
   /* 8 */ z.unused(),
@@ -1171,7 +1192,7 @@ export const AdsSection = z.positional([
   /* 4 */ z.unused(),
   /* 5 */ z.unused(),
   /* 6 */ z.unused(),
-  /* 7 */ z.unused(),
+  /* 7 */ z.mapped("hotelAds", z.array(z.array(HotelAdEntry.nullish().catch(null)).nullish()).nullish()),
   /* 8 */ z.unused(),
   /* 9 */ z.unused(),
   /* 10 */ z.unused(),

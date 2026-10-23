@@ -32,18 +32,29 @@ export async function search(options: Options): Promise<Place[]> {
   const parsed = Response.safeParse(data);
   if (!parsed.success) return [];
 
-  const organic = (parsed.data.results?.rows ?? []).map((row) => row?.place);
-  const sponsored = (parsed.data.ads?.ads ?? [])
-    .flat()
-    .map((ad) => ad?.place);
+  const { results, ads } = parsed.data;
+
+  // sponsored hotels carry no timezone; use the response's when it has only one
+  const zones = results?.context?.timezones ?? [];
+  const fallback = zones.length === 1 ? (zones[0]?.id ?? undefined) : undefined;
+
+  const organic = (results?.rows ?? []).map((row) => row?.place);
+  const sponsored = [
+    ...(ads?.ads ?? []).flat().map((ad) => ad?.place),
+    ...(ads?.hotelAds ?? []).flat().map((ad) => ad?.place),
+  ];
 
   return [
-    ...organic.flatMap((node) => place(node, false)),
-    ...sponsored.flatMap((node) => place(node, true)),
+    ...organic.flatMap((node) => place(node, false, fallback)),
+    ...sponsored.flatMap((node) => place(node, true, fallback)),
   ];
 }
 
-function place(node: PlaceNode | null | undefined, sponsored: boolean): Place[] {
+function place(
+  node: PlaceNode | null | undefined,
+  sponsored: boolean,
+  fallbackTimezone?: string,
+): Place[] {
   if (!node) return [];
 
   const address = node.structuredAddress?.flat;
@@ -62,7 +73,7 @@ function place(node: PlaceNode | null | undefined, sponsored: boolean): Place[] 
     timezone:
       node.timezone && node.timezone !== "Etc/Unknown"
         ? node.timezone
-        : undefined,
+        : fallbackTimezone,
 
     address: node.address ?? join(node.addressLines),
     street: address?.streetDisplay ?? node.addressComponents?.street ?? undefined,
@@ -85,7 +96,7 @@ function place(node: PlaceNode | null | undefined, sponsored: boolean): Place[] 
     accessible: accessible(node.attributes),
 
     reserve: node.reserve?.[0]?.url ?? undefined,
-    sponsored: sponsored || undefined,
+    sponsored: sponsored || node.adFlag === 1 || undefined,
     image:
       node.photos?.photos?.[0]?.image?.url ??
       node.legacyPhotos?.photos?.[0]?.image?.url ??
