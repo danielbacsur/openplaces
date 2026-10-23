@@ -97,7 +97,10 @@ function place(
     postalCode: address?.postalCode ?? undefined,
     country: address?.country ?? undefined,
 
-    phone: node.phones?.[0]?.number ?? undefined,
+    phone:
+      node.phones?.[0]?.variants?.find((v) => v?.type === 2)?.formatted ??
+      node.phones?.[0]?.number ??
+      undefined,
     website: node.website?.url ?? undefined,
     logo:
       node.logo?.replace(/\/s\d+(-p-k-no-ns-nd\/photo\.jpg)$/, "/s256$1") ??
