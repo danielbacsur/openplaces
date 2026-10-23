@@ -79,7 +79,7 @@ function place(
     name: node.name,
     localName: node.localName ?? undefined,
 
-    category: node.relatedTypes?.[0]?.label ?? node.categories?.[0] ?? undefined,
+    category: node.categories?.find((c): c is string => typeof c === "string"),
     categories: strings(node.categories),
     description: node.description?.summary?.text ?? node.description?.blurb?.text,
 
