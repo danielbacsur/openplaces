@@ -25,22 +25,26 @@ export default function Page() {
     <main className="relative flex h-dvh w-dvw overflow-hidden bg-[rgb(232,234,237)]">
       <Canvas ref={canvasRef} />
 
-      {!collapsed && <Aside />}
-
       {!collapsed && (
-        <div className="relative z-10 flex w-[408px] flex-col bg-white shadow-[0px_1px_2px_0px_rgba(60,64,67,0.3),0px_2px_6px_2px_rgba(60,64,67,0.15)]">
-          <Search query={query ?? undefined} />
+        <div className="relative z-10 flex w-[488px] rounded-r-[32px] bg-[#f4fbfc]">
+          <Aside />
 
-          <div className="flex-1 divide-y divide-[#e3e3e3] overflow-y-auto">
-            {places.length === 0 ? (
-              <NoResults />
-            ) : (
-              places.map((place) => <ResultCard key={place.id} place={place} />)
-            )}
-          </div>
+          <div className="my-2 mr-2 flex w-[408px] flex-col overflow-hidden rounded-3xl bg-white">
+            <Search query={query ?? undefined} />
 
-          <div className="border-t border-[#e3e3e3]">
-            <Checkbox />
+            <div className="flex-1 divide-y divide-[#e3e3e3] overflow-y-auto">
+              {places.length === 0 ? (
+                <NoResults />
+              ) : (
+                places.map((place) => (
+                  <ResultCard key={place.id} place={place} />
+                ))
+              )}
+            </div>
+
+            <div className="border-t border-[#e3e3e3]">
+              <Checkbox />
+            </div>
           </div>
         </div>
       )}
