@@ -6,7 +6,7 @@ import { Aside } from "./_components/aside";
 import { Checkbox } from "./_components/checkbox";
 import { Canvas, type CanvasHandle } from "./_components/canvas";
 import { Collapse } from "./_components/collapse";
-import { Controls } from "./_components/controls";
+import { Controls, Layers } from "./_components/controls";
 import { Filters } from "./_components/filters";
 import { NoResults } from "./_components/no-results";
 import { ResultCard } from "./_components/result-card";
@@ -78,6 +78,8 @@ export default function Page() {
           onZoomIn={() => canvasRef.current?.zoomIn()}
           onZoomOut={() => canvasRef.current?.zoomOut()}
         />
+
+        <Layers />
       </div>
     </main>
   );
