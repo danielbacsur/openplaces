@@ -10,7 +10,7 @@ import {
   VIEWPORT_HEIGHT,
   VIEWPORT_WIDTH,
 } from "../_google/maps/config";
-import { search } from "../_google/maps/search";
+import { page, search } from "../_google/maps/search";
 import { places } from "../_openplaces/drizzle/schema";
 import { sqlite } from "../_openplaces/drizzle/sqlite";
 import { parse } from "../_openplaces/language";
@@ -96,7 +96,7 @@ export async function* stream(
         let saturated = false;
 
         for (let offset = 0; offset < MAX_OFFSET; offset += PAGE_SIZE) {
-          const places = await search({
+          const { places, more } = await page({
             query: prototype.query,
             viewport,
             offset,
@@ -124,7 +124,7 @@ export async function* stream(
             if (++count >= limit) return;
           }
 
-          if (places.length < PAGE_SIZE) break;
+          if (more === false || places.length < PAGE_SIZE) break;
           saturated = true;
           if (fresh === 0) break;
         }

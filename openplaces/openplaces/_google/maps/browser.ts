@@ -6,7 +6,8 @@ let page: Page | null = null;
 async function open() {
   if (page) return page;
 
-  browser = await chromium.launch({ headless: true });
+  // the new headless mode of the full chromium build; the headless shell gets no ads
+  browser = await chromium.launch({ headless: true, channel: "chromium" });
 
   const scratch = await browser.newPage();
 
