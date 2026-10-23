@@ -103,6 +103,7 @@ function place(
 
     rating: node.ratings?.rating ?? undefined,
     reviews: node.ratings?.reviewCount ?? undefined,
+    // dark: Google sends no price to anonymous sessions as of 2026-10
     price: node.ratings?.priceLevel ?? node.ratings?.priceRange?.short ?? undefined,
 
     hours: hours(node.openingHours),
@@ -169,6 +170,7 @@ function services(node: PlaceNode) {
 
   if (organic.length) return organic;
 
+  // dark: sponsored badges are not sent to anonymous sessions as of 2026-10
   const promoted = (node.promoted?.groups?.[0]?.services?.[0] ?? []).flatMap(
     (service) => {
       const label = service?.label?.[0];

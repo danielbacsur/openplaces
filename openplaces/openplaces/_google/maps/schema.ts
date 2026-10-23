@@ -23,6 +23,7 @@ export const EntranceLocation = z.positional([
   /* 1 */ z.mapped("location", BareCoordinate.nullish()),
 ]);
 
+// RatingsPrice*: dark, null for anonymous sessions as of 2026-10 (last seen 2026-05)
 export const RatingsPriceBucketLabel = z.positional([
   /* 0 */ z.mapped("id", z.string().nullish()), /* "E:HUF_12000_TO_14000" */
   /* 1 */ z.mapped("short", z.string().nullish()), /* "12 000–14 000 Ft" */
@@ -59,15 +60,15 @@ export const RatingsReviewsLink = z.positional([
 export const Ratings = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.unused(),
-  /* 2 */ z.mapped("priceLevel", z.string().nullish()), /* "20 000 Ft+" */
+  /* 2 */ z.mapped("priceLevel", z.string().nullish()), /* "20 000 Ft+" (dark: null for anonymous sessions as of 2026-10) */
   /* 3 */ z.mapped("reviewsLink", RatingsReviewsLink.nullish()),
-  /* 4 */ z.mapped("priceSymbol", z.string().nullish()), /* "$$" */
+  /* 4 */ z.mapped("priceSymbol", z.string().nullish()), /* "$$" (dark: null for anonymous sessions as of 2026-10) */
   /* 5 */ z.unused(),
   /* 6 */ z.unused(),
   /* 7 */ z.mapped("rating", z.number()), /* 4.7 */
   /* 8 */ z.mapped("reviewCount", z.number().nullish()), /* 5203 */
-  /* 9 */ z.mapped("priceRange", RatingsPriceRange.nullish()),
-  /* 10 */ z.mapped("priceDescription", z.string().nullish()), /* "20 000 Ft or above" */
+  /* 9 */ z.mapped("priceRange", RatingsPriceRange.nullish()), /* dark: null for anonymous sessions as of 2026-10 */
+  /* 10 */ z.mapped("priceDescription", z.string().nullish()), /* "20 000 Ft or above" (dark: null for anonymous sessions as of 2026-10) */
 ]);
 
 export const Website = z.positional([
@@ -224,7 +225,7 @@ export const PromotedServiceGroup = z.positional([
   /* 3 */ z.unused(),
   /* 4 */ z.unused(),
   /* 5 */ z.unused(),
-  /* 6 */ z.mapped("services", z.array(z.array(PromotedService.nullish()).nullish()).nullish()),
+  /* 6 */ z.mapped("services", z.array(z.array(PromotedService.nullish()).nullish()).nullish()), /* dark: null for anonymous sessions as of 2026-10 */
 ]);
 
 export const PromotedServices = z.positional([
