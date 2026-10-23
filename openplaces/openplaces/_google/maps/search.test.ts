@@ -65,8 +65,8 @@
         });
       }, 5000);
 
-      it("returns exactly twenty places on a single page query", () => {
-        expect(results).toHaveLength(20);
+      it("returns exactly twenty organic places on a single page query", () => {
+        expect(results.filter((place) => !place.sponsored)).toHaveLength(20);
       });
 
       it("returns a ChIJ-prefixed id on every returned place", () => {

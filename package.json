@@ -6,6 +6,7 @@
     "openplaces-mcp",
     "openplaces-website"
   ],
+  "type": "module",
   "scripts": {
     "dev": "turbo run dev",
     "test": "turbo run vitest --log-prefix=none",
@@ -13,23 +14,14 @@
     "vitest": "vitest --run"
   },
   "devDependencies": {
-    "bumpp": "^11.1.0",
-    "turbo": "^2.10.5",
-    "vitest": "^4.1.10"
+    "bumpp": "^12.3.0",
+    "turbo": "^2.11.10",
+    "vitest": "^5.0.5"
   },
-  "overrides": {
-    "next": {
-      "postcss": "8.5.15"
-    },
-    "yuku-parser": "0.6.5"
-  },
-  "packageManager": "npm@12.0.1",
+  "packageManager": "npm@12.2.1",
   "allowScripts": {
-    "better-sqlite3@12.11.1": true,
-    "fsevents@2.3.3": true,
-    "fsevents@2.3.2": true,
-    "sharp@0.34.5": true,
-    "esbuild@0.25.12": true,
-    "esbuild@0.28.1": true
+    "better-sqlite3@13.0.3": true,
+    "esbuild@0.28.2": true,
+    "fsevents@2.3.3": true
   }
 }
