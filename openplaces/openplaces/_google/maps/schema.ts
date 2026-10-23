@@ -69,6 +69,10 @@ export const Ratings = z.positional([
   /* 8 */ z.mapped("reviewCount", z.number().nullish()), /* 5203 */
   /* 9 */ z.mapped("priceRange", RatingsPriceRange.nullish()), /* dark: null for anonymous sessions as of 2026-10 */
   /* 10 */ z.mapped("priceDescription", z.string().nullish()), /* "20 000 Ft or above" (dark: null for anonymous sessions as of 2026-10) */
+  /* 11 */ z.unused(),
+  /* 12 */ z.unused(),
+  /* 13 */ z.unused(),
+  /* 14 */ z.opaque(/* only ever 1; seen only on length-15 Ratings of some food/drink places, never on ads; meaning unknown */), /* 1 */
 ]);
 
 export const Website = z.positional([
@@ -449,7 +453,7 @@ export const Photo = z.positional([
   /* 0 */ z.mapped("id", z.string().nullish()), /* "CIHM0ogKEICAgID5vvCh7wE" */
   /* 1 */ z.mapped("mediaSource", z.number().nullish()), /* 10 */
   /* 2 */ z.mapped("mediaFormat", z.number().nullish()), /* 12 */
-  /* 3 */ z.mapped("caption", z.string().nullish()), /* "" */
+  /* 3 */ z.unused(),
   /* 4 */ z.unused(),
   /* 5 */ z.unused(),
   /* 6 */ z.mapped("image", PhotoImage),
@@ -488,7 +492,7 @@ export const LegacyPhoto = z.positional([
   /* 0 */ z.mapped("id", z.string().nullish()), /* "CIHM0ogKEICAgID5vvCh7wE" */
   /* 1 */ z.mapped("mediaSource", z.number().nullish()), /* 10 */
   /* 2 */ z.mapped("mediaFormat", z.number().nullish()), /* 12 */
-  /* 3 */ z.mapped("caption", z.string().nullish()), /* "" */
+  /* 3 */ z.unused(),
   /* 4 */ z.unused(),
   /* 5 */ z.unused(),
   /* 6 */ z.mapped("image", PhotoImage.nullish()),
@@ -526,16 +530,6 @@ export const LegacyPhotos = z.positional([
   /* 3 */ z.opaque(/* response ei token (== Response[7]) */), /* "dVZBatecE4_-wPAPjOKogAQ" */
   /* 4 */ z.unused(),
   /* 5 */ z.opaque(/* photo-gallery continuation token, base64, ~46-130 chars */), /* "CmYKAgABEgIAARgC" */
-  /* 6 */ z.unused(),
-  /* 7 */ z.unused(),
-  /* 8 */ z.mapped("paging", z.unknown().nullish()), /* [[[1, 191]], 3, null, 70, 129] */
-  /* 9 */ z.unused(),
-  /* 10 */ z.unused(),
-  /* 11 */ z.unused(),
-  /* 12 */ z.unused(),
-  /* 13 */ z.unused(),
-  /* 14 */ z.unused(),
-  /* 15 */ z.opaque(/* trailing flag */), /* 1 */
 ]);
 
 export const ActionsLogo = z.positional([
@@ -748,15 +742,6 @@ export const SaveControl = z.positional([
   /* 20 */ z.unused(),
   /* 21 */ z.unused(),
   /* 22 */ z.opaque(/* ved token for the save control */), /* "0ahUKEwiXq_7Lt6qVAxUPPxAIHQwxCkAQ0JcGCCooFA" */
-  /* 23 */ z.unused(),
-  /* 24 */ z.unused(),
-  /* 25 */ z.unused(),
-  /* 26 */ z.unused(),
-  /* 27 */ z.unused(),
-  /* 28 */ z.unused(),
-  /* 29 */ z.mapped("placeIdPair", z.array(z.string().nullish()).nullish()), /* ["5221366501350763307","8927428799103966210"] */
-  /* 30 */ z.unused(),
-  /* 31 */ z.opaque(/* trailing token */), /* "CgIgAQ" */
 ]);
 
 export const RelatedSearchTopic = z.positional([
@@ -1254,7 +1239,7 @@ export const PlaceNode = z.positional([
   /* 168 */ z.unused(),
   /* 169 */ z.unused(),
   /* 170 */ z.opaque(/* flag */), /* 1 */
-  /* 171 */ z.opaque(/* photo categories */),
+  /* 171 */ z.unused(),
   /* 172 */ z.unused(),
   /* 173 */ z.unused(),
   /* 174 */ z.opaque(/* local-guide program url */), /* ["https://www.google.com/search?q=local+guide+program&ibp=gwp;0,26,OjAKLiIqR3VuZGVsIENhZmUgUGF0aXNzZXJpZSBSZXN0YXVyYW50IEJ1ZGFwZXN0KAI&pcl=lp"] */
@@ -1361,9 +1346,13 @@ export const ResultRow = z.positional([
   /* 9 */ z.opaque(/* per-row ved token */), /* "0ahUKEwjmuZ7Mt6qVAxVBQVUIHQ7YBngQmBkIAigA" */
   /* 10 */ z.opaque(/* header-row metadata */), /* ["restaurants", 0] */
   /* 11 */ z.unused(),
-  /* 12 */ z.unused(),
+  /* 12 */ z.opaque(/* no-results row: [ved, "search on Google" href] */), /* ["2ahUKEwjKmN2y-M-XAxX7RPEDHZBWIhAQ42ooAHoECAMQAw", "/search?q=nonexistentplacexyzqq&hl=en&authuser=0"] */
   /* 13 */ z.unused(),
   /* 14 */ z.mapped("place", PlaceNode.nullish()),
+  /* 15 */ z.unused(),
+  /* 16 */ z.unused(),
+  /* 17 */ z.unused(),
+  /* 18 */ z.opaque(/* no-results row: empty list */), /* [] */
 ]);
 
 // sponsored hotel card: AdsSection[7][0][i] with our pb, Response[64][i][7] with the web-app pb
@@ -1467,7 +1456,7 @@ export const ResultContainer = z.positional([
   /* 6 */ z.unused(),
   /* 7 */ z.unused(),
   /* 8 */ z.unused(),
-  /* 9 */ z.unused(),
+  /* 9 */ z.opaque(/* lodging result total (some lodging queries) */), /* 3774 */
   /* 10 */ z.unused(),
   /* 11 */ z.opaque(/* flag */), /* 0 */
 ]);
@@ -1485,7 +1474,7 @@ export const ViewportSize = z.positional([
 
 export const Viewport = z.positional([
   /* 0 */ z.mapped("camera", ViewportCamera.nullish()),
-  /* 1 */ z.unused(),
+  /* 1 */ z.opaque(/* camera orientation echo of pb !4m.2 */), /* [0, 0, 0] */
   /* 2 */ z.mapped("size", ViewportSize.nullish()),
   /* 3 */ z.mapped("fieldOfView", z.number().nullish()), /* 13.1 */
 ]);
@@ -1582,7 +1571,7 @@ export const Response = z.positional([
   /* 20 */ z.unused(),
   /* 21 */ z.opaque(/* section config */), /* [null, null, ["0ahUKEwjmuZ7Mt6qVAxVBQVUIHQ7YBngQnVUIvQsoAA"], [[5, 0, 6, 1, 7, 2, 8, 3, 9, 4], "0ahUKEwjmuZ7Mt6qVAxVBQVUIHQ7YBngQzzgIvgsoAQ"], null, null, null, null, null, null, null, null, null, null, null, "IAE="] */
   /* 22 */ z.unused(),
-  /* 23 */ z.unused(),
+  /* 23 */ z.opaque(/* category-class flag, meaning unknown (1 on gas/pharmacy/convenience/bank/atm/post/EV and some supermarket queries) */), /* 1 */
   /* 24 */ z.unused(),
   /* 25 */ z.unused(),
   /* 26 */ z.unused(),
