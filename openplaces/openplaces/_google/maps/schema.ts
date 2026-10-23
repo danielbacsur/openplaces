@@ -145,12 +145,12 @@ export const RelatedTypeEntry = z.positional([
 ]);
 
 export const AttributesShortLabel = z.positional([
-  /* 0 */ z.mapped("state", z.number()), /* 1 */
+  /* 0 */ z.mapped("value", z.number()), /* 1; 1 = has it, 0 = lacks it ([1] is then "No ..." / " Does not have ...") */
   /* 1 */ z.mapped("label", z.string()), /* "Outdoor seating" */
 ]);
 
 export const AttributesLongLabel = z.positional([
-  /* 0 */ z.mapped("state", z.number()), /* 1 */
+  /* 0 */ z.mapped("value", z.number()), /* 1; same as shortLabels[0].value; array is just [0] when labels are blank */
   /* 1 */ z.mapped("short", z.string().nullish()), /* "Outdoor seating" */
   /* 2 */ z.mapped("canonical", z.string().nullish()), /* "Outdoor seating" */
   /* 3 */ z.mapped("sentence", z.string().nullish()), /* "Has outdoor seating" */
@@ -163,22 +163,35 @@ export const AttributesVariantOption = z.positional([
   /* 3 */ z.mapped("nameAlt", z.string().nullish()), /* "Very expensive" */
 ]);
 
+export const AttributesVariantList = z.positional([
+  /* 0 */ z.mapped("options", z.array(AttributesVariantOption.nullish()).nullish()), /* [["/g/11g7z0k821", null, "Non-motorised", "Non-motorised"]] */
+  /* 1 */ z.unused(),
+  /* 2 */ z.opaque(/* flags */), /* [1] */
+]);
+
+export const AttributesVariants = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.mapped("lists", z.array(AttributesVariantList.nullish()).nullish()),
+]);
+
 export const AttributesAvailability = z.positional([
-  /* 0 */ z.mapped("state", z.number()), /* 1 */
+  /* 0 */ z.mapped("kind", z.number()), /* 1; value type: 1 = yes/no (value in shortLabels[0].value), 3 = option list in [4]; NOT has/lacks */
   /* 1 */ z.mapped("shortLabels", z.array(AttributesShortLabel.nullish()).nullish()),
   /* 2 */ z.mapped("longLabel", AttributesLongLabel.nullish()),
-  /* 3 */ z.mapped("variant", AttributesVariantOption.nullish()),
-  /* 4 */ z.mapped("variants", z.unknown().nullish()), /* [null, [[[["/g/11g9h0yyz0", null, "American Express", "American Express"], ["/g/11g9h0tjcp", null, "Mastercard", "Mastercard"], ["/g/11fxy6tx8n", null, "VISA", "VISA"]], null, [1]]]] */
+  /* 3 */ z.unused(),
+  /* 4 */ z.mapped("variants", AttributesVariants.nullish()), /* [null, [[[["/g/11g9h0yyz0", null, "American Express", "American Express"], ["/g/11g9h0tjcp", null, "Mastercard", "Mastercard"], ["/g/11fxy6tx8n", null, "VISA", "VISA"]], null, [1]]]] */
 ]);
 
 export const AttributesAttribute = z.positional([
   /* 0 */ z.mapped("id", z.string()), /* "/geo/type/establishment_poi/has_seating_outdoors" */
   /* 1 */ z.mapped("label", z.string()), /* "Outdoor seating" */
   /* 2 */ z.mapped("availability", AttributesAvailability),
-  /* 3 */ z.mapped("negated", z.number().nullish()), /* 1 */
-  /* 4 */ z.mapped("iconGlyph", z.array(z.number().nullish())), /* [32] */
-  /* 5 */ z.opaque(/* flag */), /* 0 */
+  /* 3 */ z.mapped("negated", z.number().nullish()), /* 1; 1 iff the value is 0 (lacks); null otherwise */
+  /* 4 */ z.mapped("iconGlyph", z.array(z.number().nullish())), /* [4]; [2] = cross (lacks); [4] accessibility check; [1] generic check / offered (also kind-3 lists); [51]/[31]/[24] group-specific */
+  /* 5 */ z.opaque(/* constant 0 */), /* 0 */
 ]);
+
+export type AttributesAttribute = z.infer<typeof AttributesAttribute>;
 
 export const AttributesGroup = z.positional([
   /* 0 */ z.mapped("key", z.string()), /* "service_options" */
@@ -187,10 +200,10 @@ export const AttributesGroup = z.positional([
 ]);
 
 export const Attributes = z.positional([
-  /* 0 */ z.mapped("featured", z.array(AttributesAttribute.nullish()).nullish()),
+  /* 0 */ z.unused(),
   /* 1 */ z.mapped("groups", z.array(AttributesGroup.nullish()).nullish()),
   /* 2 */ z.unused(),
-  /* 3 */ z.mapped("summary", z.array(AttributesAttribute.nullish()).nullish()),
+  /* 3 */ z.unused(),
   /* 4 */ z.unused(),
   /* 5 */ z.mapped("secondaryGroups", z.array(AttributesGroup.nullish()).nullish()),
 ]);

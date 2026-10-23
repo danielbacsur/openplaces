@@ -2,7 +2,7 @@ import { Place } from "openplaces";
 
 import * as browser from "./browser";
 import { pb } from "./features";
-import { type PlaceNode, Response } from "./schema";
+import { type AttributesAttribute, type PlaceNode, Response } from "./schema";
 
 interface Options {
   query: string;
@@ -141,12 +141,15 @@ function hours(opening: PlaceNode["openingHours"]) {
 }
 
 function services(node: PlaceNode) {
-  const group = node.attributes?.groups?.find((g) => g?.key === "service_options");
+  const group = [
+    ...(node.attributes?.groups ?? []),
+    ...(node.attributes?.secondaryGroups ?? []),
+  ].find((g) => g?.key === "service_options");
 
   const organic = (group?.attributes ?? []).flatMap((attribute) => {
     const label = attribute?.label;
-    if (!label) return [];
-    return [{ label, available: attribute?.availability?.state === 1 }];
+    if (!attribute || !label) return [];
+    return [{ label, available: value(attribute) }];
   });
 
   if (organic.length) return organic;
@@ -163,14 +166,24 @@ function services(node: PlaceNode) {
   return promoted.length ? promoted : undefined;
 }
 
+// the card's wheelchair icon follows only the entrance attribute
 function accessible(attributes: PlaceNode["attributes"]) {
-  for (const group of attributes?.groups ?? []) {
-    for (const attribute of group?.attributes ?? []) {
-      if (typeof attribute?.id === "string" && attribute.id.includes("wheelchair")) {
-        return attribute.availability?.state === 1;
-      }
-    }
-  }
+  const entrance = [
+    ...(attributes?.groups ?? []),
+    ...(attributes?.secondaryGroups ?? []),
+  ]
+    .flatMap((group) => group?.attributes ?? [])
+    .find((attribute) =>
+      attribute?.id?.endsWith("/has_wheelchair_accessible_entrance"),
+    );
 
-  return undefined;
+  return entrance ? value(entrance) : undefined;
+}
+
+// availability.kind is the type of the value (1 yes/no, 3 option list), not the value;
+// a yes/no value sits in shortLabels[0].value, and an option list counts as offered
+function value(attribute: AttributesAttribute) {
+  const flag = attribute.availability?.shortLabels?.[0]?.value;
+  if (flag != null) return flag === 1;
+  return attribute.negated !== 1;
 }
