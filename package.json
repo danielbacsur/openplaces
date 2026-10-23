@@ -20,8 +20,8 @@
   },
   "packageManager": "npm@12.2.1",
   "allowScripts": {
-    "better-sqlite3@13.0.3": false,
+    "better-sqlite3@13.0.3": true,
     "esbuild@0.28.2": true,
-    "fsevents@2.3.3": false
+    "fsevents@2.3.3": true
   }
 }
