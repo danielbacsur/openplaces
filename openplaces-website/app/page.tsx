@@ -32,13 +32,29 @@ export default function Page() {
           <div className="my-2 mr-2 flex w-[408px] flex-col overflow-hidden rounded-3xl bg-white">
             <Search query={query ?? undefined} />
 
-            <div className="flex-1 divide-y divide-[#e3e3e3] overflow-y-auto">
+            <div className="flex-1 overflow-y-auto">
               {places.length === 0 ? (
                 <NoResults />
               ) : (
-                places.map((place) => (
-                  <ResultCard key={place.id} place={place} />
-                ))
+                <>
+                  <div className="flex h-12 items-center gap-1 px-6 pb-1 text-[#1f1f1f]">
+                    <span className="font-sans text-[20px] leading-6">
+                      Results
+                    </span>
+                    <span
+                      className="material-symbols-outlined text-[#5e5e5e]"
+                      style={{ fontSize: "18px" }}
+                    >
+                      info
+                    </span>
+                  </div>
+
+                  <div className="divide-y divide-[#e3e3e3]">
+                    {places.map((place) => (
+                      <ResultCard key={place.id} place={place} />
+                    ))}
+                  </div>
+                </>
               )}
             </div>
 
