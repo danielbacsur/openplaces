@@ -247,8 +247,8 @@ export const PromotedServices = z.positional([
 ]);
 
 export const HoursPeriodTime = z.positional([
-  /* 0 */ z.mapped("open", z.array(z.number().nullish())), /* [11, 30] */
-  /* 1 */ z.mapped("close", z.array(z.number().nullish())), /* [22] */
+  /* 0 */ z.mapped("open", z.array(z.number().nullish())), /* [11, 30] ([] = midnight 00:00) */
+  /* 1 */ z.mapped("close", z.array(z.number().nullish())), /* [22] ([] = midnight 24:00; "Open 24 hours" is [[], []]) */
 ]);
 
 export const HoursPeriod = z.positional([
@@ -262,14 +262,20 @@ export const HoursDate = z.positional([
   /* 2 */ z.mapped("day", z.number()), /* 28 */
 ]);
 
+export const HoursHoliday = z.positional([
+  /* 0 */ z.mapped("note", z.string()), /* "Independence Day (Observed) might affect these hours" */
+  /* 1 */ z.mapped("name", z.string()), /* "Independence Day (Observed)" */
+  /* 2 */ z.mapped("kind", z.number()), /* 2; 1 = special hours set for the holiday, 2 = holiday may affect these hours */
+]);
+
 export const HoursDay = z.positional([
   /* 0 */ z.mapped("weekday", z.string()), /* "Sunday" */
   /* 1 */ z.mapped("weekdayNumber", z.number()), /* 7 */
   /* 2 */ z.mapped("date", HoursDate),
   /* 3 */ z.mapped("periods", z.array(HoursPeriod.nullish())),
-  /* 4 */ z.opaque(/* flag */), /* 0 */
-  /* 5 */ z.mapped("openFlag", z.number()), /* 1 */
-  /* 6 */ z.opaque(/* holiday note */), /* ["Independence Day (Observed) might affect these hours", "Independence Day (Observed)", 2] */
+  /* 4 */ z.mapped("specialHours", z.number()), /* 0; 1 = owner-set special/holiday hours override this date */
+  /* 5 */ z.mapped("openFlag", z.number()), /* 1; 1 = has hours this day, 2 = closed all day */
+  /* 6 */ z.mapped("holiday", HoursHoliday.nullish()), /* ["Independence Day (Observed) might affect these hours", "Independence Day (Observed)", 2] */
 ]);
 
 export const HoursColorStyle = z.positional([
@@ -290,11 +296,11 @@ export const HoursStatus = z.positional([
 
 export const HoursCurrent = z.positional([
   /* 0 */ z.mapped("day", HoursDay.nullish()),
-  /* 1 */ z.mapped("activePeriodIndex", z.number().nullish()), /* 0 */
-  /* 2 */ z.mapped("openStateCode", z.number().nullish()), /* 1 */
-  /* 3 */ z.opaque(/* flag */), /* 1 */
+  /* 1 */ z.mapped("activePeriodIndex", z.number().nullish()), /* 0; index into day.periods of the current-or-next period; null when today has no more periods (codes 5/6) */
+  /* 2 */ z.mapped("openStateCode", z.number().nullish()), /* 1; 1 open, 2 closes soon, 4 closed but opens later today (incl. "Opens soon"), 5 closed for the rest of today, 6 closed all day */
+  /* 3 */ z.opaque(/* no-schedule flag: 1 only on the "Open now" stub (OpeningHours length 3, no weekly/day) */), /* 1 */
   /* 4 */ z.mapped("status", HoursStatus),
-  /* 5 */ z.mapped("statusAlt", HoursStatus.nullish()),
+  /* 5 */ z.mapped("statusAlt", HoursStatus.nullish()), /* identical to [4] in every observed place */
   /* 6 */ z.unused(),
   /* 7 */ z.mapped("nextChangeHour", z.array(z.number().nullish()).nullish()), /* [21]; when the status label next changes: close-1h while Open (capped at [24] = midnight), close while "Closes soon", open-30min while Closed, open while "Opens soon", [24] for codes 5/6 */
   /* 8 */ z.mapped("shortStatus", HoursStatus.nullish()),
@@ -331,9 +337,9 @@ export const MealDay = z.positional([
   /* 1 */ z.mapped("weekdayNumber", z.number()), /* 7 */
   /* 2 */ z.mapped("date", HoursDate),
   /* 3 */ z.mapped("intervals", z.array(MealInterval.nullish())),
-  /* 4 */ z.opaque(/* flag */), /* 0 */
+  /* 4 */ z.mapped("specialHours", z.number()), /* 0; 1 = special hours override this date */
   /* 5 */ z.mapped("statusCode", z.number()), /* 1 */
-  /* 6 */ z.opaque(/* holiday note */), /* ["Independence Day (Observed) might affect these hours", "Independence Day (Observed)", 2] */
+  /* 6 */ z.mapped("holiday", HoursHoliday.nullish()), /* ["Independence Day (Observed) might affect these hours", "Independence Day (Observed)", 2] */
 ]);
 
 export const MealToday = z.positional([
@@ -359,7 +365,7 @@ export const MealBlock = z.positional([
 ]);
 
 export const MealService = z.positional([
-  /* 0 */ z.mapped("service", z.string().nullish()), /* "Kitchen" */
+  /* 0 */ z.mapped("service", z.string().nullish()), /* "Kitchen"; localized secondary-hours group label (Kitchen/Lunch/Happy hours/Delivery/Takeout/Drive through/Online service hours ...) or a sub-business like "Walgreens Photo"; no stable id */
   /* 1 */ z.unused(),
   /* 2 */ z.unused(),
   /* 3 */ z.mapped("hours", MealBlock),
@@ -1045,7 +1051,7 @@ export const PlaceNode = z.positional([
   /* 115 */ z.unused(),
   /* 116 */ z.unused(),
   /* 117 */ z.unused(),
-  /* 118 */ z.mapped("mealHours", z.array(MealService.nullish()).nullish()),
+  /* 118 */ z.mapped("mealHours", z.array(MealService.nullish()).nullish()), /* "More hours" groups: meals, Kitchen, Takeout, Delivery, Drive through, Happy hours, sub-departments */
   /* 119 */ z.mapped("entrance", EntranceLocation.nullish()),
   /* 120 */ z.opaque(/* menu */),
   /* 121 */ z.opaque(/* flag */), /* 1 */
