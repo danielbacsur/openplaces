@@ -99,7 +99,8 @@ export const PhoneEntry = z.positional([
   /* 5 */ z.mapped("link", PhoneLink.nullish()),
 ]);
 
-export const PhonesExtra = z.positional([
+// PlaceNode[181]: duplicate of identifiers.bundle[5..6]; null on unclaimed places
+export const ListingIds = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.unused(),
   /* 2 */ z.unused(),
@@ -112,13 +113,13 @@ export const PhonesExtra = z.positional([
 export const Owner = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.mapped("name", z.string()), /* "Gundel Cafe Patisserie Restaurant (Owner)" */
-  /* 2 */ z.mapped("id", z.string().nullish()), /* "109965436827872873143" */
+  /* 2 */ z.mapped("claimedGaiaId", z.string().nullish()), /* "109965436827872873143"; == [8]; almost always only on claimed listings */
   /* 3 */ z.unused(),
   /* 4 */ z.unused(),
   /* 5 */ z.unused(),
   /* 6 */ z.unused(),
   /* 7 */ z.unused(),
-  /* 8 */ z.mapped("idAlt", z.string()), /* "109965436827872873143" */
+  /* 8 */ z.mapped("gaiaId", z.string()), /* "109965436827872873143" */
 ]);
 
 export const RankingTypeDescriptor = z.positional([
@@ -281,7 +282,7 @@ export const HoursCurrent = z.positional([
   /* 4 */ z.mapped("status", HoursStatus),
   /* 5 */ z.mapped("statusAlt", HoursStatus.nullish()),
   /* 6 */ z.unused(),
-  /* 7 */ z.mapped("closingHour", z.array(z.number().nullish()).nullish()), /* [21] */
+  /* 7 */ z.mapped("nextChangeHour", z.array(z.number().nullish()).nullish()), /* [21]; when the status label next changes: close-1h while Open (capped at [24] = midnight), close while "Closes soon", open-30min while Closed, open while "Opens soon", [24] for codes 5/6 */
   /* 8 */ z.mapped("shortStatus", HoursStatus.nullish()),
 ]);
 
@@ -357,7 +358,7 @@ export const PhotoSize = z.positional([
 
 export const PhotoImage = z.positional([
   /* 0 */ z.mapped("url", z.string()), /* "https://lh3.googleusercontent.com/gps-cs-s/APNQkAEyRlR58F-u13TJ49oFZe_M_KqibcT8CBSu3fv-OHyrZNAp32qsQbXoWZA3wbvbR7NDS7K0dw287RcwZS_OxoXd9_ibHlhVGU1kgGTFuGx9pNBxZ33ZraoAvTTa1qRG9Cf3byr_=w122-h92-k-no" */
-  /* 1 */ z.mapped("attribution", z.string().nullish()), /* "9653+ Photos" */
+  /* 1 */ z.mapped("countLabel", z.string().nullish()), /* "474 Photos" (only on legacyPhotos.photos[0]; "" on every other photo) */
   /* 2 */ z.mapped("native", PhotoSize.nullish()),
   /* 3 */ z.mapped("thumbnail", PhotoSize),
 ]);
@@ -379,7 +380,7 @@ export const PhotoCamera = z.positional([
   /* 0 */ z.mapped("position", z.array(z.number().nullish()).nullish()), /* [3, 19.0774987, 47.5173442] */
   /* 1 */ z.mapped("orientation", z.array(z.number().nullish()).nullish()), /* [0, 90] */
   /* 2 */ z.mapped("size", PhotoSize.nullish()),
-  /* 3 */ z.mapped("quality", z.number().nullish()), /* 75 */
+  /* 3 */ z.mapped("fieldOfView", z.number().nullish()), /* 75 */
 ]);
 
 export const Photo = z.positional([
@@ -518,7 +519,7 @@ export const ActionsReserve = z.positional([
   /* 1 */ z.mapped("link", ActionsLink),
   /* 2 */ z.opaque(/* flag */), /* 0 */
   /* 3 */ z.opaque(/* flag */), /* 64 */
-  /* 4 */ z.mapped("partnerId", z.number()), /* 41902 */
+  /* 4 */ z.opaque(/* UI element id per action type: 41902 reserve, 41901 order, 155425/181470 book, 67116 waitlist */), /* 41902 */
   /* 5 */ z.unused(),
   /* 6 */ z.unused(),
   /* 7 */ z.mapped("labelAlt", z.string().nullish()), /* "Reserve a table" */
@@ -684,7 +685,7 @@ export const GeoName = z.positional([
 
 export const GeoEntry = z.positional([
   /* 0 */ z.mapped("featureId", GeoFeatureId),
-  /* 1 */ z.mapped("confidence", z.number()), /* 0.9 */
+  /* 1 */ z.mapped("level", z.number()), /* 0.9; feature-type rank, not a confidence: 1 neighborhood, 0.99 sublocality (Budapest district, NYC borough, chome), 0.9 locality/city (incl. Tokyo wards), 0.84 sublocality-2, 0.83 admin-3 (London borough, arrondissement), 0.82 admin-2/county, 0.81 admin-1/state, 0.8 island, 0.75 colloquial/statistical area (continent, macro-region, school district, historic quarter), 0.5 country */
   /* 2 */ z.mapped("names", z.array(GeoName.nullish())),
 ]);
 
@@ -722,8 +723,8 @@ export const IdentifierBundle = z.positional([
   /* 2 */ z.unused(),
   /* 3 */ z.mapped("knowledgeGraphId", z.string()), /* "/m/0frxnw" */
   /* 4 */ z.mapped("placeId", z.string()), /* "ChIJhzNeW4jbQUcRDpNeQSc81aA" */
-  /* 5 */ z.mapped("cid", z.string().nullish()), /* "8350095830035021410" */
-  /* 6 */ z.mapped("ownerGaiaId", z.string().nullish()), /* "109965436827872873143" */
+  /* 5 */ z.mapped("listingId", z.string().nullish()), /* "8350095830035021410"; Business Profile listing id (== PlaceNode[181][5]); NOT the CID, which is BigInt(featureId.split(":")[1]) */
+  /* 6 */ z.mapped("ownerGaiaId", z.string().nullish()), /* "109965436827872873143"; == Owner[8] and PlaceNode[181][6]; present only on claimed listings */
 ]);
 
 export const Identifiers = z.positional([
@@ -1019,7 +1020,7 @@ export const PlaceNode = z.positional([
   /* 163 */ z.unused(),
   /* 164 */ z.mapped("relatedSearch", RelatedSearch.nullish()),
   /* 165 */ z.opaque(/* photo-source flag */), /* [1] */
-  /* 166 */ z.mapped("city", z.string().nullish()), /* "Budapest" */
+  /* 166 */ z.mapped("locality", z.string().nullish()), /* "New York, NY"; display locality line (city + region/country when non-local); use structuredAddress.flat.city for the bare city */
   /* 167 */ z.unused(),
   /* 168 */ z.unused(),
   /* 169 */ z.unused(),
@@ -1034,7 +1035,7 @@ export const PlaceNode = z.positional([
   /* 178 */ z.mapped("phones", z.array(PhoneEntry.nullish()).nullish()),
   /* 179 */ z.unused(),
   /* 180 */ z.unused(),
-  /* 181 */ z.mapped("secondaryIds", PhonesExtra.nullish()),
+  /* 181 */ z.mapped("listingIds", ListingIds.nullish()),
   /* 182 */ z.unused(),
   /* 183 */ z.mapped("structuredAddress", StructuredAddress.nullish()),
   /* 184 */ z.unused(),

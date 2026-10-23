@@ -93,7 +93,7 @@ function place(
     address: node.address ?? join(node.addressLines),
     street: address?.streetDisplay ?? node.addressComponents?.street ?? undefined,
     district: address?.district ?? node.district ?? undefined,
-    city: address?.city ?? node.city ?? undefined,
+    city: address?.city ?? node.locality ?? undefined,
     postalCode: address?.postalCode ?? undefined,
     country: address?.country ?? undefined,
 
