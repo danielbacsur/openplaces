@@ -61,7 +61,7 @@ export const Ratings = z.positional([
   /* 0 */ z.unused(),
   /* 1 */ z.unused(),
   /* 2 */ z.mapped("priceLevel", z.string().nullish()), /* "20 000 Ft+" (dark: null for anonymous sessions as of 2026-10) */
-  /* 3 */ z.mapped("reviewsLink", RatingsReviewsLink.nullish()),
+  /* 3 */ z.mapped("reviewsLink", RatingsReviewsLink.nullish()), /* null on all sponsored PlaceNodes and rarely on organic ones */
   /* 4 */ z.mapped("priceSymbol", z.string().nullish()), /* "$$" (dark: null for anonymous sessions as of 2026-10) */
   /* 5 */ z.unused(),
   /* 6 */ z.unused(),
@@ -92,14 +92,14 @@ export const PhoneLink = z.positional([
 
 export const PhoneVariant = z.positional([
   /* 0 */ z.mapped("formatted", z.string()), /* "06 30 603 2480" */
-  /* 1 */ z.mapped("type", z.number()), /* 1 */
+  /* 1 */ z.mapped("type", z.number()), /* 1; 1 = national format, 2 = international (+cc) */
 ]);
 
 export const PhoneEntry = z.positional([
   /* 0 */ z.mapped("number", z.string()), /* "06 30 603 2480" */
   /* 1 */ z.mapped("variants", z.array(PhoneVariant.nullish()).nullish()),
   /* 2 */ z.unused(),
-  /* 3 */ z.mapped("normalized", z.string().nullish()), /* "06306032480" */
+  /* 3 */ z.mapped("normalized", z.string().nullish()), /* "06306032480"; gl-dependent (E.164 under gl=us, national digits under gl=hu); formatted on sponsored nodes; null for non-geographic numbers */
   /* 4 */ z.unused(),
   /* 5 */ z.mapped("link", PhoneLink.nullish()),
 ]);
@@ -129,11 +129,11 @@ export const Owner = z.positional([
 
 export const RankingTypeDescriptor = z.positional([
   /* 0 */ z.mapped("typeCode", z.string().nullish()), /* "SearchResult.TYPE_RESTAURANT" */
-  /* 1 */ z.mapped("country", z.string().nullish()), /* "HU" */
-  /* 2 */ z.opaque(/* ranking signal */), /* 54 */
-  /* 3 */ z.opaque(/* ranking signal */), /* 84 */
-  /* 4 */ z.opaque(/* ranking signal */), /* 85 */
-  /* 5 */ z.opaque(/* ranking signal */), /* 151 */
+  /* 1 */ z.mapped("country", z.string().nullish()), /* "HU"; place country, not request gl */
+  /* 2 */ z.opaque(/* type-bucket id, deterministic per typeCode (54 restaurant, 74 lodging, 32 subtypes; 93/115 on ads) */), /* 54 */
+  /* 3 */ z.opaque(/* constant 84 on organic results; absent on sponsored descriptors */), /* 84 */
+  /* 4 */ z.opaque(/* constant 85 on organic results; absent on sponsored descriptors */), /* 85 */
+  /* 5 */ z.opaque(/* constant 151 on organic results; absent on sponsored descriptors */), /* 151 */
 ]);
 
 export const Ranking = z.positional([
@@ -146,8 +146,8 @@ export const Ranking = z.positional([
 
 export const RelatedTypeEntry = z.positional([
   /* 0 */ z.mapped("type", z.string().nullish()), /* "hungarian_restaurant" */
-  /* 1 */ z.mapped("label", z.string().nullish()), /* "Hungarian" */
-  /* 2 */ z.mapped("weight", z.number().nullish()), /* 2 */
+  /* 1 */ z.mapped("label", z.string().nullish()), /* "Hungarian"; null in every 2026-10 search response */
+  /* 2 */ z.mapped("weight", z.number().nullish()), /* 2; query-type match weight (4..7 observed) */
 ]);
 
 export const AttributesShortLabel = z.positional([
@@ -820,7 +820,7 @@ export const IdentifierBundle = z.positional([
 
 export const Identifiers = z.positional([
   /* 0 */ z.mapped("bundle", IdentifierBundle.nullish()),
-  /* 1 */ z.opaque(/* token */), /* "Q0FF" */
+  /* 1 */ z.opaque(/* short-term-rental marker: base64("CAE") = proto {1:1}; only on vacation-rental listings */), /* "Q0FF" */
 ]);
 
 export const AddressComponents = z.positional([
@@ -831,7 +831,7 @@ export const AddressComponents = z.positional([
 ]);
 
 export const StructuredAddressPart = z.positional([
-  /* 0 */ z.mapped("type", z.number()), /* 7 */
+  /* 0 */ z.mapped("type", z.number()), /* 7; 1 address w/o name (=PlaceNode[39]), 2 address with name (=[18]), 3 street in intl order (sponsored only), 4 locality line (=[166]), 5 local-script address (=[149]), 7 lines [postal/short name, ...PlaceNode[2]] */
   /* 1 */ z.mapped("values", z.array(z.array(z.string().nullish()).nullish())), /* [["Gundel Cafe Patisserie Restaurant"], ["Budapest"], ["Gundel Károly út 4"], ["1146"]] */
 ]);
 
@@ -1085,14 +1085,14 @@ export const PlaceNode = z.positional([
   /* 14 */ z.mapped("district", z.string().nullish()), /* "District XIV." */
   /* 15 */ z.unused(),
   /* 16 */ z.unused(),
-  /* 17 */ z.opaque(/* flag */), /* 1 */
+  /* 17 */ z.opaque(/* non-POI geocode flag */), /* 1 */
   /* 18 */ z.mapped("addressWithName", z.string().nullish()), /* "Budapest, Gundel Cafe Patisserie Restaurant, Gundel Károly út 4, 1146" */
   /* 19 */ z.unused(),
   /* 20 */ z.unused(),
   /* 21 */ z.unused(),
   /* 22 */ z.unused(),
   /* 23 */ z.opaque(/* flag */), /* 1 */
-  /* 24 */ z.opaque(/* single-element wrapper */), /* [[[[[2, null, null, null, null, [null, null, null, 0, 0], [null, null, null, 7, 0]], [2, null, null, null, null, [null, 30, 11], [null, 0, 22]]]]]] */
+  /* 24 */ z.opaque(/* structured weekly hours ranges (weekday range + hh:mm range); rich-result set only, redundant with [203] */), /* [[[[[2, null, null, null, null, [null, null, null, 0, 0], [null, null, null, 7, 0]], [2, null, null, null, null, [null, 30, 11], [null, 0, 22]]]]]] */
   /* 25 */ z.mapped("saveControl", SaveControl.nullish()),
   /* 26 */ z.unused(),
   /* 27 */ z.unused(),
@@ -1147,7 +1147,7 @@ export const PlaceNode = z.positional([
   /* 76 */ z.mapped("relatedTypes", z.array(RelatedTypeEntry.nullish()).nullish()),
   /* 77 */ z.unused(),
   /* 78 */ z.mapped("placeId", z.string().nullish()), /* "ChIJhzNeW4jbQUcRDpNeQSc81aA" */
-  /* 79 */ z.opaque(/* flag */), /* 1 */
+  /* 79 */ z.opaque(/* non-POI geocode flag */), /* 1 */
   /* 80 */ z.unused(),
   /* 81 */ z.unused(),
   /* 82 */ z.mapped("addressComponents", AddressComponents.nullish()),
@@ -1162,7 +1162,7 @@ export const PlaceNode = z.positional([
   /* 91 */ z.unused(),
   /* 92 */ z.unused(),
   /* 93 */ z.unused(),
-  /* 94 */ z.opaque(/* flag */), /* 1 */
+  /* 94 */ z.opaque(/* locality/country flag */), /* 1 */
   /* 95 */ z.unused(),
   /* 96 */ z.unused(),
   /* 97 */ z.unused(),
@@ -1177,7 +1177,7 @@ export const PlaceNode = z.positional([
   /* 106 */ z.unused(),
   /* 107 */ z.unused(),
   /* 108 */ z.unused(),
-  /* 109 */ z.opaque(/* flag */), /* 1 */
+  /* 109 */ z.opaque(/* non-POI geocode flag */), /* 1 */
   /* 110 */ z.mapped("nameLanguage", z.string().nullish()), /* "en" */
   /* 111 */ z.mapped("localNameLanguage", z.string().nullish()), /* "hu" */
   /* 112 */ z.mapped("translatedLanguageName", z.string().nullish()), /* "English" */
@@ -1189,14 +1189,14 @@ export const PlaceNode = z.positional([
   /* 118 */ z.mapped("mealHours", z.array(MealService.nullish()).nullish()), /* "More hours" groups: meals, Kitchen, Takeout, Delivery, Drive through, Happy hours, sub-departments */
   /* 119 */ z.mapped("entrance", EntranceLocation.nullish()),
   /* 120 */ z.opaque(/* menu */),
-  /* 121 */ z.opaque(/* flag */), /* 1 */
+  /* 121 */ z.opaque(/* local-name flag (only ever set with [101] localName) */), /* 1 */
   /* 122 */ z.opaque(/* owner posts / updates */), /* [["Gundel Cafe Patisserie Restaurant", "https://lh3.googleusercontent.com/-LzNCOr0ygq4/.../s40-c-k-mo/photo.jpg"], [[null, [[["Budapest's most iconic table is waiting for you. ", 1], ...]]]], 1] */
   /* 123 */ z.unused(),
   /* 124 */ z.unused(),
-  /* 125 */ z.opaque(/* services */), /* [[[null, [[["Hotel"], [[[["Costa Coffee", "We Proudly Serve Costa Coffee"], ["From AED 22.00"]], [["EV Charging Station", "Available for all in-house guests"], ["Free"]]]]]], null, null, 4]]] */
+  /* 125 */ z.opaque(/* business "Services" menu (offerings with descriptions/prices), not service options */), /* [[[null, [[["Hotel"], [[[["Costa Coffee", "We Proudly Serve Costa Coffee"], ["From AED 22.00"]], [["EV Charging Station", "Available for all in-house guests"], ["Free"]]]]]], null, null, 4]]] */
   /* 126 */ z.unused(),
   /* 127 */ z.unused(),
-  /* 128 */ z.opaque(/* flag */), /* 1 */
+  /* 128 */ z.opaque(/* locality/country flag */), /* [1] */
   /* 129 */ z.unused(),
   /* 130 */ z.opaque(/* flag */), /* 0 */
   /* 131 */ z.unused(),
@@ -1204,7 +1204,7 @@ export const PlaceNode = z.positional([
   /* 133 */ z.unused(),
   /* 134 */ z.mapped("affiliatedLink", AffiliatedLink.nullish()),
   /* 135 */ z.unused(),
-  /* 136 */ z.opaque(/* flag */), /* 1 */
+  /* 136 */ z.opaque(/* vertical flag (all pharmacies, coffee shops, supermarkets; few restaurants) */), /* 1 */
   /* 137 */ z.unused(),
   /* 138 */ z.unused(),
   /* 139 */ z.unused(),
@@ -1216,24 +1216,24 @@ export const PlaceNode = z.positional([
   /* 145 */ z.unused(),
   /* 146 */ z.opaque(/* constant marker */), /* [9] */
   /* 147 */ z.unused(),
-  /* 148 */ z.opaque(/* flag */), /* 1 */
+  /* 148 */ z.opaque(/* transit-station flag */), /* 1 */
   /* 149 */ z.mapped("localAddress", z.string().nullish()), /* "〒150-0031 東京都渋谷区桜丘町１−4 渋谷サクラステージ SHIBUYAサイド ４階" */
   /* 150 */ z.unused(),
   /* 151 */ z.unused(),
   /* 152 */ z.unused(),
-  /* 153 */ z.opaque(/* related topics */),
+  /* 153 */ z.opaque(/* review topics */), /* [[[[["CgsIPfL1i8s"], "pianist", null, [null, null, null, null, 211, 115, null, 101, 3, 1], ...]]] */
   /* 154 */ z.mapped("merchantDescription", MerchantDescription.nullish()), /* "From the business" text; single-place lookups only */
   /* 155 */ z.unused(),
   /* 156 */ z.unused(),
-  /* 157 */ z.mapped("logo", z.string().nullish()), /* "https://lh3.googleusercontent.com/-LzNCOr0ygq4/AAAAAAAAAAI/AAAAAAAAAAA/FdoZVpgjS44/s44-p-k-no-ns-nd/photo.jpg" */
+  /* 157 */ z.mapped("logo", z.string().nullish()), /* "https://lh3.googleusercontent.com/-LzNCOr0ygq4/AAAAAAAAAAI/AAAAAAAAAAA/FdoZVpgjS44/s44-p-k-no-ns-nd/photo.jpg"; Business Profile owner avatar (s44); present iff listingId/ownerGaiaId */
   /* 158 */ z.unused(),
   /* 159 */ z.unused(),
-  /* 160 */ z.opaque(/* single-element wrapper */), /* [1] */
+  /* 160 */ z.opaque(/* flag, meaning unknown */), /* [1] */
   /* 161 */ z.mapped("summary", LocationSummary.nullish()),
   /* 162 */ z.unused(),
   /* 163 */ z.unused(),
   /* 164 */ z.mapped("relatedSearch", RelatedSearch.nullish()),
-  /* 165 */ z.opaque(/* photo-source flag */), /* [1] */
+  /* 165 */ z.opaque(/* claimed-listing companion flag [0|1]: present iff [157] logo and [181] are, never with [49] claim link; value meaning unknown */), /* [1] */
   /* 166 */ z.mapped("locality", z.string().nullish()), /* "New York, NY"; display locality line (city + region/country when non-local); use structuredAddress.flat.city for the bare city */
   /* 167 */ z.unused(),
   /* 168 */ z.unused(),
@@ -1254,7 +1254,7 @@ export const PlaceNode = z.positional([
   /* 183 */ z.mapped("structuredAddress", StructuredAddress.nullish()),
   /* 184 */ z.unused(),
   /* 185 */ z.unused(),
-  /* 186 */ z.opaque(/* related */), /* [1, "0ahUKEwjcofbV0aqVAxVD4gIHHdn4M6UQyKAGCCUoEA", [["Lodging", [["0x60f0cfdefb89b549:0x7dac5195995d4d09"]], null, 17]]] */
+  /* 186 */ z.opaque(/* nearby categories */), /* [1, "0ahUKEwjcofbV0aqVAxVD4gIHHdn4M6UQyKAGCCUoEA", [["Lodging", [["0x60f0cfdefb89b549:0x7dac5195995d4d09"]], null, 17]]] */
   /* 187 */ z.unused(),
   /* 188 */ z.unused(),
   /* 189 */ z.unused(),
@@ -1273,16 +1273,16 @@ export const PlaceNode = z.positional([
   /* 202 */ z.unused(),
   /* 203 */ z.mapped("openingHours", OpeningHours.nullish()),
   /* 204 */ z.mapped("containedPlaces", ContainedPlaces.nullish().catch(null)),
-  /* 205 */ z.opaque(/* rank/tier */), /* 1 */
+  /* 205 */ z.opaque(/* vertical enum: 1 food&drink, 2 retail/services, 3 recreation, 4 grocery, 5 fuel, 6 parking */), /* 1 */
   /* 206 */ z.unused(),
   /* 207 */ z.unused(),
   /* 208 */ z.mapped("pin", PinLocation.nullish()),
-  /* 209 */ z.opaque(/* result token */), /* "CgZHdW5kZWySARRodW5nYXJpYW5fcmVzdGF1cmFudOABAA" */
+  /* 209 */ z.opaque(/* result token: base64 proto with the query and the primary gcid (field 18) */), /* "CgZHdW5kZWySARRodW5nYXJpYW5fcmVzdGF1cmFudOABAA" */
   /* 210 */ z.unused(),
   /* 211 */ z.unused(),
   /* 212 */ z.unused(),
   /* 213 */ z.unused(),
-  /* 214 */ z.opaque(/* rank/tier */), /* 1 */
+  /* 214 */ z.opaque(/* duplicate of [205] */), /* 1 */
   /* 215 */ z.unused(),
   /* 216 */ z.unused(),
   /* 217 */ z.unused(),
@@ -1297,7 +1297,7 @@ export const PlaceNode = z.positional([
   /* 226 */ z.mapped("claimSetupLink", ClaimLink.nullish()),
   /* 227 */ z.mapped("identifiers", Identifiers.nullish()),
   /* 228 */ z.unused(),
-  /* 229 */ z.opaque(/* directions */),
+  /* 229 */ z.opaque(/* travel-time rings */), /* ["2ahUKEw...", [[[2, [900, "15 min"]], [null, null, 48.8589777, 2.2934008], 1, null, 4.46e-8, "2ahUKEw..."], ...]] */
   /* 230 */ z.unused(),
   /* 231 */ z.unused(),
   /* 232 */ z.unused(),
@@ -1308,8 +1308,8 @@ export const PlaceNode = z.positional([
   /* 237 */ z.unused(),
   /* 238 */ z.unused(),
   /* 239 */ z.unused(),
-  /* 240 */ z.opaque(/* flag */), /* 1 */
-  /* 241 */ z.opaque(/* contribution policy */),
+  /* 240 */ z.opaque(/* locality/country flag */), /* 1 */
+  /* 241 */ z.opaque(/* contribution policy */), /* [[[1, ["Our policies do not permit contributions to this type of place.", "Posting is currently turned off", ...]]]] */
   /* 242 */ z.unused(),
   /* 243 */ z.mapped("country", z.string().nullish()), /* "HU" */
   /* 244 */ z.unused(),
@@ -1344,7 +1344,7 @@ export const ResultRow = z.positional([
   /* 7 */ z.unused(),
   /* 8 */ z.opaque(/* shared result token */), /* "dVZBaqarM8GC1fIPjrCbwAc" */
   /* 9 */ z.opaque(/* per-row ved token */), /* "0ahUKEwjmuZ7Mt6qVAxVBQVUIHQ7YBngQmBkIAigA" */
-  /* 10 */ z.opaque(/* header-row metadata */), /* ["restaurants", 0] */
+  /* 10 */ z.opaque(/* header row: [head term (may be null or the full query), lodging flag 0|1, optional lodging filter stub] */), /* ["hotels near paris", 1, [[null, null, []]]] */
   /* 11 */ z.unused(),
   /* 12 */ z.opaque(/* no-results row: [ved, "search on Google" href] */), /* ["2ahUKEwjKmN2y-M-XAxX7RPEDHZBWIhAQ42ooAHoECAMQAw", "/search?q=nonexistentplacexyzqq&hl=en&authuser=0"] */
   /* 13 */ z.unused(),
@@ -1583,7 +1583,7 @@ export const Response = z.positional([
   /* 32 */ z.unused(),
   /* 33 */ z.unused(),
   /* 34 */ z.unused(),
-  /* 35 */ z.opaque(/* continuation token */), /* "Q2dBd0Fn" */
+  /* 35 */ z.opaque(/* vertical token, same on every page (FR on lodging); not a continuation */), /* "Q2dBd0Fn" */
   /* 36 */ z.unused(),
   /* 37 */ z.opaque(/* metadata block */), /* [2, "Budapest, 1011", [["0ahUKEwjmuZ7Mt6qVAxVBQVUIHQ7YBngQjqADCMwLKCU", null, "0x4741dc1bf6cc22c1:0xb00c428e9fdf5d3", [null, null, 47.4979, 19.0402], "Budapest, 1011"]]] */
   /* 38 */ z.opaque(/* flag */), /* 0 */
