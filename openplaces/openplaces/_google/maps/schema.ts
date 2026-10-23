@@ -841,6 +841,17 @@ export const HotelClass = z.positional([
   /* 5 */ z.opaque(/* flag */), /* 1 */
 ]);
 
+// PlaceNode[260]: sponsored booking-partner offer on organic hotel cards; rare, ad-auction dependent
+export const PartnerOffer = z.positional([
+  /* 0 */ z.mapped("clickUrl", z.string().nullish()), /* "https://www.google.com/aclk?sa=L&ai=DChsSEwjdzeXf-8-XAxX_GQYAHWLjKt8YACICCAEQWRoCd3M&...&adurl=" */
+  /* 1 */ z.mapped("advertiser", z.string().nullish()), /* "Booking.com" */
+  /* 2 */ z.mapped("logo", z.string().nullish()), /* "https://tpc.googlesyndication.com/simgad/17528167228336897850" */
+  /* 3 */ z.opaque(/* about-this-ad disclosure */), /* [null, [["https://adssettings.google.com/aboutthisad?source=maps&reasons=...", null, null, null, null, null, 1, ["ata_theme", "dark"]]]] */
+  /* 4 */ z.mapped("cta", z.string().nullish()), /* "Book now" */
+  /* 5 */ z.mapped("priceText", z.string().nullish()), /* "46 829 HUF" */
+  /* 6 */ z.opaque(/* adview impression url */), /* "https://www.google.com/adview?skip=a&avs=..." */
+]);
+
 export const PlaceNode = z.positional([
   /* 0 */ z.opaque(/* session token */), /* "dVZBatecE4_-wPAPjOKogAQ" */
   /* 1 */ z.opaque(/* per-result ved token */), /* "0ahUKEwiXq_7Lt6qVAxUPPxAIHQwxCkAQ8BcIBSgA" */
@@ -893,7 +904,7 @@ export const PlaceNode = z.positional([
   /* 48 */ z.unused(),
   /* 49 */ z.mapped("claimLink", ClaimLink.nullish()),
   /* 50 */ z.unused(),
-  /* 51 */ z.opaque(/* data */), /* [null, null, null, "o0dBasudHr-vwPAPlb2vwQs", null, null, null, null, null, null, null, null, null, null, null, 1] */
+  /* 51 */ z.opaque(/* sponsored-card photo carousel: [Photo[] (same ids as [72]/[37]), null, null, ei token]; ad PlaceNodes only */), /* [[["CIABIhACsVHNo_sZDbdNizHtI--e", 99, 27, null, null, null, ["https://lh3.googleusercontent.com/grass-cs/...=k-no", "", [2214, 1476], [203, 100]], ...]], null, null, "8jrbas-0GNGF7NYP2oLwmAg"] */
   /* 52 */ z.unused(),
   /* 53 */ z.unused(),
   /* 54 */ z.unused(),
@@ -1102,6 +1113,7 @@ export const PlaceNode = z.positional([
   /* 257 */ z.unused(),
   /* 258 */ z.opaque(/* flag */), /* 1 */
   /* 259 */ z.opaque(/* flag */), /* 0 */
+  /* 260 */ z.mapped("partnerOffer", PartnerOffer.nullish().catch(null)),
 ]);
 
 export type PlaceNode = z.infer<typeof PlaceNode>;
@@ -1133,23 +1145,62 @@ export const HotelAdEntry = z.positional([
   /* 4 */ z.opaque(/* flag */), /* 1 */
 ]);
 
+export const AdDisclosure = z.positional([
+  /* 0 */ z.mapped("advertiserDomain", z.string().nullish()), /* "makosguba.hu" */
+  /* 1 */ z.opaque(/* why-this-ad sentence (promoted pins only) */), /* "This ad was shown to you based on the map location you're browsing" */
+  /* 2 */ z.opaque(/* flag */), /* 0 */
+  /* 3 */ z.mapped("reasons", z.array(z.array(z.string().nullish()).nullish()).nullish()), /* [["This ad is based on:"], ["Your current search terms"], ["Google's estimation of your approximate current location"]] */
+  /* 4 */ z.mapped("settingsUrl", z.string().nullish()), /* "https://www.google.com/settings/ads/preferences"; ads only */
+  /* 5 */ z.mapped("businessName", z.string().nullish()), /* "Mákos Guba Restaurant - Budavár" */
+]);
+
 export const AdEntry = z.positional([
-  /* 0 */ z.mapped("tagline", z.string().nullish()), /* "Budapest’s award‑winning Neapolitan pizzas promise an unforgettable culinary experience." */
-  /* 1 */ z.opaque(/* unknown */), /* 1 */
-  /* 2 */ z.opaque(/* unknown */), /* "Visit Site" */
-  /* 3 */ z.opaque(/* unknown */), /* "business.google.com" */
-  /* 4 */ z.opaque(/* unknown */), /* "/aclk?sa=L&ai=DChsSEwiFoaPMt6qVAxUOUpEFHd12AGIYACICCAEQJxoCbHI&co=1&ase=2&gclid=EAIaIgocChMIhaGjzLeqlQMVDlKRBR3ddgBiEBAYASDIARIC1kHw_wcB&cce=2&category=acrcp_v1_32&sig=AOD64_3TMu388ivv5uCFCOPSi9HzbgmWRw&adurl&lsa=CBAQARgBIhMI5rmezLeqlQMVQUFVCB0O2AZ4KAE&ei=dVZBaqarM8GC1fIPjrCbwAc&rct=j&bp=1&bps=1" */
-  /* 5 */ z.opaque(/* unknown */), /* 1 */
-  /* 6 */ z.opaque(/* unknown */), /* 1 */
-  /* 7 */ z.opaque(/* unknown */), /* 1 */
-  /* 8 */ z.opaque(/* unknown */), /* 1 */
-  /* 9 */ z.opaque(/* unknown */), /* "dVZBaqarM8GC1fIPjrCbwAc" */
-  /* 10 */ z.opaque(/* unknown */), /* "0ahUKEwjmuZ7Mt6qVAxVBQVUIHQ7YBngQkRoI3gooFQ" */
-  /* 11 */ z.opaque(/* unknown */), /* 1 */
-  /* 12 */ z.opaque(/* unknown */), /* 1 */
-  /* 13 */ z.opaque(/* unknown */), /* 1 */
-  /* 14 */ z.opaque(/* unknown */), /* 1 */
+  /* 0 */ z.mapped("tagline", z.string().nullish()), /* "Budapest’s award‑winning Neapolitan pizzas promise an unforgettable culinary experience."; HTML (&amp;, <b>); null when the ad has no promo box */
+  /* 1 */ z.unused(),
+  /* 2 */ z.mapped("cta", z.string().nullish()), /* "Visit Site" */
+  /* 3 */ z.mapped("displayUrl", z.string().nullish()), /* "makosguba.hu" */
+  /* 4 */ z.mapped("clickUrl", z.string().nullish()), /* "/aclk?sa=L&ai=DChsSEwjd3tqB-8-XAxX8qIMHHaaxIO0YACICCAEQPxoCZWY&co=1&ase=2&gclid=...&adurl&lsa=...&ei=8jrbas-0GNGF7NYP2oLwmAg&rct=j&bp=1&bps=1" */
+  /* 5 */ z.opaque(/* map pin for this ad: [[[blockId, position, 0, 0, null, clickUrl], coordinates, name, teaser, ..., featureId@9, ..., headline@12], ..., pinClickUrl@8, ved@10, 7811@11] */), /* [[[[1, 0, 0, 0, null, "/aclk?..."], [null, null, 47.492162, 19.056549], "Traditional Goulash & Langosh Bar by Bonnie", ...]]] */
+  /* 6 */ z.opaque(/* flag */), /* 1 */
+  /* 7 */ z.unused(),
+  /* 8 */ z.unused(),
+  /* 9 */ z.opaque(/* shared result token (= Response[7]) */), /* "dVZBaqarM8GC1fIPjrCbwAc" */
+  /* 10 */ z.opaque(/* per-ad ved token */), /* "0ahUKEwjmuZ7Mt6qVAxVBQVUIHQ7YBngQkRoI3gooFQ" */
+  /* 11 */ z.unused(),
+  /* 12 */ z.unused(),
+  /* 13 */ z.unused(),
+  /* 14 */ z.unused(),
   /* 15 */ z.mapped("place", PlaceNode.nullish()),
+  /* 16 */ z.unused(),
+  /* 17 */ z.opaque(/* flag */), /* 0 */
+  /* 18 */ z.unused(),
+  /* 19 */ z.unused(),
+  /* 20 */ z.mapped("headline", z.string().nullish()), /* "Skip the Waiting List" */
+  /* 21 */ z.mapped("disclosure", AdDisclosure.nullish()),
+  /* 22 */ z.opaque(/* tracked click (ctype=99) */), /* "/aclk?sa=L&ai=...&adurl&q&ctype=99" */
+  /* 23 */ z.opaque(/* tracked click (bp=1&bps=1), call-tracking ads only */), /* "https://www.google.com/aclk?sa=L&ai=...&adurl=&bp=1&bps=1" */
+  /* 24 */ z.opaque(/* call-tracked click */), /* "https://www.google.com/aclk?sa=L&ai=...&adurl=&bp=1&label=local_ad_ps_call_tracked_click" */
+  /* 25 */ z.unused(),
+  /* 26 */ z.unused(),
+  /* 27 */ z.opaque(/* promo-box click */), /* "/aclk?sa=L&ai=...&adurl=&rct=j" */
+  /* 28 */ z.opaque(/* promo-box format code */), /* 2 */
+  /* 29 */ z.unused(),
+  /* 30 */ z.unused(),
+  /* 31 */ z.opaque(/* promo-box creative click (label=free_ps_creative) */), /* "/aclk?sa=L&ai=...&adurl&rct=j&bp=1&label=free_ps_creative" */
+  /* 32 */ z.unused(),
+  /* 33 */ z.unused(),
+  /* 34 */ z.mapped("advertiser", z.string().nullish()), /* "By The J.M. Smucker Company"; only when the advertiser is not the place */
+  /* 35 */ z.mapped("advertiserIsPlace", z.number().nullish()), /* 1 */
+  /* 36 */ z.unused(),
+  /* 37 */ z.opaque(/* "About this ad" link: [null, [[aboutThisAdUrl]]] */), /* [null, [["https://adssettings.google.com/aboutthisad?source=maps&reasons=...&hl=en&opi=79508299"]]] */
+  /* 38 */ z.unused(),
+  /* 39 */ z.opaque(/* absolute tracked click (aclk, adurl empty); exact UI action unverified */), /* "https://www.google.com/aclk?sa=L&ai=...&adurl=" */
+  /* 40 */ z.unused(),
+  /* 41 */ z.unused(),
+  /* 42 */ z.opaque(/* flag */), /* 0 */
+  /* 43 */ z.unused(),
+  /* 44 */ z.unused(),
+  /* 45 */ z.mapped("aiGenerated", z.number().nullish()), /* 1; card shows an "AI" badge (n=2) */
 ]);
 
 export const ResultTimezone = z.positional([
@@ -1197,8 +1248,57 @@ export const Viewport = z.positional([
   /* 3 */ z.mapped("fieldOfView", z.number().nullish()), /* 13.1 */
 ]);
 
+export const PromotedPinLabel = z.positional([
+  /* 0 */ z.mapped("coordinates", Coordinates.nullish()),
+  /* 1 */ z.opaque(/* logo image */), /* "https://tpc.googlesyndication.com/simgad/.../composite_map_square_logo_v2" */
+  /* 2 */ z.opaque(/* logo size variants */),
+  /* 3 */ z.mapped("headline", z.array(z.string().nullish()).nullish()), /* ["Good Restaurant in Budapest"] */
+  /* 4 */ z.unused(),
+  /* 5 */ z.opaque(/* flag */), /* 1 */
+  /* 6 */ z.mapped("rating", z.number().nullish()), /* 4.8 */
+]);
+
+export const PromotedPinCreative = z.positional([
+  /* 0 */ z.opaque(/* creative image */), /* "https://tpc.googlesyndication.com/simgad/3654712028956864740" */
+  /* 1 */ z.unused(),
+  /* 2 */ z.unused(),
+  /* 3 */ z.unused(),
+  /* 4 */ z.mapped("clickUrl", z.string().nullish()), /* "https://www.google.com/aclk?sa=L&ai=...&adurl&ved=0EO2PAg" */
+  /* 5 */ z.mapped("displayUrl", z.string().nullish()), /* "www.makosguba.hu/" */
+  /* 6 */ z.unused(),
+  /* 7 */ z.mapped("lines", z.array(z.string().nullish()).nullish()), /* ["Good Restaurant in Budapest", "Where tradition is style. ...", "Visit Site"] */
+  /* 8 */ z.unused(),
+  /* 9 */ z.opaque(/* tour/booking offer: [badge, price, reviewCount, rating, reviewLabel] */), /* ["Free cancellation", "26 900 HUF", 1567, 4.94, "1k+"] */
+]);
+
+export const PromotedPin = z.positional([
+  /* 0 */ z.mapped("featureId", z.string().nullish()), /* "0x4741dd0067c07c27:0x17279910b3d4d035" */
+  /* 1 */ z.mapped("name", z.string().nullish()), /* "Mákos Guba Restaurant - Bazilika" */
+  /* 2 */ z.mapped("label", PromotedPinLabel.nullish()),
+  /* 3 */ z.mapped("creative", PromotedPinCreative.nullish()),
+  /* 4 */ z.opaque(/* adview + click tracking URLs */), /* ["https://www.google.com/adview?skip=a&avs=...", "https://www.google.com/aclk?...", null, null, "https://www.google.com/aclk?...&label=free_ps_website..."] */
+  /* 5 */ z.mapped("disclosure", AdDisclosure.nullish()),
+  /* 6 */ z.opaque(/* pin style */), /* [16383, 0, null, null, [177, 115, 1469, 179, 248], 0, 1] */
+  /* 7 */ z.unused(),
+  /* 8 */ z.opaque(/* pin icon/category code */), /* 6 */
+  /* 9 */ z.unused(),
+  /* 10 */ z.unused(),
+  /* 11 */ z.opaque(/* flag */), /* 0 */
+  /* 12 */ z.unused(),
+  /* 13 */ z.opaque(/* "About this ad" link */), /* [null, [["https://adssettings.google.com/aboutthisad?source=maps&reasons=..."]]] */
+  /* 14 */ z.mapped("advertiser", z.string().nullish()), /* "By GetYourGuide" */
+  /* 15 */ z.mapped("advertiserIsPlace", z.number().nullish()), /* 1 */
+  /* 16 */ z.opaque(/* format codes */), /* [[2], [1]] */
+]);
+
+// AdsSection[11]: map-only "promoted pins"; not list cards (no placeId, address, hours)
+export const PromotedPins = z.positional([
+  /* 0 */ z.mapped("pins", z.array(PromotedPin.nullish().catch(null)).nullish()),
+  /* 1 */ z.opaque(/* pin render config (len 41) */), /* [0, 10, null, 1, "https://www.google.com/settings/ads/preferences", null, 32, 40, 27, 30, "https://www.gstatic.com/maps/promotions/promotedpins/square_bg_transparent.png", ...] */
+]);
+
 export const AdsSection = z.positional([
-  /* 0 */ z.opaque(/* ad request id */), /* 1216951176 */
+  /* 0 */ z.opaque(/* ad block id: random int32 with our pb, 1-based page counter with the web-app pb; = AdEntry[5][0][0][0][0] */), /* 1216951176 */
   /* 1 */ z.mapped("ads", z.array(z.array(AdEntry.nullish().catch(null)).nullish()).nullish()),
   /* 2 */ z.unused(),
   /* 3 */ z.unused(),
@@ -1209,7 +1309,11 @@ export const AdsSection = z.positional([
   /* 8 */ z.unused(),
   /* 9 */ z.unused(),
   /* 10 */ z.unused(),
-  /* 11 */ z.mapped("renderConfig", z.unknown().nullish()),
+  /* 11 */ z.mapped("promotedPins", PromotedPins.nullish().catch(null)),
+  /* 12 */ z.unused(),
+  /* 13 */ z.unused(),
+  /* 14 */ z.unused(),
+  /* 15 */ z.opaque(/* booking-offer index keyed by signed CID, duplicates PlaceNode[260] */), /* [[["1951655465534962032", ["https://www.google.com/aclk?...", "Booking.com", ..., "Book now", "25 232 HUF", ...]]]] */
 ]);
 
 export const Response = z.positional([
