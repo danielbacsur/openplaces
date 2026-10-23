@@ -16,9 +16,9 @@
         "$TURBO_DEFAULT$",
         "openplaces/**",
         "openplaces-atlas/**",
+        "openplaces-atlas-web/**",
         "openplaces-docs/**",
-        "openplaces-mcp/**",
-        "openplaces-website/**"
+        "openplaces-mcp/**"
       ],
       "outputs": []
     }
