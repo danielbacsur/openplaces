@@ -555,8 +555,8 @@ export const ActionsUrlInner = z.positional([
   /* 0 */ z.mapped("url", z.string().nullish()), /* "https://gundel.hu/asztalfoglalas/" */
   /* 1 */ z.unused(),
   /* 2 */ z.unused(),
-  /* 3 */ z.opaque(/* ved / tracking token */), /* "0ahUKEwjIoomByaqVAxWXFRAIHWamE3AQtxwIogQoAA" */
-  /* 4 */ z.opaque(/* tracking / ved token */), /* ",AOvVaw3g-NRU_1JZ6vcU_Cnu9Aga,,0ahUKEwiXq_7Lt6qVAxUPPxAIHQwxCkAQtxwIVSgA," */
+  /* 3 */ z.opaque(/* ved token; only on length-4 inners of google.com/maps/reserve/appt buttons */), /* "0ahUKEwjIoomByaqVAxWXFRAIHWamE3AQtxwIogQoAA" */
+  /* 4 */ z.opaque(/* ",AOvVaw...,,<ved>," usg + ved click-tracking */), /* ",AOvVaw3g-NRU_1JZ6vcU_Cnu9Aga,,0ahUKEwiXq_7Lt6qVAxUPPxAIHQwxCkAQtxwIVSgA," */
 ]);
 
 export const ActionsUrl = z.positional([
@@ -576,19 +576,42 @@ export const ActionsProviderEntry = z.positional([
   /* 2 */ z.opaque(/* flag */), /* 1 */
 ]);
 
+export const ActionsOrderMode = z.positional([
+  /* 0 */ z.mapped("mode", z.number()), /* 1; 1 delivery, 2 pickup */
+]);
+
+export const ActionsOrderDetails = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.mapped("modes", z.array(ActionsOrderMode.nullish()).nullish()), /* [[1], [2]] */
+  /* 2 */ z.unused(),
+  /* 3 */ z.unused(),
+  /* 4 */ z.unused(),
+  /* 5 */ z.opaque(/* constant */), /* 4 */
+  /* 6 */ z.unused(),
+  /* 7 */ z.opaque(/* small count, 1-14; likely ordering partners behind searchviewer */), /* 2 */
+]);
+
+export const ActionsOrder = z.positional([
+  /* 0 */ z.unused(),
+  /* 1 */ z.mapped("details", ActionsOrderDetails.nullish()),
+  /* 2 */ z.unused(),
+  /* 3 */ z.unused(),
+  /* 4 */ z.opaque(/* constant */), /* 4 */
+]);
+
 export const ActionsReserve = z.positional([
-  /* 0 */ z.mapped("label", z.string()), /* "Reserve a table" */
+  /* 0 */ z.mapped("label", z.string()), /* "Reserve a table"; button text; "Order online" / "Book online" / "Join waitlist" for other types */
   /* 1 */ z.mapped("link", ActionsLink),
-  /* 2 */ z.opaque(/* flag */), /* 0 */
-  /* 3 */ z.opaque(/* flag */), /* 64 */
+  /* 2 */ z.opaque(/* 1 only on type 1/6 Google reserve buttons whose ActionsList has no providers; always 0 on type 3/4 */), /* 0 */
+  /* 3 */ z.opaque(/* action category bitmask: 64 reserve/book, 32 order, 16 waitlist */), /* 64 */
   /* 4 */ z.opaque(/* UI element id per action type: 41902 reserve, 41901 order, 155425/181470 book, 67116 waitlist */), /* 41902 */
   /* 5 */ z.unused(),
   /* 6 */ z.unused(),
-  /* 7 */ z.mapped("labelAlt", z.string().nullish()), /* "Reserve a table" */
+  /* 7 */ z.mapped("labelAlt", z.string().nullish()), /* "Reserve a table"; accessible label; null on waitlist */
   /* 8 */ z.unused(),
   /* 9 */ z.opaque(/* ved / tracking token */), /* "0ahUKEwiXq_7Lt6qVAxUPPxAIHQwxCkAQrscCCFYoAQ" */
   /* 10 */ z.mapped("shortLabel", z.string()), /* "Reserve" */
-  /* 11 */ z.unused(),
+  /* 11 */ z.mapped("order", ActionsOrder.nullish()), /* [null, [null, [[1], [2]], null, null, null, 4, null, 2], null, null, 4] */
   /* 12 */ z.opaque(/* flag */), /* 0 */
   /* 13 */ z.unused(),
   /* 14 */ z.unused(),
@@ -599,16 +622,21 @@ export const ActionsReserve = z.positional([
   /* 19 */ z.unused(),
   /* 20 */ z.unused(),
   /* 21 */ z.opaque(/* flag */), /* 0 */
+  /* 22 */ z.unused(),
+  /* 23 */ z.opaque(/* appointment booking kind: [1] partner page, [null, 1] Google /maps/reserve/appt */), /* [1] */
+  /* 24 */ z.mapped("provider", ActionsProvider.nullish()), /* ["Zocdoc", null, ["https://lh3.googleusercontent.com/...", "Zocdoc", [80, 80]], 20003046] */
+  /* 25 */ z.unused(),
+  /* 26 */ z.opaque(/* waitlist flag */), /* [0] */
 ]);
 
 export const ActionsList = z.positional([
-  /* 0 */ z.mapped("type", z.number()), /* 1 */
+  /* 0 */ z.mapped("type", z.number()), /* 1; 1 reserve a table, 3 book appointment, 4 order online, 6 join waitlist */
   /* 1 */ z.unused(),
   /* 2 */ z.mapped("providers", z.array(ActionsProviderEntry.nullish()).nullish()),
   /* 3 */ z.unused(),
-  /* 4 */ z.mapped("enum", z.number()), /* 21631 */
+  /* 4 */ z.mapped("enum", z.number()), /* 21631; 1:1 with type: 21631 reserve, 21633 book, 21634 order, 21565 waitlist */
   /* 5 */ z.mapped("reserve", ActionsReserve.nullish()),
-  /* 6 */ z.opaque(/* flag */), /* 1 */
+  /* 6 */ z.opaque(/* reserve-with-Google flag: 1 on type 1/6 lists whose [5] button is a google.com/maps/reserve/v/(dine|waitlist) URL */), /* 1 */
   /* 7 */ z.unused(),
   /* 8 */ z.opaque(/* flag */), /* 0 */
 ]);
@@ -1021,7 +1049,7 @@ export const PlaceNode = z.positional([
   /* 43 */ z.unused(),
   /* 44 */ z.unused(),
   /* 45 */ z.unused(),
-  /* 46 */ z.mapped("reserve", z.array(Website.nullish()).nullish()),
+  /* 46 */ z.mapped("reserve", z.array(Website.nullish()).nullish()), /* reservation links = ActionsList type-1 providers[*]; null when only the Reserve-with-Google button exists */
   /* 47 */ z.unused(),
   /* 48 */ z.unused(),
   /* 49 */ z.mapped("claimLink", ClaimLink.nullish()),
